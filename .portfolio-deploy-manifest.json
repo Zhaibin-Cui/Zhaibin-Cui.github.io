@@ -6,9 +6,29 @@
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "app.js": {
-      "bytes": 28097,
-      "git_blob_sha1": "40754962b91cd58204c5512e36784caeca867f31",
-      "sha256": "5e6e0b96ede3155d346c08bb4f469e14e896a451667294ba83436e2ab93e8ff3"
+      "bytes": 25907,
+      "git_blob_sha1": "83124ac76dd5926d25cd74338528f56374364981",
+      "sha256": "1c080a261e9a4af46afcdb9b533286b64e6ae104ce95d34209e5aaf9932615f3"
+    },
+    "assets/affiliations/iiis.png": {
+      "bytes": 19701,
+      "git_blob_sha1": "108e4029858227021800e5ef05c31070feddaead",
+      "sha256": "727dc03866fb93c80eaf73b80b525fdf1d75dfc402c402042f188236c271dc82"
+    },
+    "assets/affiliations/minimax.webp": {
+      "bytes": 7122,
+      "git_blob_sha1": "af8b7edbb4a2951ce32f229f7d23703b5eb9064c",
+      "sha256": "7459aaaecb55eeb47c9a754ecc4c982a469d73f783084adc044d538cb4e593c5"
+    },
+    "assets/affiliations/tsinghua.jpg": {
+      "bytes": 98663,
+      "git_blob_sha1": "d040c3238cfa807226c39fb2dfb09aa910958ca1",
+      "sha256": "5bba2316fe2a231b67c1de13e9c3229db963c81ade4eb5a747813e60ba8d8197"
+    },
+    "assets/affiliations/ustc.svg": {
+      "bytes": 200991,
+      "git_blob_sha1": "5bab4a81e3479aa6ab67893cf4e7d5694763ce8a",
+      "sha256": "39d2d180e96f33160d1684665699d67fa54494f9a37fd716225767a14effc726"
     },
     "assets/ai/minitrain-readout-first.png": {
       "bytes": 174604,
@@ -80,10 +100,15 @@
       "git_blob_sha1": "8ef82972d5f9d8cb1f4183bde6b8fa0861de074f",
       "sha256": "3b311d841b0c3f6c4fe1ca7cc006b0beabfa8fe3af54431544f1059161c323ff"
     },
+    "assets/editorial/field-poster.svg": {
+      "bytes": 436441,
+      "git_blob_sha1": "5a2fe3d1dd6ef019efc568db9b72d824703122e7",
+      "sha256": "c8f00c073c397ad4e646e8004a0a40782c8c71c03e0c06ef7fd020a817ec4ba8"
+    },
     "assets/editorial/harness-cover.svg": {
-      "bytes": 4773,
-      "git_blob_sha1": "032f4deebccc996fc6f8ac62c0292141e9053f06",
-      "sha256": "cea7ce8704a67a5f125724d00d3457c8e514083a132b3cc444668c949898e8d4"
+      "bytes": 4777,
+      "git_blob_sha1": "d4a07bf3f83614bdfc5ea3db446deb09d909f26e",
+      "sha256": "a8168c591afa3f79a01f28944116a3c83191dea90c94a30e72f5bbbc6d5628d9"
     },
     "assets/editorial/ion-trap-camera.png": {
       "bytes": 4266084,
@@ -105,10 +130,20 @@
       "git_blob_sha1": "9061d2a2de8af062cb95a9ce0768ebd109308710",
       "sha256": "6faa572daf578cda588c840a3bc57c9dfc6a46f4300e8ba99d979b45510d4939"
     },
+    "assets/editorial/quantum-network-overall.svg": {
+      "bytes": 6193,
+      "git_blob_sha1": "6068897109f07f0ae8f25057cd041a48fef44c8d",
+      "sha256": "3205e655b95629fdf4ba87586919f2fd912a7b3cc43c10f0d59727f35680dd78"
+    },
     "assets/editorial/quctrl-control-rack.jpg": {
       "bytes": 724943,
       "git_blob_sha1": "9f648dde4ad0eacaaf0d92f95877a8e529a749c2",
       "sha256": "f938d60a13921d5c0df577eaa069c4c67fa346b3e56c883143290dae096191a6"
+    },
+    "assets/editorial/representation-field.svg": {
+      "bytes": 22214,
+      "git_blob_sha1": "f74d9a109273e0e51a743a16da13fc18dfa1a6fe",
+      "sha256": "21729b5aaae557463385708c0cd38d27fa7dd3729634ea6570e321a99541232f"
     },
     "assets/editorial/scaling-ladder.svg": {
       "bytes": 4486,
@@ -116,9 +151,9 @@
       "sha256": "919f3befd6bf3d203f572bc5be61c6c9d5de2b7948211a2352067ea07733e8d9"
     },
     "assets/editorial/scaling-law.svg": {
-      "bytes": 3267,
-      "git_blob_sha1": "7d2d7f635b77d299c91f29f638ebb6779e9212d9",
-      "sha256": "6313ddc2651623b5e4587376a0fcdc0ea35d235f57fbec969a134d29824357db"
+      "bytes": 5812,
+      "git_blob_sha1": "b7d8c6c458268aa7dfcc9fac2a8cf5b684cc1332",
+      "sha256": "cf4fb6bff2b16b8abfc179be54ffcfc5e84bed1af0ba6643a054b0b88b205116"
     },
     "assets/editorial/vacuum-window-assembly.jpg": {
       "bytes": 139619,
@@ -130,20 +165,30 @@
       "git_blob_sha1": "1c9f43281b8f216c5461fe9ac729afbade7724e4",
       "sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9"
     },
+    "assets/fonts/SpaceGrotesk-OFL.txt": {
+      "bytes": 4495,
+      "git_blob_sha1": "cb512b9af44ff61e75e1aad387b7424cdfab36a3",
+      "sha256": "564ce565c371c5e5bbf286006565a7c9aa55a9f56e7ca58d56e05d649dd61a72"
+    },
     "assets/fonts/research-sans.woff2": {
-      "bytes": 267452,
-      "git_blob_sha1": "c1718bef739858dc2b71bd0429d42546140db4c7",
-      "sha256": "8e9e9f75762280254ab3ee72336f1a2d1f26f81894793515970081a752842f9c"
+      "bytes": 279564,
+      "git_blob_sha1": "462ae3e7467db94dde34122bfb94a3e9d8acb0d3",
+      "sha256": "0270357976003a6a5a7a2bfc17a5422801d2b9107fd6390adfc30393513a3213"
+    },
+    "assets/fonts/space-grotesk.woff2": {
+      "bytes": 26952,
+      "git_blob_sha1": "a864757eb5aff071f5346e90d3932e797a092292",
+      "sha256": "01a1140af348d2252d20bae95f77cc1e04ac469732999d72880c13d65b9df50d"
     },
     "assets/harness/architecture.svg": {
-      "bytes": 4526,
-      "git_blob_sha1": "a9a6d19c3bfba184d2e93e6fca3cb47708007364",
-      "sha256": "d91af8ab01e5eb87c5d541b53c490ec1c49c1d7b43490bfd2fda89daa33acf62"
+      "bytes": 4603,
+      "git_blob_sha1": "90f05df71e94a852d8814f89dfead8d3a1267659",
+      "sha256": "28e291651492f26f64e1fd0a31cf245cad5fda6b316b6c4dc7fe9df798a0462e"
     },
-    "assets/harness/sanitized-mobile.png": {
-      "bytes": 1409205,
-      "git_blob_sha1": "43554fde5ee5a3a93cc1f08f0053fe7c3c0f2817",
-      "sha256": "88bdeae2cba3830e5da892cf36011e170c336850e771eed8abee8293b96c2a52"
+    "assets/harness/mobile-workspace.svg": {
+      "bytes": 4487,
+      "git_blob_sha1": "40a88edc063c4c29b6a142ef35cb3e2dc74381a9",
+      "sha256": "661acc65e1229afb308b93756d53b930f638afe66ee52a659c8930931da210d9"
     },
     "assets/previews/ion-trap-camera.webp": {
       "bytes": 1798024,
@@ -185,11 +230,6 @@
       "git_blob_sha1": "06c3eefe4112ea159b4d6db19614c7e740c31074",
       "sha256": "1fe0150f7ec2f987a9fdd9cada1d69264dd44e5c9bfb74097e065ff390ba97c2"
     },
-    "assets/previews/sanitized-mobile.webp": {
-      "bytes": 86310,
-      "git_blob_sha1": "ad5f413a6a41546b6b77d16751698ed8a3eff1e2",
-      "sha256": "2cfb5989d9c531904261e457cc24f067db8cb3ad6340644da399eb96f6951b43"
-    },
     "assets/profile/portrait.jpg": {
       "bytes": 398375,
       "git_blob_sha1": "ca394c866d92fdfe297c947f22b744a447623b95",
@@ -219,6 +259,16 @@
       "bytes": 301782,
       "git_blob_sha1": "bfc88c512db086b9e83def85373d3b3631e46eb6",
       "sha256": "cc4a061db30479e2acd7ef93088b0c072da4e274f3e0ea3d419ed7d64914172e"
+    },
+    "assets/quantum/control-calibration.png": {
+      "bytes": 139843,
+      "git_blob_sha1": "c3d25690211753476525308242b6590ba78cf03a",
+      "sha256": "06730bbca4b7d3784e764548fcf348f6493eb8a2f077d62e76a4e22647cd1b06"
+    },
+    "assets/quantum/control-ion-imaging.png": {
+      "bytes": 22095,
+      "git_blob_sha1": "b9fbb159aa4d84672809794769a9d989e62e9b69",
+      "sha256": "f6633c30342315e1f86e3935aeb2b83122d75eb338927446dbddb151a36f6cb5"
     },
     "assets/quantum/control-ui.webp": {
       "bytes": 456112,
@@ -250,10 +300,20 @@
       "git_blob_sha1": "f11a4092402f50364612e7b601497b30315f1d8a",
       "sha256": "9afba1f18e8a66c7c6c4a3cacd40b402c6e2f7e3adfa630fdab69f14e7dfa891"
     },
+    "assets/quantum/news-quantumchina-header.png": {
+      "bytes": 68880,
+      "git_blob_sha1": "dcc57836b12082b05dda41a9f08d5b7b7b645b40",
+      "sha256": "018be7025ee59f3a22db263d134c829e3bfc2292e735a42cfebba170c20b1c36"
+    },
     "assets/quantum/pcb-layout.webp": {
       "bytes": 164126,
       "git_blob_sha1": "4aa6dcae96d07af5d7993e4ae82c8bd7c8c730dc",
       "sha256": "ebef7cc54a69efea1840c6b51b44313065beccd14a6a724be98af4b6ca082560"
+    },
+    "assets/quantum/quantum-network-keyvisual.png": {
+      "bytes": 2806666,
+      "git_blob_sha1": "19fac5dcd2cb7c8e0c26dcdb49bbfcb07a96645e",
+      "sha256": "3fdab0470d3a51fa7ff458d7a18ed9c017c45c5e04f7ecc73600cc48e39373c7"
     },
     "assets/quantum/quctrl-compiler.webp": {
       "bytes": 319588,
@@ -270,20 +330,90 @@
       "git_blob_sha1": "49d0ef8881cec36aa7be32f4b283f1975ee891e0",
       "sha256": "ee51e54d76f1a93ce881f58dd225502bc8476b19e4f7e5783a8d5b7c3b31dd96"
     },
+    "assets/social/harness.png": {
+      "bytes": 118973,
+      "git_blob_sha1": "4463ab520a33926f735b362c9b0e7f259832c216",
+      "sha256": "55adc31de69eeb1b2c09327dd41194a654e8924ec137eaa3a797f2fdae2d82df"
+    },
+    "assets/social/minimax.png": {
+      "bytes": 94797,
+      "git_blob_sha1": "64a4a428c183aa476b308096bf3d38f0b889cc69",
+      "sha256": "96ca1a22137dc77b193ff208216363f538cb6ee95354f86764ff9ad926b159d8"
+    },
+    "assets/social/minitrainsys.png": {
+      "bytes": 84751,
+      "git_blob_sha1": "cb3a50df61b13ebc7a762aeaf2565dcf8c4f3368",
+      "sha256": "7e93696eee0e8a1aa75f0f3aa7d3097cd38c58d05a8c0e2a84e99992bb1d1440"
+    },
+    "assets/social/quantum-control.png": {
+      "bytes": 533799,
+      "git_blob_sha1": "320bceaa165fd15afa8db78424972f6e1d64d250",
+      "sha256": "130ef639e27cea1fca69b999fdc010adf4aa9ff2c2905d2bf2a902c77ef539e2"
+    },
     "favicon.svg": {
       "bytes": 285,
       "git_blob_sha1": "93c70fb1bf8746e84f5e51dceea896cfe31592c7",
       "sha256": "453b67597064daee5c3960be5345afb6048ce734407c947c00a0ce98b257dca3"
     },
+    "field.js": {
+      "bytes": 13457,
+      "git_blob_sha1": "f9d5d196c4b3501cee3fb864cbc57136bdf39b69",
+      "sha256": "34de65b3ee2cde0b05d4e2ad86ae066a463cb7bfc64c115fdfe4616d3b88a74e"
+    },
     "index.html": {
-      "bytes": 53571,
-      "git_blob_sha1": "c3d79b2c691ffbe2e9196a01139ed379574d3084",
-      "sha256": "a6125704873ad6f173d2eeabb8c8d261b75dcedc846e567f29aceb7d30f8a4cb"
+      "bytes": 78011,
+      "git_blob_sha1": "7f55b5eae3fd2c5f894885fc688200003bd28b3b",
+      "sha256": "a810139183a4b6f2b4e1aa9a1999a600e6360166fdcf72a6f37320140d903306"
+    },
+    "materials/bell-feedforward-manuscript.pdf": {
+      "bytes": 2940481,
+      "git_blob_sha1": "d289c0019c06d6c5807c62f8a0fd17f1f3a4b012",
+      "sha256": "d5eafbf11063dc38d238519fba6bab82f8bc7adc1275c35cc2db62503360e785"
+    },
+    "materials/bell-feedforward-preview.png": {
+      "bytes": 370768,
+      "git_blob_sha1": "03bfec98e0388486e6b00d3e33034fa0c975ff78",
+      "sha256": "70f61f54e560d191e81fb4c2e111b6b9987dbb9f04609f6c18f4f640e4fbcfa4"
+    },
+    "materials/hybrid-multiplexing-nature-communications.pdf": {
+      "bytes": 4743160,
+      "git_blob_sha1": "d4099a87c64f68e7d04e84a46b889447cfc5cca2",
+      "sha256": "61d62959c95c8bdf7c1ff89c3c94994fe5110bda69efd20fe724ef9079814261"
+    },
+    "materials/hybrid-multiplexing-preview.png": {
+      "bytes": 329653,
+      "git_blob_sha1": "7bdedd28475f1279ce2a8bc7b570f2383bd2c7c2",
+      "sha256": "b403d717f52c6e8aa06b940ab47284de141b40ba7a84cf47610c01bb3ae95fe5"
+    },
+    "materials/research-poster-preview.png": {
+      "bytes": 2018528,
+      "git_blob_sha1": "8dbfb4be9088cdce0514c212766887cbe28645cb",
+      "sha256": "c70eb78f4fdf4be99e541b618ffed1a72e2dae251225b54f212eaa486a86e5e0"
+    },
+    "materials/research-poster.pdf": {
+      "bytes": 31755917,
+      "git_blob_sha1": "b0dc9b94536669fc554f6ebc7c8d09258d05a93d",
+      "sha256": "d12358cfd35d8e82ccc0614324408f0ad13116cbdfdadc9b4c10e76d23660b7f"
+    },
+    "materials/zhaibin-cui-cv-preview.png": {
+      "bytes": 633323,
+      "git_blob_sha1": "726a26e930c3eddf019b88818923d2a50f6812a4",
+      "sha256": "64c266563c90087b673ae960b976ed5d0741f16c7d47cca743b52ee44ba24c3a"
+    },
+    "materials/zhaibin-cui-cv.pdf": {
+      "bytes": 889270,
+      "git_blob_sha1": "53d9474c7e3575a916a58cc116248068012efd67",
+      "sha256": "53993b0662c7efe4d1f1d82c7c641bab75e1d222f3bf3ff8f81ace094d77da5f"
+    },
+    "refinement.css": {
+      "bytes": 14636,
+      "git_blob_sha1": "d674b53c122d2e60f69d2237b503092aee63babb",
+      "sha256": "38e9f248ee693afc9bb7d7f2d1687c0b87cab46f7096f0e9f10612769e4554c7"
     },
     "sources.html": {
-      "bytes": 13402,
-      "git_blob_sha1": "0c670c06b67d742c68d554706266fead69d2e5ad",
-      "sha256": "4cf3d899bbc04b7b9926882b9abab4bac0c3745c47ae828de46800e19976f1f3"
+      "bytes": 17998,
+      "git_blob_sha1": "c75d719cf505e22f67d22c8862e7daa19bef8626",
+      "sha256": "18b278ad39600b0a59577b3b15bcca13bfda11ae9ce5a8368c6b032b12cd355e"
     },
     "style.css": {
       "bytes": 22510,
@@ -296,34 +426,39 @@
       "sha256": "6bca9b44a2a75c23ea754d99b139ee6b50e7efc79c220fe82f6f123bd74e6d4b"
     },
     "work/bell-control.html": {
-      "bytes": 20568,
-      "git_blob_sha1": "41ea3f141ef8cf34ba6360ad14b4b595154f87d8",
-      "sha256": "1cf4c98e5c1fab3f8b49573ebb05d27d06f7fb9620061dabbd249c9fbb5cb88e"
+      "bytes": 19822,
+      "git_blob_sha1": "7d88e9c54ab540ce5a0de53f5e0593f4180303bc",
+      "sha256": "a82177e9fbfd69c38090b56776bbe7e6c56e5bb111771e9acf7002d55b92daa3"
     },
     "work/harness.html": {
-      "bytes": 20269,
-      "git_blob_sha1": "95e448817620b8ee45250b250f9d63b78408a639",
-      "sha256": "0d9440672f4e26021746c98127e9f0b7e61ae84adabe1a9da8aa749d3077c3da"
+      "bytes": 19696,
+      "git_blob_sha1": "806191a95545803f45614acfed8e9b7aa2c03ff0",
+      "sha256": "56be14deeb3398e187b57f3ff7fe80422e750afa015c5b4af0ad1507fd5108f8"
+    },
+    "work/minimax.html": {
+      "bytes": 30834,
+      "git_blob_sha1": "03668ab1a3875fe499528c31d2a1b521d98c4865",
+      "sha256": "c83f8df1e1aa0c2b548ec2fbd2dfa2d5849f4e156130a5dce6c7066d7c8e98a8"
     },
     "work/minitrainsys.html": {
-      "bytes": 27837,
-      "git_blob_sha1": "5e33cce1bafbb381470d07fb4e843a8905b2f3e1",
-      "sha256": "a2e215b7407825815956c711b788897b0585c828c43985811248ea46384c8b87"
+      "bytes": 27319,
+      "git_blob_sha1": "e16a7dd0928b0c8294e779636525fed943782cd1",
+      "sha256": "17470d08f897c86cb5159d52f331787018f051179a439732f4d981391181207e"
     },
     "work/page.html": {
-      "bytes": 22949,
-      "git_blob_sha1": "c18d6f4323b7add112d05f1af67ee36190219ed2",
-      "sha256": "8b10f787db5f0c69c8fff6169e0a6054218660d93d7a44f5e4235feacca857a5"
+      "bytes": 22241,
+      "git_blob_sha1": "46b1b46900d5cc4ae44e356cab152764db9faf8e",
+      "sha256": "092a1b89534ffdfaecea70a2603eeffc11252b3a778e91d13cf72bb84e8ec61d"
     },
     "work/quantum-control.html": {
-      "bytes": 16648,
-      "git_blob_sha1": "f4dcef35227187101ef355d77675d1f90fd81a58",
-      "sha256": "84389c30dc5048708dac80192d715bde221f7a1f6d3830f13fe4411b4414ac51"
+      "bytes": 19926,
+      "git_blob_sha1": "faaebc48ac488da0b283ec55421f72b11cd659dd",
+      "sha256": "1cfbfd86eec44a7b02d537498126210411bb8b01eee26407b0e4dd4c166262b3"
     },
     "work/quantum-networks.html": {
-      "bytes": 22141,
-      "git_blob_sha1": "637c5ac85b4d7068ea0cb22e930ddfae2a152ba5",
-      "sha256": "4dcdfa2cdf593e9c64c40b26708656172dd74a2567da2573d5201050e5bf778b"
+      "bytes": 26319,
+      "git_blob_sha1": "dc979d72ef28c0c65e9c7a03c6e3e184857b72b1",
+      "sha256": "fc9b43d29359c898632c534ef23adf79e047f620ec5f2adca3151bf4055fd9b4"
     }
   },
   "repository": "Zhaibin-Cui/Zhaibin-Cui.github.io",

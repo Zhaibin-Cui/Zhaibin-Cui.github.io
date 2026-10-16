@@ -1,23 +1,48 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
-<title id="title">Scaling law: parameters, data, and compute</title><desc id="desc">Conceptual dense-Transformer loss law L of N and D equals L infinity plus A over N to alpha plus B over D to beta. Compute is approximately six N D. Three illustrative validation-loss curves compare small, medium, and large model families; no measured data is shown.</desc>
-<defs><style>text{font-family:Arial,Helvetica,sans-serif;fill:#17191d}.label{font-size:18px;letter-spacing:2px;fill:#6f747b}.title{font-size:48px;font-weight:600;letter-spacing:-1px}.body{font-size:22px;fill:#626872}.small{font-size:18px;fill:#707680}.math{font-family:Cambria,Georgia,serif}.accent{fill:#385bce}</style><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1L8 5L1 9" fill="none" stroke="#6f747b" stroke-width="1.5"/></marker></defs>
+<title id="title">Architecture-aware training compute accounting</title>
+<desc id="desc">Method illustration, not internal measurements. Account for forward, backward, optional activation recomputation, and optimizer updates with an explicitly declared scope. Attention work depends on sequence structure and implementation. For MoE, distinguish active computation from total parameter and optimizer-state storage. Report FLOPs, token throughput, and elapsed time separately. The blocks are accounting categories, not an execution timeline or a universal formula.</desc>
+<metadata>Public method references: https://github.com/NVIDIA-NeMo/Megatron-Bridge/blob/main/src/megatron/bridge/training/utils/flop_utils.py ; https://docs.nvidia.com/nemo/megatron-bridge/latest/training/activation-recomputation.html ; https://docs.nvidia.com/nemo/megatron-bridge/latest/performance-summary.html ; https://github.com/NVIDIA/Megatron-LM/blob/main/megatron/core/transformer/moe/README.md</metadata>
+<defs><style>text{font-family:Arial,Helvetica,sans-serif;fill:#17191d}.label{font-size:18px;letter-spacing:2px;fill:#6f747b}.title{font-size:48px;font-weight:600;letter-spacing:-1px}.body{font-size:22px;fill:#626872}.small{font-size:18px;fill:#707680}.heading{font-size:28px;font-weight:600}.accent{fill:#385bce}</style></defs>
 <rect width="1600" height="900" fill="#f6f5f1"/>
-<text x="64" y="64" class="label">01 / SCALING LAW</text><text x="1536" y="64" text-anchor="end" class="small">Conceptual illustration</text>
-
-<text x="64" y="145" class="title">From scale to a testable prediction.</text>
-<rect x="64" y="194" width="1472" height="184" rx="4" fill="#eeefec"/>
-<text x="102" y="274" font-size="55" class="math" xml:space="preserve">L(N, D) = L<tspan baseline-shift="sub" font-size="30">∞</tspan><tspan baseline-shift="baseline"> + </tspan>A / N<tspan baseline-shift="super" font-size="30">α</tspan><tspan baseline-shift="baseline"> + </tspan>B / D<tspan baseline-shift="super" font-size="30">β</tspan></text>
-<text x="104" y="335" class="small">N: parameters · D: training tokens · L∞: irreducible loss</text>
-<path d="M1075 226V344" stroke="#c6cacd"/>
-<text x="1120" y="277" font-size="51" class="math" xml:space="preserve">C ≈ 6ND</text><text x="1120" y="335" class="small">Dense Transformer approximation</text>
-<text x="102" y="440" class="label">LOSS VS. COMPUTE</text>
-<path d="M140 478V792H1500" fill="none" stroke="#727983" stroke-width="1.5"/>
-<path d="M140 560H1500M140 640H1500M140 720H1500" fill="none" stroke="#daddde" stroke-dasharray="4 9"/>
-<path d="M180 530C280 620 360 660 500 668S1100 675 1480 678" fill="none" stroke="#a1a7ad" stroke-width="3"/>
-<path d="M180 490C360 550 400 650 600 685S1100 710 1480 715" fill="none" stroke="#4d555e" stroke-width="3"/>
-<path d="M180 458C350 485 420 600 660 665S1120 730 1480 745" fill="none" stroke="#385bce" stroke-width="4"/>
-<text transform="translate(83 652) rotate(-90)" text-anchor="middle" class="small">Validation loss ↓</text>
-<text x="1500" y="833" text-anchor="end" class="small">Training compute →</text>
-<g class="small"><path d="M1100 432H1135" stroke="#a1a7ad" stroke-width="3"/><text x="1146" y="438">Small</text><path d="M1240 432H1275" stroke="#4d555e" stroke-width="3"/><text x="1286" y="438">Medium</text><path d="M1400 432H1435" stroke="#385bce" stroke-width="4"/><text x="1446" y="438">Large</text></g>
-<text x="140" y="871" font-size="16" fill="#707680">Schematic model-size families; illustrative axes and curves, not measured training results.</text>
+<text x="64" y="64" class="label">01 / COMPUTE ACCOUNTING</text>
+<text x="1536" y="64" text-anchor="end" class="small">Method illustration · no internal data</text>
+<text x="64" y="145" class="title">Count the work. Measure the time.</text>
+<text x="64" y="184" class="body">Architecture, sequence structure, and execution policy determine the training cost.</text>
+<!-- Accounting categories, deliberately not a serial execution timeline. -->
+<rect x="64" y="220" width="350" height="170" rx="4" fill="#eeefec"/>
+<rect x="438" y="220" width="350" height="170" rx="4" fill="#eeefec"/>
+<rect x="812" y="220" width="350" height="170" rx="4" fill="#f0f2f8" stroke="#a4b3e5" stroke-dasharray="6 5"/>
+<rect x="1186" y="220" width="350" height="170" rx="4" fill="#eeefec"/>
+<text x="92" y="253" class="label">MODEL PASS</text><text x="466" y="253" class="label">GRADIENT PASS</text>
+<text x="840" y="253" class="label">IF ENABLED</text><text x="1214" y="253" class="label">STEP UPDATE</text>
+<text x="92" y="294" class="heading">Forward</text><text x="466" y="294" class="heading">Backward</text>
+<text x="840" y="294" class="heading accent">Recomputation</text><text x="1214" y="294" class="heading">Optimizer update</text>
+<text x="92" y="333" class="body">Layers, attention, logits</text><text x="92" y="365" class="small">Count configured operations</text>
+<text x="466" y="333" class="body">Input + parameter gradients</text><text x="466" y="365" class="small">Account for the trained modules</text>
+<text x="840" y="333" class="body">Replay selected activations</text><text x="840" y="365" class="small">Extra work to reduce memory</text>
+<text x="1214" y="333" class="body">States + parameter updates</text><text x="1214" y="365" class="small">Declare whether it is included</text>
+<text x="426" y="312" font-size="22" text-anchor="middle">+</text><text x="800" y="312" font-size="22" text-anchor="middle">+</text><text x="1174" y="312" font-size="22" text-anchor="middle">+</text>
+<text x="64" y="422" class="small">Define the counting scope first. These categories are not execution order; schedules can overlap.</text>
+<rect x="64" y="450" width="716" height="192" rx="4" fill="#ffffff" stroke="#e0e2df"/>
+<rect x="820" y="450" width="716" height="192" rx="4" fill="#ffffff" stroke="#e0e2df"/>
+<path d="M64 450H780M820 450H1536" stroke="#385bce" stroke-width="3"/>
+<text x="92" y="490" class="heading">Attention is sequence-dependent.</text>
+<text x="92" y="529" class="body">Lengths, document boundaries, masks, attention variant.</text>
+<text x="92" y="561" class="body">Equal token counts need not imply equal attention work.</text>
+<text x="92" y="597" class="small">Use actual sequence statistics and implementation-aware counts;</text>
+<text x="92" y="624" class="small">logical masking alone does not guarantee skipped computation.</text>
+<text x="848" y="490" class="heading">MoE: active is not total.</text>
+<text x="848" y="529" class="body">Per-token work: routed experts + shared layers + routing.</text>
+<text x="848" y="561" class="body">State storage: total parameters and the sharding policy.</text>
+<text x="848" y="597" class="small">Record top-k, shared experts, and the actual token dispatch;</text>
+<text x="848" y="624" class="small">communication and load imbalance also affect elapsed time.</text>
+<text x="64" y="689" class="label">THREE MEASURES · THREE DIFFERENT QUESTIONS</text>
+<path d="M64 708H1536M555 731V822M1061 731V822" stroke="#cfd3d3"/>
+<text x="64" y="750" class="heading">FLOPs</text><text x="64" y="785" class="body">Operation count under a stated scope.</text>
+<text x="64" y="816" class="small">Model FLOPs ≠ all executed operations.</text>
+<text x="589" y="750" class="heading">tokens / s</text><text x="589" y="785" class="body">Specify the token numerator and clock.</text>
+<text x="589" y="816" class="small">Processed or effective? Global or per GPU?</text>
+<text x="1095" y="750" class="heading accent">Wall time</text><text x="1095" y="785" class="body">Measure the step or full-run duration.</text>
+<text x="1095" y="816" class="small">Includes exposed I/O, communication, stalls.</text>
+<text x="64" y="869" font-size="16">Method references: NVIDIA Megatron Bridge FLOP utilities, recomputation and performance documentation; Megatron Core MoE.</text>
 </svg>

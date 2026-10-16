@@ -27,20 +27,23 @@
     }
     document.dispatchEvent(event);
   }
-  let lang = 'zh';
-  try {
-    const queryLanguage = new URLSearchParams(location.search).get('lang');
-    const storedLanguage = localStorage.getItem('zc-language');
-    lang = ['zh', 'en'].includes(queryLanguage) ? queryLanguage : storedLanguage;
-  } catch (error) {
-    try { lang = new URLSearchParams(location.search).get('lang'); } catch (ignored) { /* Default language. */ }
+  // URL language is authoritative; old browser preferences never override it.
+  function languageFromUrl() {
+    try { return new URLSearchParams(location.search).get('lang') === 'zh' ? 'zh' : 'en'; }
+    catch (error) { return 'en'; }
   }
-  if (!['zh', 'en'].includes(lang)) lang = 'zh';
+  let lang = languageFromUrl();
 
-  function setLang(value) {
+  function setLang(value, updateUrl = false) {
     lang = value === 'en' ? 'en' : 'zh';
     document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
-    try { localStorage.setItem('zc-language', lang); } catch (error) { /* Persistence is optional. */ }
+    if (updateUrl) {
+      try {
+        const current = new URL(location.href);
+        current.searchParams.set('lang', lang);
+        history.replaceState(history.state, '', current.href);
+      } catch (error) { /* Local file previews may restrict History API updates. */ }
+    }
     $$('[data-zh][data-en]').forEach(node => { node.textContent = node.dataset[lang]; });
     $$('[data-placeholder-zh]').forEach(node => { node.placeholder = node.dataset[lang === 'zh' ? 'placeholderZh' : 'placeholderEn'] || ''; });
     $$('[data-lang-label]').forEach(node => { node.setAttribute('aria-label', lang === 'zh' ? 'Switch to English' : '切换到中文'); });
@@ -58,7 +61,8 @@
     emitLanguageChange(lang);
   }
   const languageButton = $('.lang-toggle');
-  if (languageButton) languageButton.addEventListener('click', () => setLang(lang === 'zh' ? 'en' : 'zh'));
+  if (languageButton) languageButton.addEventListener('click', () => setLang(lang === 'zh' ? 'en' : 'zh', true));
+  window.addEventListener('popstate', () => setLang(languageFromUrl()));
   setLang(lang);
 
   // Shared, frame-throttled scroll/resize updates; nothing is queued while hidden.
@@ -256,8 +260,8 @@
   if (publicationSearch) publicationSearch.addEventListener('input', filterPublications);
   document.addEventListener('languagechange', filterPublications);
 
-  // Transparent, smoothly rendered lunar field. Fine surface grain is cached;
-  // only the restrained orbital motion and star opacity change per frame.
+  // Restrained scientific-image overlay; the real photograph remains in HTML.
+  // Corner marks, subtle grain, and one slow scan are decorative, not telemetry.
   const canvas = $('#mission-canvas') || $('#field-canvas');
   let synchronizeCanvas = () => {};
   if (canvas) {
@@ -270,81 +274,44 @@
     } else {
       let width = 0; let height = 0; let pixelRatio = 1;
       let animation = null; let lastPaint = 0; let lastTime = 0; let elapsed = 0;
-      let inView = true; let stars = []; let moon = null;
+      let inView = true; let grain = [];
       const random = seed => () => {
         seed = (seed * 1664525 + 1013904223) >>> 0;
         return seed / 4294967296;
       };
-      function ellipse(ctx, x, y, rx, ry, rotation) {
-        ctx.save(); ctx.translate(x, y); ctx.rotate(rotation); ctx.scale(rx, ry);
-        ctx.beginPath(); ctx.arc(0, 0, 1, 0, Math.PI * 2); ctx.restore();
-      }
-      function makeMoon() {
-        const surface = document.createElement('canvas');
-        surface.width = 1200; surface.height = 1200;
-        const ctx = surface.getContext('2d');
-        if (!ctx) return null;
-        const size = 1200; const radius = size * 0.47; const center = size / 2;
-        const rng = random(80951);
-        ctx.save(); ctx.beginPath(); ctx.arc(center, center, radius, 0, Math.PI * 2); ctx.clip();
-        const shade = ctx.createRadialGradient(size * 0.31, size * 0.29, 0, center, center, radius * 1.24);
-        shade.addColorStop(0, '#f2f1ec'); shade.addColorStop(0.42, '#e5e4df');
-        shade.addColorStop(0.75, '#c7c8c6'); shade.addColorStop(1, '#989da0');
-        ctx.fillStyle = shade; ctx.fillRect(0, 0, size, size);
-        for (let i = 0; i < 72; i += 1) {
-          const angle = rng() * Math.PI * 2; const distance = Math.sqrt(rng()) * radius * 0.88;
-          const x = center + Math.cos(angle) * distance; const y = center + Math.sin(angle) * distance;
-          const r = 7 + Math.pow(rng(), 2) * 80;
-          const crater = ctx.createRadialGradient(x + r * 0.1, y + r * 0.15, r * 0.12, x, y, r);
-          crater.addColorStop(0, 'rgba(53,60,66,.11)'); crater.addColorStop(0.72, 'rgba(70,77,83,.075)'); crater.addColorStop(1, 'rgba(70,77,83,0)');
-          ctx.fillStyle = crater; ctx.fillRect(x - r, y - r, r * 2, r * 2);
-          ctx.strokeStyle = 'rgba(255,255,255,.25)'; ctx.lineWidth = 1.1;
-          ctx.beginPath(); ctx.arc(x, y, r * 0.77, Math.PI * 0.83, Math.PI * 1.73); ctx.stroke();
-        }
-        // Subpixel circular grain, deliberately avoiding pixel art or a visible grid.
-        for (let i = 0; i < 8500; i += 1) {
-          const angle = rng() * Math.PI * 2; const distance = Math.sqrt(rng()) * radius;
-          const x = center + Math.cos(angle) * distance; const y = center + Math.sin(angle) * distance;
-          ctx.fillStyle = 'rgba(42,50,57,' + (0.018 + rng() * 0.045) + ')';
-          ctx.beginPath(); ctx.arc(x, y, 0.35 + rng() * 0.65, 0, Math.PI * 2); ctx.fill();
-        }
-        ctx.restore(); return surface;
-      }
       function draw(time) {
         if (!width || !height) return;
         context.clearRect(0, 0, width, height);
-        const small = width < 720;
-        const radius = Math.min(width * (small ? 0.43 : 0.215), height * (small ? 0.25 : 0.36));
-        const x = width * (small ? 0.74 : 0.79);
-        const y = height * (small ? 0.76 : 0.51) + Math.sin(time * 0.11) * 1.5;
-        stars.forEach(star => {
-          context.fillStyle = 'rgba(47,54,63,' + star.alpha * (0.9 + Math.sin(time * 0.28 + star.phase) * 0.1) + ')';
-          context.beginPath(); context.arc(star.x * width, star.y * height, star.size, 0, Math.PI * 2); context.fill();
+        const narrow = width <= 620;
+        const left = width * (narrow ? 0.13 : 0.63);
+        const top = height * (narrow ? 0.70 : 0.22);
+        const right = width * 0.91;
+        const bottom = height * (narrow ? 0.91 : 0.77);
+        const corner = narrow ? 11 : 17;
+        context.lineWidth = 0.7;
+        context.strokeStyle = 'rgba(255,255,255,.17)';
+        context.beginPath();
+        context.moveTo(left, top + corner); context.lineTo(left, top); context.lineTo(left + corner, top);
+        context.moveTo(right - corner, top); context.lineTo(right, top); context.lineTo(right, top + corner);
+        context.moveTo(right, bottom - corner); context.lineTo(right, bottom); context.lineTo(right - corner, bottom);
+        context.moveTo(left + corner, bottom); context.lineTo(left, bottom); context.lineTo(left, bottom - corner);
+        context.stroke();
+        grain.forEach(point => {
+          const opacity = point.alpha * (0.85 + Math.sin(time * 0.16 + point.phase) * 0.15);
+          context.fillStyle = 'rgba(255,255,255,' + opacity + ')';
+          context.beginPath();
+          context.arc(left + point.x * (right - left), top + point.y * (bottom - top), point.size, 0, Math.PI * 2);
+          context.fill();
         });
-        context.lineWidth = 0.65; context.strokeStyle = 'rgba(54,63,74,.16)';
-        ellipse(context, x, y, radius * 1.55, radius * 0.43, -0.27); context.stroke();
-        context.strokeStyle = 'rgba(54,63,74,.07)';
-        ellipse(context, x, y, radius * 1.8, radius * 0.58, -0.27); context.stroke();
-        if (moon) {
-          context.globalAlpha = small ? 0.76 : 0.9;
-          context.drawImage(moon, x - radius * 1.064, y - radius * 1.064, radius * 2.128, radius * 2.128);
-          context.globalAlpha = 1;
-        }
-        const angle = time * 0.035 + 0.9;
-        const orbitX = Math.cos(angle) * radius * 1.55; const orbitY = Math.sin(angle) * radius * 0.43;
-        const px = x + orbitX * Math.cos(-0.27) - orbitY * Math.sin(-0.27);
-        const py = y + orbitX * Math.sin(-0.27) + orbitY * Math.cos(-0.27);
-        context.fillStyle = 'rgba(45,53,64,.5)';
-        context.beginPath(); context.arc(px, py, 1.8, 0, Math.PI * 2); context.fill();
-        context.strokeStyle = 'rgba(45,53,64,.16)';
-        context.beginPath(); context.moveTo(px - 7, py); context.lineTo(px + 7, py); context.moveTo(px, py - 7); context.lineTo(px, py + 7); context.stroke();
-        // Alpha fade keeps the copy area quiet on any background color.
-        const fade = context.createLinearGradient(0, 0, width, 0);
-        fade.addColorStop(0, 'rgba(0,0,0,.015)'); fade.addColorStop(0.34, 'rgba(0,0,0,.1)');
-        fade.addColorStop(0.57, 'rgba(0,0,0,.65)'); fade.addColorStop(1, 'rgba(0,0,0,1)');
-        context.globalCompositeOperation = 'destination-in';
-        context.fillStyle = fade; context.fillRect(0, 0, width, height);
-        context.globalCompositeOperation = 'source-over';
+        // Slow, continuous movement without a flashing or snapping loop.
+        const scan = top + (bottom - top) * (0.5 + Math.sin(time * 0.09) * 0.38);
+        context.strokeStyle = 'rgba(255,255,255,.075)';
+        context.beginPath(); context.moveTo(left + 6, scan); context.lineTo(right - 6, scan); context.stroke();
+        context.strokeStyle = 'rgba(255,255,255,.22)';
+        context.beginPath();
+        context.moveTo(left - 3, scan); context.lineTo(left + 3, scan);
+        context.moveTo(right - 3, scan); context.lineTo(right + 3, scan);
+        context.stroke();
       }
       function stop() {
         if (animation !== null) cancelFrame(animation);
@@ -353,7 +320,7 @@
       function tick(timestamp) {
         animation = null;
         if (document.hidden || reducedMotion || !inView) { stop(); return; }
-        if (timestamp - lastPaint >= 1000 / 24) {
+        if (timestamp - lastPaint >= 1000 / 16) {
           elapsed += lastTime ? Math.min(100, timestamp - lastTime) / 1000 : 0;
           lastTime = timestamp; lastPaint = timestamp; draw(elapsed);
         }
@@ -378,13 +345,13 @@
           width = newWidth; height = newHeight; pixelRatio = newRatio;
           canvas.width = Math.round(width * pixelRatio); canvas.height = Math.round(height * pixelRatio);
           context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-          const rng = random(50291); const number = Math.min(145, Math.max(45, Math.round(width * height / 8500)));
-          stars = Array.from({ length: number }, () => ({ x: rng(), y: rng(), size: 0.35 + rng() * 0.65, alpha: 0.1 + rng() * 0.2, phase: rng() * Math.PI * 2 }));
+          const rng = random(50291); const number = Math.min(160, Math.max(35, Math.round(width * height / 9000)));
+          grain = Array.from({ length: number }, () => ({ x: rng(), y: rng(), size: 0.25 + rng() * 0.4, alpha: 0.025 + rng() * 0.045, phase: rng() * Math.PI * 2 }));
           draw(elapsed);
         }
         checkVisibility();
       }
-      moon = makeMoon(); viewportCallbacks.push(resizeCanvas);
+      viewportCallbacks.push(resizeCanvas);
       if (typeof window.ResizeObserver === 'function') {
         const sizeObserver = new ResizeObserver(() => queueViewportUpdate()); sizeObserver.observe(canvas);
       }
