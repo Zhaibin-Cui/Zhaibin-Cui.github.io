@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+<title id="title">Data and pretraining evaluation loop</title><desc id="desc">Conceptual data mix to packing to distributed pretraining to benchmark and bits-per-byte evaluation to analysis, with feedback to the next experiment. BPB is token negative log likelihood in bits divided by UTF-8 bytes of scored text.</desc>
+<defs><style>text{font-family:Arial,Helvetica,sans-serif;fill:#17191d}.label{font-size:18px;letter-spacing:2px;fill:#6f747b}.title{font-size:48px;font-weight:600;letter-spacing:-1px}.body{font-size:22px;fill:#626872}.small{font-size:18px;fill:#707680}.math{font-family:Cambria,Georgia,serif}.accent{fill:#385bce}</style><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1L8 5L1 9" fill="none" stroke="#6f747b" stroke-width="1.5"/></marker></defs>
+<rect width="1600" height="900" fill="#f6f5f1"/>
+<text x="64" y="64" class="label">03 / DATA &amp; EVALUATION</text><text x="1536" y="64" text-anchor="end" class="small">Conceptual illustration</text>
+
+<text x="64" y="145" class="title">Connect data decisions to model evidence.</text>
+<text x="64" y="192" class="body">A shared experimental loop across data, training, and evaluation.</text>
+<rect x="64" y="276" width="256" height="292" rx="4" fill="#eeefec" stroke="#cbd0d3"/>
+<text x="88" y="321" class="label">01</text>
+<text x="88" y="375" font-size="28" font-weight="600">Data mix</text>
+<text x="88" y="480" font-size="18" fill="#626872">Source proportions</text>
+<text x="88" y="513" font-size="18" fill="#626872">Quality / diversity</text>
+<path d="M331 421H356" stroke="#6f747b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="368" y="276" width="256" height="292" rx="4" fill="#eeefec" stroke="#cbd0d3"/>
+<text x="392" y="321" class="label">02</text>
+<text x="392" y="375" font-size="28" font-weight="600">Packing</text>
+<text x="392" y="480" font-size="18" fill="#626872">Document boundaries</text>
+<text x="392" y="513" font-size="18" fill="#626872">Length / mask policy</text>
+<path d="M635 421H660" stroke="#6f747b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="672" y="276" width="256" height="292" rx="4" fill="#eeefec" stroke="#cbd0d3"/>
+<text x="696" y="321" class="label">03</text>
+<text x="696" y="375" font-size="28" font-weight="600">Distributed</text>
+<text x="696" y="412" font-size="28" font-weight="600">pretraining</text>
+<text x="696" y="480" font-size="18" fill="#626872">Multi-GPU execution</text>
+<text x="696" y="513" font-size="18" fill="#626872">Consistent run metadata</text>
+<path d="M939 421H964" stroke="#6f747b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="976" y="276" width="256" height="292" rx="4" fill="#edf0fa" stroke="#b4c2eb"/>
+<text x="1000" y="321" class="label accent">04</text>
+<text x="1000" y="375" font-size="28" font-weight="600">Benchmark</text>
+<text x="1000" y="412" font-size="28" font-weight="600">+ BPB</text>
+<text x="1000" y="480" font-size="18" fill="#626872">Task-level evaluation</text>
+<text x="1000" y="513" font-size="18" fill="#626872">Byte-normalized NLL</text>
+<path d="M1243 421H1268" stroke="#6f747b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1280" y="276" width="256" height="292" rx="4" fill="#eeefec" stroke="#cbd0d3"/>
+<text x="1304" y="321" class="label">05</text>
+<text x="1304" y="375" font-size="28" font-weight="600">Analysis</text>
+<text x="1304" y="480" font-size="18" fill="#626872">Compare / diagnose</text>
+<text x="1304" y="513" font-size="18" fill="#626872">Update hypotheses</text>
+
+<path d="M1408 569V617H192V580" fill="none" stroke="#8a919a" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="800" y="656" text-anchor="middle" font-size="20" fill="#626872">Controlled ablations · inspect outcomes · revise the next experiment</text>
+<rect x="64" y="702" width="1472" height="130" rx="4" fill="#e9ecef"/>
+<text x="98" y="759" font-size="34" class="math" xml:space="preserve">BPB = − Σ<tspan baseline-shift="sub" font-size="20">t</tspan><tspan baseline-shift="baseline"> log</tspan><tspan baseline-shift="sub" font-size="20">2</tspan><tspan baseline-shift="baseline"> p(token</tspan><tspan baseline-shift="sub" font-size="20">t</tspan><tspan baseline-shift="baseline"> | context) / bytes(text)</tspan></text>
+<text x="100" y="803" font-size="18" fill="#626872">Aggregate test-text negative log likelihood, normalized by UTF-8 byte count; complements downstream benchmarks.</text>
+<text x="64" y="874" class="small">Illustrative workflow, not an internal architecture or measured experiment.</text>
+</svg>

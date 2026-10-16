@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+<title id="title">Scaling law: parameters, data, and compute</title><desc id="desc">Conceptual dense-Transformer loss law L of N and D equals L infinity plus A over N to alpha plus B over D to beta. Compute is approximately six N D. Three illustrative validation-loss curves compare small, medium, and large model families; no measured data is shown.</desc>
+<defs><style>text{font-family:Arial,Helvetica,sans-serif;fill:#17191d}.label{font-size:18px;letter-spacing:2px;fill:#6f747b}.title{font-size:48px;font-weight:600;letter-spacing:-1px}.body{font-size:22px;fill:#626872}.small{font-size:18px;fill:#707680}.math{font-family:Cambria,Georgia,serif}.accent{fill:#385bce}</style><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1L8 5L1 9" fill="none" stroke="#6f747b" stroke-width="1.5"/></marker></defs>
+<rect width="1600" height="900" fill="#f6f5f1"/>
+<text x="64" y="64" class="label">01 / SCALING LAW</text><text x="1536" y="64" text-anchor="end" class="small">Conceptual illustration</text>
+
+<text x="64" y="145" class="title">From scale to a testable prediction.</text>
+<rect x="64" y="194" width="1472" height="184" rx="4" fill="#eeefec"/>
+<text x="102" y="274" font-size="55" class="math" xml:space="preserve">L(N, D) = L<tspan baseline-shift="sub" font-size="30">∞</tspan><tspan baseline-shift="baseline"> + </tspan>A / N<tspan baseline-shift="super" font-size="30">α</tspan><tspan baseline-shift="baseline"> + </tspan>B / D<tspan baseline-shift="super" font-size="30">β</tspan></text>
+<text x="104" y="335" class="small">N: parameters · D: training tokens · L∞: irreducible loss</text>
+<path d="M1075 226V344" stroke="#c6cacd"/>
+<text x="1120" y="277" font-size="51" class="math" xml:space="preserve">C ≈ 6ND</text><text x="1120" y="335" class="small">Dense Transformer approximation</text>
+<text x="102" y="440" class="label">LOSS VS. COMPUTE</text>
+<path d="M140 478V792H1500" fill="none" stroke="#727983" stroke-width="1.5"/>
+<path d="M140 560H1500M140 640H1500M140 720H1500" fill="none" stroke="#daddde" stroke-dasharray="4 9"/>
+<path d="M180 530C280 620 360 660 500 668S1100 675 1480 678" fill="none" stroke="#a1a7ad" stroke-width="3"/>
+<path d="M180 490C360 550 400 650 600 685S1100 710 1480 715" fill="none" stroke="#4d555e" stroke-width="3"/>
+<path d="M180 458C350 485 420 600 660 665S1120 730 1480 745" fill="none" stroke="#385bce" stroke-width="4"/>
+<text transform="translate(83 652) rotate(-90)" text-anchor="middle" class="small">Validation loss ↓</text>
+<text x="1500" y="833" text-anchor="end" class="small">Training compute →</text>
+<g class="small"><path d="M1100 432H1135" stroke="#a1a7ad" stroke-width="3"/><text x="1146" y="438">Small</text><path d="M1240 432H1275" stroke="#4d555e" stroke-width="3"/><text x="1286" y="438">Medium</text><path d="M1400 432H1435" stroke="#385bce" stroke-width="4"/><text x="1446" y="438">Large</text></g>
+<text x="140" y="871" font-size="16" fill="#707680">Schematic model-size families; illustrative axes and curves, not measured training results.</text>
+</svg>

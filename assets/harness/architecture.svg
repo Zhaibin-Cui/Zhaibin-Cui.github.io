@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="940" viewBox="0 0 1440 940" role="img" aria-labelledby="title desc">
+  <title id="title">GF-Harness conceptual architecture</title>
+  <desc id="desc">An original illustration of desktop and mobile clients connecting to sessions, model providers, agent orchestration, and development tools. It contains no employer systems or data.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#101924"/><stop offset="1" stop-color="#090f18"/></linearGradient>
+    <linearGradient id="core" x2="1" y2="1"><stop stop-color="#193547"/><stop offset="1" stop-color="#17283d"/></linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 1 1 L 9 5 L 1 9" fill="none" stroke="#6b9bb6" stroke-width="1.6"/></marker>
+    <style>
+      text{font-family:Inter,Arial,Helvetica,sans-serif;fill:#eaf1f7}
+      .eyebrow{font-size:15px;font-weight:600;letter-spacing:3px;fill:#8bddc1}
+      .label{font-size:23px;font-weight:600}
+      .small{font-size:17px;fill:#a7b8c8}
+      .tiny{font-size:14px;fill:#8d9fae}
+      .panel{fill:#152130;stroke:#334658;stroke-width:1.3}
+      .line{fill:none;stroke:#6b9bb6;stroke-width:2;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1440" height="940" rx="28" fill="url(#bg)"/>
+  <text x="64" y="70" class="eyebrow">GF-HARNESS / CONCEPTUAL ARCHITECTURE</text>
+  <text x="64" y="124" font-size="41" font-weight="600">One workspace. Continuous research.</text>
+  <text x="64" y="161" class="small">Models can change. Context, tools, and ongoing work stay connected.</text>
+  <rect class="panel" x="64" y="211" width="380" height="117" rx="18"/>
+  <text x="92" y="253" class="label">Desktop workstation</text>
+  <text x="92" y="288" class="small">Projects · conversations · code review</text>
+  <rect class="panel" x="996" y="211" width="380" height="117" rx="18"/>
+  <text x="1024" y="253" class="label">Mobile companion</text>
+  <text x="1024" y="288" class="small">Drafts · voice · remote progress</text>
+  <path class="line" d="M 460 267 L 978 267" marker-start="url(#arrow)"/>
+  <rect x="574" y="241" width="292" height="52" rx="26" fill="#1c3640" stroke="#527c82"/>
+  <text x="720" y="273" font-size="18" text-anchor="middle" fill="#a9ead7">Shared workspace &amp; session state</text>
+  <path class="line" d="M 254 328 L 254 380 L 405 380 L 405 406"/>
+  <path class="line" d="M 1186 328 L 1186 380 L 1035 380 L 1035 406"/>
+  <rect x="250" y="408" width="940" height="206" rx="23" fill="url(#core)" stroke="#588b9a" stroke-width="1.8"/>
+  <text x="282" y="453" class="eyebrow">HARNESS / ORCHESTRATION</text>
+  <text x="282" y="493" class="label">Sessions &amp; branches</text>
+  <text x="282" y="528" class="small">History · handoff · task context</text>
+  <path d="M 663 470 L 663 572" stroke="#365266"/>
+  <text x="704" y="493" class="label">Agents &amp; reusable workflows</text>
+  <text x="704" y="528" class="small">Delegation · subagents · result handoff</text>
+  <text x="282" y="580" class="tiny">Provider adaptation</text>
+  <text x="704" y="580" class="tiny">Custom MCP · Skills composition · task presets</text>
+  <path class="line" d="M 400 614 L 400 653 L 254 653 L 254 688"/>
+  <path class="line" d="M 720 614 L 720 688"/>
+  <path class="line" d="M 1040 614 L 1040 653 L 1186 653 L 1186 688"/>
+  <rect class="panel" x="64" y="691" width="380" height="155" rx="18"/>
+  <text x="92" y="734" class="label">Model backends</text>
+  <text x="92" y="772" class="small">Provider / API / Proxy adapters</text>
+  <text x="92" y="806" class="small">Model and account configuration</text>
+  <rect class="panel" x="530" y="691" width="380" height="155" rx="18"/>
+  <text x="558" y="734" class="label">Linux &amp; development</text>
+  <text x="558" y="772" class="small">Bash · Git · files · Docker</text>
+  <text x="558" y="806" class="small">Training jobs · experiment tracking</text>
+  <rect class="panel" x="996" y="691" width="380" height="155" rx="18"/>
+  <text x="1024" y="734" class="label">Knowledge &amp; collaboration</text>
+  <text x="1024" y="772" class="small">Authorized documents · Feishu bots</text>
+  <text x="1024" y="806" class="small">Research · translation · delivery</text>
+  <text x="64" y="901" class="tiny">Original conceptual diagram. No employer infrastructure, credentials, or experiment data are represented.</text>
+  <circle cx="1357" cy="896" r="6" fill="#8bddc1"/>
+</svg>

@@ -1,0 +1,332 @@
+{
+  "files": {
+    ".nojekyll": {
+      "bytes": 0,
+      "git_blob_sha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "app.js": {
+      "bytes": 28097,
+      "git_blob_sha1": "40754962b91cd58204c5512e36784caeca867f31",
+      "sha256": "5e6e0b96ede3155d346c08bb4f469e14e896a451667294ba83436e2ab93e8ff3"
+    },
+    "assets/ai/minitrain-readout-first.png": {
+      "bytes": 174604,
+      "git_blob_sha1": "88b2ea53562df6a3419dd676f02d52fb1bab3cd4",
+      "sha256": "6399d10eac0451f83729372fe53f1d3cc26f068ac2ea20191cc7c853d39696b5"
+    },
+    "assets/ai/minitrain-readout-whole.png": {
+      "bytes": 190259,
+      "git_blob_sha1": "7298ef3f74eed4be9e9461a472bb6f6705358938",
+      "sha256": "d190d91fe79c05938bd2d8346a8aadf48ff4e204deecb5b9e5c0d8363e7b66d3"
+    },
+    "assets/ai/minitrain-route-did.png": {
+      "bytes": 149911,
+      "git_blob_sha1": "80c02f704115fa484981a1649b47925a3c6edfd0",
+      "sha256": "66699d9a41429485c90734a5cec89a5a54cac6a48f77ad3baf30cb2ed1cd3b79"
+    },
+    "assets/ai/minitrain-scaling.png": {
+      "bytes": 395095,
+      "git_blob_sha1": "813caca994fd59bb50cace365e5445a7b262f1a2",
+      "sha256": "c3ddaf4d51bf96d04ae9192b6e0c5123fc93525bee4ed1fb24cdf9db30606681"
+    },
+    "assets/ai/minitrain-study.png": {
+      "bytes": 245113,
+      "git_blob_sha1": "e3a703866096b7dc5bbfd1474f50be258f895637",
+      "sha256": "f13c95548f6970dc5c67c3d1021360a9fcd5c77d1455c9f3ce69790d2d9581af"
+    },
+    "assets/ai/minitrain-system.svg": {
+      "bytes": 5508,
+      "git_blob_sha1": "7b66da7d8fc68874b126583a41f94644e609e13c",
+      "sha256": "7e339586d1f5647a266c34f64d6c3e2d8a55bdacaffed73fed20184e5bdec278"
+    },
+    "assets/ai/minitrain-throughput.png": {
+      "bytes": 254441,
+      "git_blob_sha1": "dcc6bfcd7cec54d95a76b0ced70963405ea774db",
+      "sha256": "c417e79dbce36c32cbc141cd2e3527ec94a618606e20046d6d64d0a080adcbc8"
+    },
+    "assets/ai/page-architecture.png": {
+      "bytes": 1255129,
+      "git_blob_sha1": "9f353cf470ce288d5cee175b02f5379f1dc324ef",
+      "sha256": "5b7c875432de7ee19581448bb6d7a69c1b7f5f1177471fa51a2f40e6c8d28cb0"
+    },
+    "assets/ai/page-failure-cases.png": {
+      "bytes": 2903386,
+      "git_blob_sha1": "a4ef635479dcc3d02fd836da7be784c42c54bd52",
+      "sha256": "b07667b4f62a192daced50935e2617a798ed41a7a214bafd5b7af395c1a541c4"
+    },
+    "assets/ai/page-generalization.png": {
+      "bytes": 6333221,
+      "git_blob_sha1": "9b661a962c1df7eb1b97583332a040b1de68dd22",
+      "sha256": "ae7d0ec250103efd861a7acca5711eea80335c4af40afa56b92c4c8d4e400fca"
+    },
+    "assets/ai/page-results.png": {
+      "bytes": 4260592,
+      "git_blob_sha1": "8c6a2b99e5c073cd5d4fd803670bc049d5dd35f6",
+      "sha256": "dd9de20fdb426e60a9d0f80242f69acc4f2f34111db3c8c567ebeb13e6e98f84"
+    },
+    "assets/ai/page-screen-gaze.png": {
+      "bytes": 2834345,
+      "git_blob_sha1": "f3c2600dcba5eac0f782ee858e8311b754f06386",
+      "sha256": "65ec25b3b6bc253fdf21f1f85e8caa0b1f62a4009da217be95733a2f34c9f5e5"
+    },
+    "assets/editorial/bell-fpga-hardware.jpg": {
+      "bytes": 239504,
+      "git_blob_sha1": "ced305edcfb096d9ea6d832233e7ac1831bc2c85",
+      "sha256": "6813738f402e22838a454ff9b86efa168023cf885b29b80480a240c2dd9bfc17"
+    },
+    "assets/editorial/data-evaluation.svg": {
+      "bytes": 4765,
+      "git_blob_sha1": "8ef82972d5f9d8cb1f4183bde6b8fa0861de074f",
+      "sha256": "3b311d841b0c3f6c4fe1ca7cc006b0beabfa8fe3af54431544f1059161c323ff"
+    },
+    "assets/editorial/harness-cover.svg": {
+      "bytes": 4773,
+      "git_blob_sha1": "032f4deebccc996fc6f8ac62c0292141e9053f06",
+      "sha256": "cea7ce8704a67a5f125724d00d3457c8e514083a132b3cc444668c949898e8d4"
+    },
+    "assets/editorial/ion-trap-camera.png": {
+      "bytes": 4266084,
+      "git_blob_sha1": "cd42b5f8c5312bd69095b844672af1628aeadf7a",
+      "sha256": "ffbd8b8c291a81e667ae101bd6883e79c24c7eaac1870fa910b51784308d2755"
+    },
+    "assets/editorial/minitrain-cover.svg": {
+      "bytes": 6005,
+      "git_blob_sha1": "e03233699aabdc59f7c8a4ecdedd15742e93c34e",
+      "sha256": "c72516530be866c1778afc330a9dd9075f52a06874802eb94dbe9bfa3bb4cd39"
+    },
+    "assets/editorial/objective-vacuum-interface.jpg": {
+      "bytes": 299693,
+      "git_blob_sha1": "a56cdbf75e60ae88b5a7fc59d06a51093e45c349",
+      "sha256": "38d0707e1451a4dd0c7e0bef59480693b684c697b371baba7ff6ff2fb24b4a6a"
+    },
+    "assets/editorial/quantum-control-cover.svg": {
+      "bytes": 919748,
+      "git_blob_sha1": "9061d2a2de8af062cb95a9ce0768ebd109308710",
+      "sha256": "6faa572daf578cda588c840a3bc57c9dfc6a46f4300e8ba99d979b45510d4939"
+    },
+    "assets/editorial/quctrl-control-rack.jpg": {
+      "bytes": 724943,
+      "git_blob_sha1": "9f648dde4ad0eacaaf0d92f95877a8e529a749c2",
+      "sha256": "f938d60a13921d5c0df577eaa069c4c67fa346b3e56c883143290dae096191a6"
+    },
+    "assets/editorial/scaling-ladder.svg": {
+      "bytes": 4486,
+      "git_blob_sha1": "9d7386114f723607e2957d8de1b6b8844dd4f6a4",
+      "sha256": "919f3befd6bf3d203f572bc5be61c6c9d5de2b7948211a2352067ea07733e8d9"
+    },
+    "assets/editorial/scaling-law.svg": {
+      "bytes": 3267,
+      "git_blob_sha1": "7d2d7f635b77d299c91f29f638ebb6779e9212d9",
+      "sha256": "6313ddc2651623b5e4587376a0fcdc0ea35d235f57fbec969a134d29824357db"
+    },
+    "assets/editorial/vacuum-window-assembly.jpg": {
+      "bytes": 139619,
+      "git_blob_sha1": "cf9c4cc0fba7838eb4894413f1965370046c1430",
+      "sha256": "01dc702356c5034260336527f68855cc128e15687812c4354384f03ccf4dfb8e"
+    },
+    "assets/fonts/OFL.txt": {
+      "bytes": 4388,
+      "git_blob_sha1": "1c9f43281b8f216c5461fe9ac729afbade7724e4",
+      "sha256": "1c05c68c34f9708415aada51f17e1b0092d2cea709bf4a94cd38114f9e73d7d9"
+    },
+    "assets/fonts/research-sans.woff2": {
+      "bytes": 267452,
+      "git_blob_sha1": "c1718bef739858dc2b71bd0429d42546140db4c7",
+      "sha256": "8e9e9f75762280254ab3ee72336f1a2d1f26f81894793515970081a752842f9c"
+    },
+    "assets/harness/architecture.svg": {
+      "bytes": 4526,
+      "git_blob_sha1": "a9a6d19c3bfba184d2e93e6fca3cb47708007364",
+      "sha256": "d91af8ab01e5eb87c5d541b53c490ec1c49c1d7b43490bfd2fda89daa33acf62"
+    },
+    "assets/harness/sanitized-mobile.png": {
+      "bytes": 1409205,
+      "git_blob_sha1": "43554fde5ee5a3a93cc1f08f0053fe7c3c0f2817",
+      "sha256": "88bdeae2cba3830e5da892cf36011e170c336850e771eed8abee8293b96c2a52"
+    },
+    "assets/previews/ion-trap-camera.webp": {
+      "bytes": 1798024,
+      "git_blob_sha1": "84f810b052a2a83e78c0c4551e0bc4eaf0bb198d",
+      "sha256": "b3be018b44477382c7b920b665a43793d41062604bba2ec48ab51fe4dc8d6e86"
+    },
+    "assets/previews/ion-trap-lab.webp": {
+      "bytes": 712946,
+      "git_blob_sha1": "8702a735c35e9736ccd64131ce0c822239f53dc1",
+      "sha256": "77da6a5efc6109053831b35d90d26cc7bfad5e3d27c8b40ed7613ead77d0f217"
+    },
+    "assets/previews/page-architecture.webp": {
+      "bytes": 131414,
+      "git_blob_sha1": "c8c19358a20c4eed1835c5a11df2eeff44c5830c",
+      "sha256": "a97f8b332db428ee26585db1fd490ca89ce160496a9774f029f7b06096e5a1e3"
+    },
+    "assets/previews/page-failure-cases.webp": {
+      "bytes": 251760,
+      "git_blob_sha1": "66e6b639688b465639f7f740dc62896eea02243c",
+      "sha256": "6506122676d50f4f72b59e03c7d9c45b5116847f81e2d146be65e683f3544cb2"
+    },
+    "assets/previews/page-generalization.webp": {
+      "bytes": 479578,
+      "git_blob_sha1": "b354aa249377440742cf91481f2813c14b9791ee",
+      "sha256": "aed2c5a3c87a86ab2cdd8159040f2fc6aaaaec2a3b7aaa2c05c778928c993a44"
+    },
+    "assets/previews/page-results.webp": {
+      "bytes": 456186,
+      "git_blob_sha1": "43451027ef646c122b626ceed97773da3a82f736",
+      "sha256": "af9acd3a98dbb529ad4254067e8b1dd4ab83a80be73a5d0b28838b485db86aaf"
+    },
+    "assets/previews/page-screen-gaze.webp": {
+      "bytes": 164474,
+      "git_blob_sha1": "64c80f91ef345b91b8763525800fa0329a92d5dc",
+      "sha256": "14edb3c8ed2d60c96f4617e2fa2748270ff9e30080a79839d879eae28f737fac"
+    },
+    "assets/previews/quctrl-rack.webp": {
+      "bytes": 389586,
+      "git_blob_sha1": "06c3eefe4112ea159b4d6db19614c7e740c31074",
+      "sha256": "1fe0150f7ec2f987a9fdd9cada1d69264dd44e5c9bfb74097e065ff390ba97c2"
+    },
+    "assets/previews/sanitized-mobile.webp": {
+      "bytes": 86310,
+      "git_blob_sha1": "ad5f413a6a41546b6b77d16751698ed8a3eff1e2",
+      "sha256": "2cfb5989d9c531904261e457cc24f067db8cb3ad6340644da399eb96f6951b43"
+    },
+    "assets/profile/portrait.jpg": {
+      "bytes": 398375,
+      "git_blob_sha1": "ca394c866d92fdfe297c947f22b744a447623b95",
+      "sha256": "9649343d3cd7bf966aea2c98710aec9ebf2ee26ac7a7ef9bfce601f888a1063a"
+    },
+    "assets/quantum/bell-architecture.webp": {
+      "bytes": 162264,
+      "git_blob_sha1": "489654854670a65e1d42b5d946372a1757682d3d",
+      "sha256": "bec7d770683b2140365e5f8c4e20e759f3fd5107071d418239220350ecc35198"
+    },
+    "assets/quantum/bell-coherence.webp": {
+      "bytes": 90530,
+      "git_blob_sha1": "784f3e4bfe5626f2ad50a1a71b2c148a3b8c9a04",
+      "sha256": "0b8eba748c6ecf951922d756ad4ac83ee3fbd8bf1225457857014be003764a97"
+    },
+    "assets/quantum/bell-feedback-trace.webp": {
+      "bytes": 131942,
+      "git_blob_sha1": "01dc556cdc4d4c586368b1c86260ac4c37d3ae1c",
+      "sha256": "63e71187c45edd5605b213fc5c27b04dc2ec63d914f086caee485560236857bf"
+    },
+    "assets/quantum/bell-feedforward.webp": {
+      "bytes": 146176,
+      "git_blob_sha1": "901cf4ca4d9188ea4e09875b32a9324f0e60470f",
+      "sha256": "a550819e2698fab255bd1edf77718202df859abdb42f61988b6892f415f65f25"
+    },
+    "assets/quantum/bell-fpga-board.webp": {
+      "bytes": 301782,
+      "git_blob_sha1": "bfc88c512db086b9e83def85373d3b3631e46eb6",
+      "sha256": "cc4a061db30479e2acd7ef93088b0c072da4e274f3e0ea3d419ed7d64914172e"
+    },
+    "assets/quantum/control-ui.webp": {
+      "bytes": 456112,
+      "git_blob_sha1": "554ae21dd464782c717c27ad63daa3c535966ca5",
+      "sha256": "f9419c0e582a82b97989184769610208be4909b9abd6daa37daeffc8921d3415"
+    },
+    "assets/quantum/ion-node-cad.webp": {
+      "bytes": 370954,
+      "git_blob_sha1": "a26035a403c5ab6d9043a4b38e7f882e65c3d717",
+      "sha256": "ece80e320af7b01a31898d69021a5016c5bc33cc0fa57e13cb456b14694d5781"
+    },
+    "assets/quantum/ion-trap-lab.webp": {
+      "bytes": 1743812,
+      "git_blob_sha1": "81e87dbe7591df8f0bf2eaa7c1f746a7ba66c556",
+      "sha256": "1a75a077287c675d3062f06b8490fc3a9497344ec8ba7927362e471f0e8c2720"
+    },
+    "assets/quantum/memory-architecture.webp": {
+      "bytes": 157824,
+      "git_blob_sha1": "72b072c670bb58dcb66da008841acbd0d5cc8078",
+      "sha256": "00cca6bd93a6b9178badc7004cccc8cbe3531773c00dd0e97ea27ccbe79c5f23"
+    },
+    "assets/quantum/multiplexing-architecture.webp": {
+      "bytes": 146948,
+      "git_blob_sha1": "db303be16d345953c4d14547b76cd7bedf754992",
+      "sha256": "a87ff5d7815fdc2dbc99d271f30c52e7ae028256145037d87976cca4cb3ff3b1"
+    },
+    "assets/quantum/network-overview.webp": {
+      "bytes": 198960,
+      "git_blob_sha1": "f11a4092402f50364612e7b601497b30315f1d8a",
+      "sha256": "9afba1f18e8a66c7c6c4a3cacd40b402c6e2f7e3adfa630fdab69f14e7dfa891"
+    },
+    "assets/quantum/pcb-layout.webp": {
+      "bytes": 164126,
+      "git_blob_sha1": "4aa6dcae96d07af5d7993e4ae82c8bd7c8c730dc",
+      "sha256": "ebef7cc54a69efea1840c6b51b44313065beccd14a6a724be98af4b6ca082560"
+    },
+    "assets/quantum/quctrl-compiler.webp": {
+      "bytes": 319588,
+      "git_blob_sha1": "3dc731fff7a63c8f2173bc9d840fc762761847ed",
+      "sha256": "2de78b1acee30b0bf15bf9fedb94427c4c0f63d1d50b844595aee770bac6de78"
+    },
+    "assets/quantum/quctrl-rack.webp": {
+      "bytes": 1323998,
+      "git_blob_sha1": "2ee112289939de6d08982a0b4ffdbb7a150f8c8a",
+      "sha256": "98a75394a12f145da4f30e8361399613fd80902ca288fdff017ee473773ea23a"
+    },
+    "assets/quantum/vacuum-assembly.webp": {
+      "bytes": 209530,
+      "git_blob_sha1": "49d0ef8881cec36aa7be32f4b283f1975ee891e0",
+      "sha256": "ee51e54d76f1a93ce881f58dd225502bc8476b19e4f7e5783a8d5b7c3b31dd96"
+    },
+    "favicon.svg": {
+      "bytes": 285,
+      "git_blob_sha1": "93c70fb1bf8746e84f5e51dceea896cfe31592c7",
+      "sha256": "453b67597064daee5c3960be5345afb6048ce734407c947c00a0ce98b257dca3"
+    },
+    "index.html": {
+      "bytes": 53571,
+      "git_blob_sha1": "c3d79b2c691ffbe2e9196a01139ed379574d3084",
+      "sha256": "a6125704873ad6f173d2eeabb8c8d261b75dcedc846e567f29aceb7d30f8a4cb"
+    },
+    "sources.html": {
+      "bytes": 13402,
+      "git_blob_sha1": "0c670c06b67d742c68d554706266fead69d2e5ad",
+      "sha256": "4cf3d899bbc04b7b9926882b9abab4bac0c3745c47ae828de46800e19976f1f3"
+    },
+    "style.css": {
+      "bytes": 22510,
+      "git_blob_sha1": "1d59fcd765f1609b28a35c342f5688e30cbf4883",
+      "sha256": "34dfaf4d56006312e67b97cfe74a0611fc2bffdfe7f2b6f14e50aa752209045b"
+    },
+    "visual.css": {
+      "bytes": 37358,
+      "git_blob_sha1": "137040c9cecd39cfb0ffc6e92f1efb5bf9350c88",
+      "sha256": "6bca9b44a2a75c23ea754d99b139ee6b50e7efc79c220fe82f6f123bd74e6d4b"
+    },
+    "work/bell-control.html": {
+      "bytes": 20568,
+      "git_blob_sha1": "41ea3f141ef8cf34ba6360ad14b4b595154f87d8",
+      "sha256": "1cf4c98e5c1fab3f8b49573ebb05d27d06f7fb9620061dabbd249c9fbb5cb88e"
+    },
+    "work/harness.html": {
+      "bytes": 20269,
+      "git_blob_sha1": "95e448817620b8ee45250b250f9d63b78408a639",
+      "sha256": "0d9440672f4e26021746c98127e9f0b7e61ae84adabe1a9da8aa749d3077c3da"
+    },
+    "work/minitrainsys.html": {
+      "bytes": 27837,
+      "git_blob_sha1": "5e33cce1bafbb381470d07fb4e843a8905b2f3e1",
+      "sha256": "a2e215b7407825815956c711b788897b0585c828c43985811248ea46384c8b87"
+    },
+    "work/page.html": {
+      "bytes": 22949,
+      "git_blob_sha1": "c18d6f4323b7add112d05f1af67ee36190219ed2",
+      "sha256": "8b10f787db5f0c69c8fff6169e0a6054218660d93d7a44f5e4235feacca857a5"
+    },
+    "work/quantum-control.html": {
+      "bytes": 16648,
+      "git_blob_sha1": "f4dcef35227187101ef355d77675d1f90fd81a58",
+      "sha256": "84389c30dc5048708dac80192d715bde221f7a1f6d3830f13fe4411b4414ac51"
+    },
+    "work/quantum-networks.html": {
+      "bytes": 22141,
+      "git_blob_sha1": "637c5ac85b4d7068ea0cb22e930ddfae2a152ba5",
+      "sha256": "4dcdfa2cdf593e9c64c40b26708656172dd74a2567da2573d5201050e5bf778b"
+    }
+  },
+  "repository": "Zhaibin-Cui/Zhaibin-Cui.github.io",
+  "schema": "zhaibin-cui-portfolio-public-v1",
+  "source": "public/"
+}

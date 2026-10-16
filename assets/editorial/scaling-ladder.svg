@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+<title id="title">Scaling ladder from small to medium to large models</title><desc id="desc">A conceptual three-tier ladder: small-scale controlled experiments, medium-scale trend and extrapolation estimates, and large-scale held-out validation. No internal model sizes, measured performance, or configuration details are shown.</desc>
+<defs><style>text{font-family:Arial,Helvetica,sans-serif;fill:#17191d}.label{font-size:18px;letter-spacing:2px;fill:#6f747b}.title{font-size:48px;font-weight:600;letter-spacing:-1px}.body{font-size:22px;fill:#626872}.small{font-size:18px;fill:#707680}.math{font-family:Cambria,Georgia,serif}.accent{fill:#385bce}</style><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M1 1L8 5L1 9" fill="none" stroke="#6f747b" stroke-width="1.5"/></marker></defs>
+<rect width="1600" height="900" fill="#f6f5f1"/>
+<text x="64" y="64" class="label">02 / SCALING LADDER</text><text x="1536" y="64" text-anchor="end" class="small">Conceptual illustration</text>
+
+<text x="64" y="145" class="title">A ladder for cross-scale reasoning.</text>
+<text x="64" y="192" class="body">Controlled experiments → scaling estimates → held-out validation</text>
+<path d="M493 419L575 342" fill="none" stroke="#6f747b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M1003 329L1085 252" fill="none" stroke="#6f747b" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="64" y="423" width="432" height="341" rx="4" fill="#eeefec" stroke="#cfd2d3"/>
+<rect x="584" y="333" width="432" height="431" rx="4" fill="#e9ecef" stroke="#bfc5cc"/>
+<rect x="1104" y="243" width="432" height="521" rx="4" fill="#edf0fa" stroke="#b4c2eb"/>
+<text x="96" y="469" class="label">01 / EXPLORE</text><text x="96" y="528" font-size="43" font-weight="600">Small</text>
+<text x="616" y="379" class="label">02 / ESTIMATE</text><text x="616" y="438" font-size="43" font-weight="600">Medium</text>
+<text x="1136" y="289" class="label accent">03 / VALIDATE</text><text x="1136" y="348" font-size="43" font-weight="600">Large</text>
+<g fill="#9ca3aa"><rect x="97" y="563" width="32" height="24"/><rect x="137" y="563" width="32" height="24"/><rect x="177" y="563" width="32" height="24"/></g>
+<g fill="#5c6671"><rect x="617" y="478" width="32" height="24"/><rect x="657" y="478" width="32" height="24"/><rect x="697" y="478" width="32" height="24"/><rect x="737" y="478" width="32" height="24"/><rect x="617" y="510" width="32" height="24"/><rect x="657" y="510" width="32" height="24"/><rect x="697" y="510" width="32" height="24"/><rect x="737" y="510" width="32" height="24"/></g>
+<g fill="#385bce"><rect x="1137" y="388" width="32" height="24"/><rect x="1177" y="388" width="32" height="24"/><rect x="1217" y="388" width="32" height="24"/><rect x="1257" y="388" width="32" height="24"/><rect x="1297" y="388" width="32" height="24"/><rect x="1137" y="420" width="32" height="24"/><rect x="1177" y="420" width="32" height="24"/><rect x="1217" y="420" width="32" height="24"/><rect x="1257" y="420" width="32" height="24"/><rect x="1297" y="420" width="32" height="24"/><rect x="1137" y="452" width="32" height="24"/><rect x="1177" y="452" width="32" height="24"/><rect x="1217" y="452" width="32" height="24"/><rect x="1257" y="452" width="32" height="24"/><rect x="1297" y="452" width="32" height="24"/></g>
+<g class="body"><text x="96" y="642">Compare candidate recipes</text><text x="96" y="678">Isolate data / training effects</text><text x="96" y="714">Build the experimental base</text>
+<text x="616" y="592">Test trend consistency</text><text x="616" y="628">Fit scale-dependent behavior</text><text x="616" y="664">Estimate beyond observed runs</text>
+<text x="1136" y="545">Evaluate held-out runs</text><text x="1136" y="581">Check prediction residuals</text><text x="1136" y="617">Refine scaling assumptions</text></g>
+<path d="M1136 660H1504" stroke="#bcc7e2"/><text x="1136" y="700" font-size="20" class="accent">Prediction ↔ observed outcome</text>
+<text x="800" y="826" text-anchor="middle" font-size="21">Matched evaluation · explicit compute budgets · reproducible configurations</text>
+<text x="800" y="868" text-anchor="middle" class="small">Generic scales only. Block counts are symbolic; no internal model configurations are shown.</text>
+</svg>
