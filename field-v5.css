@@ -1,0 +1,34 @@
+/* Decorative point fields only. Existing typography is intentionally inherited. */
+.research-field{position:relative;isolation:isolate;overflow:hidden;background:#f6f5f1}
+.research-field>canvas[data-research-field],.research-field>canvas[id$="-field"]{position:absolute;inset:0;width:100%;height:100%;z-index:-2;pointer-events:none}
+.research-field>.field-poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-3;pointer-events:none}
+/* The canvas and SVG already include the text-safe veil; avoid fading twice. */
+.research-field>.field-shade{background:none;pointer-events:none}
+.research-field:not([data-field-ready="true"]) [data-field-toggle]{visibility:hidden}
+.research-field[data-field-ready="true"]>.field-poster{visibility:hidden}
+.field-stage{min-height:410px;border-block:1px solid #dce0e7;margin-block:38px 64px}
+.field-stage>.field-toggle{position:absolute;right:28px;bottom:22px;z-index:3}
+.field-stage .field-copy{position:relative;z-index:2;max-width:48%;padding:64px 0;pointer-events:none}
+.field-stage .field-copy a,.field-stage .field-copy button{pointer-events:auto}
+.field-stage[data-field-layout="full"]{min-height:390px}
+.research-field [data-field-toggle]:focus-visible{outline:2px solid #667eab;outline-offset:4px}
+@media(max-width:1000px){
+  /* Match the Canvas text-safe vertical veil when JavaScript is unavailable. */
+  .research-field:not([data-field-layout="full"])>.field-poster{
+    object-position:62% 100%;
+    -webkit-mask-image:linear-gradient(180deg,transparent 0%,transparent 69%,rgba(0,0,0,.02) 74%,rgba(0,0,0,.45) 83%,rgba(0,0,0,.97) 92%,#000 100%);
+    mask-image:linear-gradient(180deg,transparent 0%,transparent 69%,rgba(0,0,0,.02) 74%,rgba(0,0,0,.45) 83%,rgba(0,0,0,.97) 92%,#000 100%);
+  }
+}
+@media(max-width:700px){
+  .field-stage{min-height:350px;margin-block:28px 42px}
+  .field-stage .field-copy{max-width:85%;padding-block:40px 90px}
+  .field-stage>.field-toggle{right:20px;bottom:18px}
+  .field-stage[data-field-layout="full"]{min-height:280px}
+}
+@media(prefers-reduced-motion:reduce){.research-field>canvas{transition:none}}
+@media print{
+  .research-field>canvas,.research-field>.field-poster,.research-field [data-field-toggle]{display:none!important}
+  .field-stage,.field-stage[data-field-layout="full"]{min-height:0;background:white;border:0;margin:0}
+  .field-stage .field-copy{max-width:100%;padding:20pt 0}
+}

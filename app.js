@@ -183,6 +183,26 @@
     const image = $('img', lightbox);
     const caption = $('.caption', lightbox);
     const closeButton = $('.close', lightbox);
+    const imageTools = document.createElement('div');
+    imageTools.className = 'lightbox-tools';
+    const scaleButton = document.createElement('button');
+    scaleButton.className = 'image-scale';
+    scaleButton.type = 'button';
+    scaleButton.setAttribute('aria-pressed', 'false');
+    imageTools.appendChild(scaleButton);
+    if (image) lightbox.insertBefore(imageTools, image);
+    function updateScaleLabel() {
+      const native = lightbox.classList.contains('native-size');
+      scaleButton.textContent = native ? (lang === 'zh' ? '适应窗口' : 'Fit to window') : (lang === 'zh' ? '100% 查看细节' : 'Inspect at 100%');
+      scaleButton.setAttribute('aria-pressed', String(native));
+    }
+    scaleButton.addEventListener('click', () => {
+      lightbox.classList.toggle('native-size');
+      updateScaleLabel();
+      lightbox.scrollTop = 0;
+      lightbox.scrollLeft = 0;
+    });
+    document.addEventListener('languagechange', updateScaleLabel);
     let previousFocus = null;
     let open = false;
     let fallback = false;
@@ -194,6 +214,7 @@
       if (!open) return;
       open = false;
       lightbox.classList.remove('is-open');
+      lightbox.classList.remove('native-size');
       lightbox.removeAttribute('aria-modal'); lightbox.removeAttribute('open');
       lightbox.hidden = true;
       if (fallback) ['display', 'position', 'left', 'top', 'transform', 'margin', 'zIndex'].forEach(key => { lightbox.style[key] = ''; });
@@ -213,6 +234,9 @@
       const source = trigger.dataset.zoom || (thumbnail && thumbnail.src);
       if (!source) return;
       previousFocus = document.activeElement;
+      lightbox.classList.remove('native-size');
+      imageTools.hidden = /\.svg(?:[?#]|$)/i.test(source);
+      updateScaleLabel();
       image.src = source; image.alt = thumbnail ? thumbnail.alt : '';
       const figure = trigger.closest('figure');
       const figureCaption = figure && $('figcaption', figure);
@@ -223,7 +247,7 @@
         originalLink.href = source;
         originalLink.target = '_blank';
         originalLink.rel = 'noopener';
-        originalLink.textContent = lang === 'zh' ? '打开高清原图 ↗' : 'Open full-resolution image ↗';
+        originalLink.textContent = lang === 'zh' ? '打开完整分辨率图片 ↗' : 'Open full-resolution image ↗';
         caption.appendChild(originalLink);
       }
       lightbox.hidden = false;
