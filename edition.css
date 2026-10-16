@@ -275,3 +275,21 @@ p,li{overflow-wrap:break-word}
 }
 /* A full-width quantum scene without scrollbar-induced horizontal overflow. */
 .quantum-field-stage{width:var(--page-width,100%);margin-inline:calc((100% - var(--page-width,100%)) / 2)}
+
+/* Keep image navigation visible while a full-resolution figure is panned. */
+.lightbox[open],.lightbox.is-open{display:flex;flex-direction:column;width:min(1120px,94vw);max-width:94vw;overflow:hidden}
+.lightbox .lightbox-tools{position:static;display:flex;flex:0 0 auto;align-items:center;justify-content:space-between;gap:16px;width:100%;margin:0 0 16px;background:none;border-radius:0}
+.lightbox .close{position:static;float:none;flex:0 0 44px;margin-left:auto}
+.lightbox-viewport{position:relative;flex:0 1 auto;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.lightbox:not(.native-size) .lightbox-viewport>img{display:block;width:auto;max-width:100%;height:auto;max-height:64vh;max-height:64dvh;object-fit:contain;margin-inline:auto}
+.lightbox.native-size .lightbox-viewport>img{display:block;width:var(--native-image-width,auto);max-width:none;height:auto;max-height:none;margin:0}
+.lightbox .caption,.lightbox.native-size>.caption{position:static;flex:0 0 auto;min-height:0;max-width:100%;max-height:18vh;max-height:18dvh;overflow:auto;overscroll-behavior:contain;margin:0;padding:15px 0 0}
+.lightbox .lightbox-original{display:flex;width:fit-content;margin-top:10px}
+@media(max-width:1000px){.demo-main select,.pub-search{font-size:16px}}
+@media(max-width:620px){
+  .lightbox[open],.lightbox.is-open{width:96vw;max-width:96vw;padding:15px}
+  .lightbox .lightbox-tools{gap:10px;margin-bottom:12px}
+  .lightbox:not(.native-size) .lightbox-viewport>img{max-height:60vh;max-height:60dvh}
+  .lightbox .caption{max-height:22vh;max-height:22dvh;padding-top:12px}
+  .demo-main select,.pub-search{font-size:16px}
+}

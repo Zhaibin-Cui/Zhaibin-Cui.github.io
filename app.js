@@ -195,16 +195,37 @@
     scaleButton.setAttribute('aria-pressed', 'false');
     imageTools.appendChild(scaleButton);
     if (image) lightbox.insertBefore(imageTools, image);
+    // The toolbar stays outside the pannable image on touch browsers.
+    if (closeButton) imageTools.appendChild(closeButton);
+    const imageViewport = document.createElement('div');
+    imageViewport.className = 'lightbox-viewport';
+    imageViewport.tabIndex = 0;
+    imageViewport.setAttribute('role', 'region');
+    imageViewport.setAttribute('aria-label', 'Enlarged figure; scroll to inspect details');
+    if (image) {
+      lightbox.insertBefore(imageViewport, image);
+      imageViewport.appendChild(image);
+    }
+    let vectorImage = false;
+    function sizeOriginal() {
+      if (!image) return;
+      const width = Math.max(image.naturalWidth || 0, vectorImage ? imageViewport.clientWidth * 2 : 0);
+      if (width) image.style.setProperty('--native-image-width', width + 'px');
+    }
+    if (image) image.addEventListener('load', sizeOriginal);
     function updateScaleLabel() {
       const native = lightbox.classList.contains('native-size');
       scaleButton.textContent = native ? (lang === 'zh' ? '适应窗口' : 'Fit to window') : (lang === 'zh' ? '100% 查看细节' : 'Inspect at 100%');
       scaleButton.setAttribute('aria-pressed', String(native));
     }
     scaleButton.addEventListener('click', () => {
+      sizeOriginal();
       lightbox.classList.toggle('native-size');
       updateScaleLabel();
       lightbox.scrollTop = 0;
       lightbox.scrollLeft = 0;
+      imageViewport.scrollTop = 0;
+      imageViewport.scrollLeft = 0;
     });
     document.addEventListener('languagechange', updateScaleLabel);
     let previousFocus = null;
@@ -224,7 +245,9 @@
       if (fallback) ['display', 'position', 'left', 'top', 'transform', 'margin', 'zIndex'].forEach(key => { lightbox.style[key] = ''; });
       if (backdrop) { backdrop.remove(); backdrop = null; }
       document.body.classList.remove('modal-open');
-      if (previousFocus && document.documentElement.contains(previousFocus)) previousFocus.focus();
+      if (previousFocus && document.documentElement.contains(previousFocus)) {
+        try { previousFocus.focus({ preventScroll: true }); } catch (_) { previousFocus.focus(); }
+      }
       previousFocus = null;
     }
     function closeLightbox() {
@@ -237,15 +260,26 @@
       const thumbnail = $('img', trigger);
       const source = trigger.dataset.zoom || (thumbnail && thumbnail.src);
       if (!source) return;
-      previousFocus = document.activeElement;
+      // Safari does not always focus a button after a touch/click.
+      previousFocus = trigger;
       lightbox.classList.remove('native-size');
-      imageTools.hidden = /\.svg(?:[?#]|$)/i.test(source);
+      vectorImage = /\.svg(?:[?#]|$)/i.test(source);
+      imageTools.hidden = false;
+      image.style.removeProperty('--native-image-width');
+      imageViewport.scrollTop = 0;
+      imageViewport.scrollLeft = 0;
       updateScaleLabel();
       image.src = source; image.alt = thumbnail ? thumbnail.alt : '';
       const figure = trigger.closest('figure');
       const figureCaption = figure && $('figcaption', figure);
       if (caption) {
-        caption.textContent = figureCaption ? figureCaption.innerText : '';
+        caption.textContent = '';
+        if (figureCaption) {
+          const description = document.createElement('div');
+          description.className = 'lightbox-description';
+          Array.from(figureCaption.childNodes).forEach(node => description.appendChild(node.cloneNode(true)));
+          caption.appendChild(description);
+        }
         const originalLink = document.createElement('a');
         originalLink.className = 'lightbox-original';
         originalLink.href = source;
@@ -267,11 +301,12 @@
         backdrop.addEventListener('click', closeLightbox);
         document.body.appendChild(backdrop);
         lightbox.classList.add('is-open'); lightbox.setAttribute('open', '');
-        Object.assign(lightbox.style, { display: 'block', position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', margin: '0', zIndex: '9999' });
+        Object.assign(lightbox.style, { display: 'flex', position: 'fixed', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', margin: '0', zIndex: '9999' });
       }
       open = true;
       lightbox.setAttribute('aria-modal', 'true');
       document.body.classList.add('modal-open');
+      sizeOriginal();
       (closeButton || lightbox).focus();
     }
     $$('[data-zoom]').forEach(trigger => trigger.addEventListener('click', () => openLightbox(trigger)));
