@@ -7,11 +7,15 @@
   'use strict';
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+  // Full-width artwork uses the layout viewport, excluding desktop scrollbars.
+  const syncPageWidth = () => document.documentElement.style.setProperty('--page-width', document.documentElement.clientWidth + 'px');
+  syncPageWidth();
+  window.addEventListener('resize', syncPageWidth, { passive: true });
   const hasRAF = typeof window.requestAnimationFrame === 'function' && typeof window.cancelAnimationFrame === 'function';
   const frame = hasRAF ? window.requestAnimationFrame.bind(window) : callback => window.setTimeout(() => callback(Date.now()), 32);
   const cancelFrame = hasRAF ? window.cancelAnimationFrame.bind(window) : window.clearTimeout.bind(window);
-  const motionQuery = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
-  let reducedMotion = Boolean(motionQuery && motionQuery.matches);
+  const motionQuery = null; // Continuous decorative motion requested for this edition.
+  const reducedMotion = false;
 
   function watchMedia(query, callback) {
     if (!query) return;
@@ -29,13 +33,13 @@
   }
   // URL language is authoritative; old browser preferences never override it.
   function languageFromUrl() {
-    try { return new URLSearchParams(location.search).get('lang') === 'zh' ? 'zh' : 'en'; }
+    try { return 'en'; }
     catch (error) { return 'en'; }
   }
   let lang = languageFromUrl();
 
   function setLang(value, updateUrl = false) {
-    lang = value === 'en' ? 'en' : 'zh';
+    lang = 'en'; // Chinese editorial content is archived, not exposed in this edition.
     document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
     if (updateUrl) {
       try {
@@ -54,7 +58,7 @@
       try {
         const url = new URL(anchor.getAttribute('href'), location.href);
         if (url.origin !== location.origin) return;
-        url.searchParams.set('lang', lang);
+        url.searchParams.delete('lang');
         anchor.href = url.pathname + url.search + url.hash;
       } catch (error) { /* Keep the original link. */ }
     });
@@ -427,7 +431,7 @@
     }
   }
   watchMedia(motionQuery, event => {
-    reducedMotion = Boolean(event.matches);
+    // The public edition does not switch to a static motion mode.
     if (reducedMotion) revealEverything();
     synchronizeCanvas();
   });
