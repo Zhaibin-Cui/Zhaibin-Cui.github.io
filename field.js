@@ -1,324 +1,291 @@
-/* Original optical field: a perspective point surface carried by orbital fibers.
- * Canvas 2D only. No third-party code, measured data, or remote assets.
- * Progressive enhancement: the SVG behind the canvas is the no-JS fallback.
+/* Original light point fields: layered representations and correlated waves.
+ * Canvas 2D, no remote assets or dependencies. Illustrative, not measured data.
+ * Each stage owns its controls; a static SVG remains the no-JS fallback.
  */
 (() => {
   'use strict';
-  const canvas = document.getElementById('research-field');
-  if (!canvas) return;
-  const container = canvas.closest('.research-field') || canvas.parentElement;
-  const button = document.querySelector('[data-field-toggle]');
-  let ctx;
-  try { ctx = canvas.getContext('2d', { alpha: false }); }
-  catch (_) { canvas.hidden = true; if (button) button.hidden = true; return; }
-  if (!ctx) { canvas.hidden = true; if (button) button.hidden = true; return; }
-
-  const canAnimate = typeof requestAnimationFrame === 'function' && typeof cancelAnimationFrame === 'function';
-  const motion = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
-  let reduced = Boolean(motion && motion.matches);
-  let userPaused = false;
-  let inView = true;
-  let pageHidden = false;
-  let running = false;
-  let raf = 0;
-  let resizeTimer = 0;
-  let scrollTimer = 0;
-  let width = 0;
-  let height = 0;
-  let dpr = 1;
-  let mobile = false;
-  let phase = 0;
-  let previous = 0;
-  let mesh = [];
-  let waveFloor = [];
-  let trails = [];
-  let geometry = null;
-  const base = document.createElement('canvas');
-  const baseCtx = base.getContext('2d', { alpha: false });
-  if (!baseCtx) { canvas.hidden = true; if (button) button.hidden = true; return; }
+  const canvases = ['research-field', 'quantum-field'].map(id => document.getElementById(id)).filter(Boolean);
+  if (!canvases.length) return;
   const TAU = Math.PI * 2;
-  const palette = ['197,211,232', '132,172,226', '120,146,226', '158,145,227', '206,207,232'];
+  const paper = '#f6f5f1';
+  const colors = ['93,119,162', '119,119,162', '132,117,163', '87,115,153'];
+  const canAnimate = typeof requestAnimationFrame === 'function' && typeof cancelAnimationFrame === 'function';
+  const media = typeof matchMedia === 'function' ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+  let reduced = Boolean(media && media.matches);
+  let pageHidden = false;
+  let scrollTimer = 0;
+  let resizeTimer = 0;
+  const stages = [];
+  const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
-  function project(u, v) {
-    const g = geometry;
-    const radius = g.radius * (0.60 + 0.45 * v);
-    const x = radius * Math.cos(u);
-    const y = radius * Math.sin(u);
-    const z = g.radius * (0.085 * Math.sin(2 * u + v * 2.8) + 0.035 * Math.sin(v * Math.PI));
-    const yy = y * g.ct - z * g.st;
-    const zz = y * g.st + z * g.ct;
-    const perspective = (3.8 * g.radius) / (3.8 * g.radius + zz);
-    return {
-      x: g.cx + (x * g.cr - yy * g.sr) * perspective,
-      y: g.cy + (x * g.sr + yy * g.cr) * perspective,
-      depth: Math.max(0, Math.min(1, (zz / g.radius + 1.1) / 2.2)),
-      scale: perspective,
-      u: u,
-      v: v
-    };
-  }
+  function makeStage(canvas) {
+    const container = canvas.closest('.research-field, .quantum-field-stage') || canvas.parentElement;
+    const mode = canvas.id === 'quantum-field' || container.dataset.fieldMode === 'quantum' ? 'quantum' : 'ai';
+    const button = container.querySelector('[data-field-toggle]');
+    let ctx;
+    try { ctx = canvas.getContext('2d', { alpha: false }); } catch (_) { /* SVG fallback. */ }
+    if (!ctx) { canvas.hidden = true; if (button) button.hidden = true; return null; }
 
-  function pathAt(target, v, start, end, steps) {
-    target.beginPath();
-    for (let i = 0; i <= steps; i++) {
-      const p = project(start + (end - start) * i / steps, v);
-      if (i === 0) target.moveTo(p.x, p.y);
-      else target.lineTo(p.x, p.y);
+    let width = 0, height = 0, dpr = 1, mobile = false;
+    let points = [], rows = 0, cols = 0;
+    let phase = 0, scrollView = 0.45, targetView = 0.45;
+    let running = false, userPaused = false, inView = false;
+    let frame = 0, previous = 0;
+    let geometry = null;
+    let background = null;
+    let readingVeil = null;
+    let edgeVeil = null;
+
+    function camera() {
+      const view = reduced ? 0.45 : scrollView;
+      const yaw = (mode === 'ai' ? -0.28 : -0.11) + (view - 0.5) * 0.22;
+      const tilt = (mode === 'ai' ? 0.60 : 0.72) + (view - 0.5) * 0.13;
+      geometry = {
+        cx: width * (mode === 'ai' ? (mobile ? 0.64 : 0.73) : 0.52),
+        cy: height * (mode === 'ai' ? 0.58 : 0.53),
+        size: Math.min(width * (mobile ? 0.61 : mode === 'ai' ? 0.43 : 0.35), height * (mode === 'ai' ? 0.69 : 0.77)),
+        cyaw: Math.cos(yaw), syaw: Math.sin(yaw), ct: Math.cos(tilt), st: Math.sin(tilt),
+        morph: (view - 0.5) * 0.06
+      };
     }
-  }
 
-  function createBase() {
-    base.width = canvas.width;
-    base.height = canvas.height;
-    baseCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    baseCtx.fillStyle = '#080a0f';
-    baseCtx.fillRect(0, 0, width, height);
-    const halo = baseCtx.createRadialGradient(geometry.cx, geometry.cy, 0, geometry.cx, geometry.cy, geometry.radius * 1.3);
-    halo.addColorStop(0, 'rgba(21,28,47,0.14)');
-    halo.addColorStop(0.55, 'rgba(29,36,65,0.20)');
-    halo.addColorStop(1, 'rgba(8,10,15,0)');
-    baseCtx.fillStyle = halo;
-    baseCtx.fillRect(0, 0, width, height);
-
-    // A restrained measurement grid, subordinate to the continuous field.
-    baseCtx.lineWidth = 0.5;
-    baseCtx.strokeStyle = 'rgba(160,174,201,0.035)';
-    const grid = mobile ? 72 : 100;
-    baseCtx.beginPath();
-    for (let x = width * 0.42; x < width; x += grid) {
-      baseCtx.moveTo(x, height * 0.08); baseCtx.lineTo(x, height * 0.93);
-    }
-    for (let y = height * 0.08; y < height * 0.94; y += grid) {
-      baseCtx.moveTo(width * 0.42, y); baseCtx.lineTo(width, y);
-    }
-    baseCtx.stroke();
-
-    const lanes = mobile ? 38 : 64;
-    const samples = mobile ? 104 : 160;
-    baseCtx.globalCompositeOperation = 'screen';
-    for (let j = 0; j < lanes; j++) {
-      const v = j / (lanes - 1);
-      const color = palette[Math.min(4, Math.floor(v * 5))];
-      const alpha = 0.13 + 0.15 * Math.pow(Math.sin(Math.PI * v), 2);
-      pathAt(baseCtx, v, 0, TAU, samples);
-      baseCtx.strokeStyle = 'rgba(' + color + ',' + alpha + ')';
-      baseCtx.lineWidth = j % 9 === 0 ? 0.9 : 0.45;
-      baseCtx.stroke();
-      if (j % 8 === 0) {
-        baseCtx.strokeStyle = 'rgba(' + color + ',0.06)';
-        baseCtx.lineWidth = 5;
-        baseCtx.stroke();
+    function elevation(x, z, layer, time) {
+      if (mode === 'quantum') {
+        const a = Math.sqrt((x + 0.47) ** 2 + z * z);
+        const b = Math.sqrt((x - 0.47) ** 2 + z * z);
+        return 0.115 * (Math.sin(a * 7.4 - time * 0.43) / Math.sqrt(0.5 + a)
+          + Math.sin(b * 7.4 - time * 0.43 + 0.48) / Math.sqrt(0.5 + b))
+          + geometry.morph * Math.sin(x * 2.3 - z * 1.2);
       }
-    }
-    baseCtx.globalCompositeOperation = 'source-over';
-  }
-
-  function prepare() {
-    const rect = container.getBoundingClientRect();
-    const newWidth = Math.max(1, Math.round(rect.width));
-    const newHeight = Math.max(1, Math.round(rect.height));
-    const newMobile = newWidth < 700;
-    const newDpr = Math.min(window.devicePixelRatio || 1, newMobile ? 1.5 : 2);
-    if (width === newWidth && height === newHeight && dpr === newDpr) return;
-    width = newWidth; height = newHeight; mobile = newMobile; dpr = newDpr;
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(height * dpr);
-    canvas.style.width = '100%'; canvas.style.height = '100%';
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    geometry = {
-      cx: width * (mobile ? 0.73 : 0.755), cy: height * (mobile ? 0.50 : 0.53),
-      radius: Math.min(width * (mobile ? 0.88 : 0.43), height * (mobile ? 0.51 : 0.84)),
-      ct: Math.cos(1.015), st: Math.sin(1.015), cr: Math.cos(-0.43), sr: Math.sin(-0.43)
-    };
-    const rows = mobile ? 20 : 30;
-    const cols = mobile ? 92 : 144;
-    mesh = [];
-    for (let j = 0; j < rows; j++) {
-      const v = j / (rows - 1);
-      for (let i = 0; i < cols; i++) {
-        const p = project((i + (j % 2) * 0.5) / cols * TAU, v);
-        p.color = Math.min(4, Math.floor(v * 5));
-        p.radius = (0.48 + 0.37 * (1 - p.depth)) * p.scale;
-        mesh.push(p);
-      }
-    }
-    trails = [];
-    waveFloor = [];
-    const floorRows = mobile ? 17 : 25;
-    const floorCols = mobile ? 42 : 74;
-    for (let row = 0; row < floorRows; row++) {
-      const depth = row / (floorRows - 1);
-      for (let col = 0; col < floorCols; col++) {
-        const across = col / (floorCols - 1);
-        const spread = 0.62 + depth * 0.58;
-        waveFloor.push({
-          x: width * (0.76 + (across - 0.5) * spread),
-          y: height * (0.68 + depth * 0.35),
-          across: across, depth: depth,
-          radius: 0.32 + depth * 0.58,
-          amplitude: height * (0.012 + depth * 0.026)
-        });
-      }
-    }
-    const count = mobile ? 13 : 24;
-    for (let i = 0; i < count; i++) {
-      trails.push({ v: 0.06 + 0.90 * ((i * 0.61803398875) % 1), angle: i * 2.3999632297, speed: 0.045 + (i % 7) * 0.006 });
-    }
-    createBase();
-    draw(phase);
-    container.dataset.fieldReady = 'true';
-  }
-
-  function draw(time) {
-    if (!geometry || width < 2 || height < 2) return;
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.globalAlpha = 1;
-    ctx.drawImage(base, 0, 0, width, height);
-    ctx.globalCompositeOperation = 'screen';
-
-    // The orbital field opens into one continuous, perspective wave surface.
-    // Small distant samples become brighter, wider-spaced points in front.
-    for (let band = 0; band < 3; band++) {
-      ctx.beginPath();
-      for (let i = 0; i < waveFloor.length; i++) {
-        const p = waveFloor[i];
-        if (Math.min(2, Math.floor(p.depth * 3)) !== band) continue;
-        const wave = Math.sin(p.across * 11 + p.depth * 4 - time * 0.24) * 0.67
-          + Math.sin(p.across * 19 - p.depth * 3 + time * 0.16) * 0.33;
-        const y = p.y + wave * p.amplitude;
-        ctx.moveTo(p.x + p.radius, y);
-        ctx.arc(p.x, y, p.radius, 0, TAU);
-      }
-      ctx.fillStyle = 'rgba(153,177,211,' + (0.13 + band * 0.095) + ')';
-      ctx.fill();
+      return -0.41 + layer * 0.27
+        + 0.085 * Math.sin(x * 2.3 + z * 1.9 + layer * 0.55 - time * 0.14)
+        + 0.035 * Math.cos(x * 4.2 - z * 2.6 + layer * 0.7 + time * 0.10)
+        + geometry.morph * Math.sin(x * 2 + z * 1.5);
     }
 
-    // Wave fronts modulate a single, coherent toroidal point surface.
-    // Batched paths keep the point field inexpensive on mobile GPUs.
-    for (let color = 0; color < palette.length; color++) {
-      for (let band = 0; band < 3; band++) {
-        ctx.beginPath();
-        for (let i = 0; i < mesh.length; i++) {
-          const p = mesh[i];
-          if (p.color !== color) continue;
-          const wave = 0.5 + 0.5 * Math.sin(p.u * 3 - p.v * 8 - time * 0.42);
-          if (Math.min(2, Math.floor(wave * 3)) !== band) continue;
-          const y = p.y + Math.sin(p.u * 3 - p.v * 7 - time * 0.42) * p.scale * (mobile ? 1.3 : 2.1);
-          ctx.moveTo(p.x + p.radius, y);
-          ctx.arc(p.x, y, p.radius, 0, TAU);
+    function project(x, y, z) {
+      const g = geometry;
+      const xx = x * g.cyaw + z * g.syaw;
+      const zz = z * g.cyaw - x * g.syaw;
+      const yy = y * g.ct + zz * g.st;
+      const depth = zz * g.ct - y * g.st;
+      const scale = 1 / (1 + depth * 0.17);
+      return { x: g.cx + xx * g.size * scale, y: g.cy + yy * g.size * scale, scale: scale };
+    }
+
+    function position(x, z, layer, time) {
+      return project(x, elevation(x, z, layer, time), z);
+    }
+
+    function prepare() {
+      const rect = container.getBoundingClientRect();
+      const w = Math.max(1, Math.round(rect.width));
+      const h = Math.max(1, Math.round(rect.height));
+      const small = w < 700;
+      const ratio = Math.min(window.devicePixelRatio || 1, small ? 1.5 : 2);
+      if (w === width && h === height && ratio === dpr) return;
+      width = w; height = h; dpr = ratio; mobile = small;
+      canvas.width = Math.round(width * dpr); canvas.height = Math.round(height * dpr);
+      canvas.style.width = '100%'; canvas.style.height = '100%';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      camera();
+      rows = mode === 'ai' ? (mobile ? 17 : 26) : (mobile ? 27 : 43);
+      cols = mode === 'ai' ? (mobile ? 37 : 62) : (mobile ? 53 : 90);
+      const layers = mode === 'ai' ? 4 : 1;
+      points = [];
+      for (let layer = 0; layer < layers; layer++) {
+        for (let row = 0; row < rows; row++) {
+          for (let col = 0; col < cols; col++) {
+            const u = col / (cols - 1), v = row / (rows - 1);
+            points.push({ x: (u - 0.5) * (mode === 'ai' ? 2.16 : 2.8), z: (v - 0.5) * 1.44,
+              layer: layer, band: Math.min(2, Math.floor(v * 3)),
+              radius: (mobile ? 0.78 : 0.95) + v * (mobile ? 0.45 : 0.65),
+              px: 0, py: 0, r: 0 });
+          }
         }
-        ctx.fillStyle = 'rgba(' + palette[color] + ',' + (0.26 + band * 0.20) + ')';
-        ctx.fill();
+      }
+      background = ctx.createRadialGradient(width * 0.78, height * 0.42, 0, width * 0.72, height * 0.5, Math.max(width, height) * 0.6);
+      background.addColorStop(0, 'rgba(219,227,241,0.48)');
+      background.addColorStop(0.45, 'rgba(230,223,239,0.24)');
+      background.addColorStop(1, 'rgba(246,245,241,0)');
+      readingVeil = ctx.createLinearGradient(0, 0, width, 0);
+      readingVeil.addColorStop(0, 'rgba(246,245,241,0.99)');
+      readingVeil.addColorStop(mobile ? 0.12 : 0.29, 'rgba(246,245,241,0.94)');
+      readingVeil.addColorStop(mobile ? 0.60 : 0.56, 'rgba(246,245,241,0.08)');
+      readingVeil.addColorStop(1, 'rgba(246,245,241,0)');
+      edgeVeil = ctx.createLinearGradient(0, 0, 0, height);
+      edgeVeil.addColorStop(0, 'rgba(246,245,241,0.42)');
+      edgeVeil.addColorStop(0.20, 'rgba(246,245,241,0)');
+      edgeVeil.addColorStop(0.81, 'rgba(246,245,241,0)');
+      edgeVeil.addColorStop(1, 'rgba(246,245,241,0.76)');
+      draw(reduced ? 0 : phase);
+      container.dataset.fieldReady = 'true';
+    }
+
+    function strokeRow(z, layer, time, alpha) {
+      ctx.beginPath();
+      const samples = mobile ? 40 : 64;
+      const extent = mode === 'ai' ? 2.16 : 2.8;
+      for (let i = 0; i <= samples; i++) {
+        const p = position((i / samples - 0.5) * extent, z, layer, time);
+        if (i === 0) ctx.moveTo(p.x, p.y); else ctx.lineTo(p.x, p.y);
+      }
+      ctx.strokeStyle = 'rgba(' + colors[layer % 4] + ',' + alpha + ')';
+      ctx.lineWidth = 0.55; ctx.stroke();
+    }
+
+    function draw(time) {
+      if (!geometry || width < 2 || height < 2) return;
+      camera();
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = paper; ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = background; ctx.fillRect(0, 0, width, height);
+
+      // One sampled surface family; lines and points share the same geometry.
+      for (let i = 0; i < points.length; i++) {
+        const p = points[i];
+        const view = position(p.x, p.z, p.layer, time);
+        p.px = view.x; p.py = view.y; p.r = p.radius * view.scale;
+      }
+      const layers = mode === 'ai' ? 4 : 1;
+      for (let layer = 0; layer < layers; layer++) {
+        for (let row = 2; row < rows; row += mode === 'ai' ? 7 : 6) {
+          strokeRow((row / (rows - 1) - 0.5) * 1.44, layer, time, mode === 'ai' ? 0.16 : 0.18);
+        }
+        for (let band = 0; band < 3; band++) {
+          ctx.beginPath();
+          for (let i = 0; i < points.length; i++) {
+            const p = points[i];
+            if (p.layer !== layer || p.band !== band) continue;
+            ctx.moveTo(p.px + p.r, p.py); ctx.arc(p.px, p.py, p.r, 0, TAU);
+          }
+          ctx.fillStyle = 'rgba(' + colors[mode === 'quantum' ? (band === 1 ? 2 : 0) : layer] + ',' + (0.35 + band * 0.18) + ')';
+          ctx.fill();
+        }
+      }
+      if (mode === 'ai') drawInformation(time); else drawCorrelation(time);
+      if (mode === 'ai') { ctx.fillStyle = readingVeil; ctx.fillRect(0, 0, width, height); }
+      ctx.fillStyle = edgeVeil; ctx.fillRect(0, 0, width, height);
+    }
+
+    function drawInformation(time) {
+      // Sparse cross-layer trajectories indicate transformation, not a network diagram.
+      const count = mobile ? 4 : 7;
+      for (let i = 0; i < count; i++) {
+        const x = -0.82 + i * 1.64 / (count - 1);
+        const z = Math.sin(i * 2.17) * 0.49;
+        const first = position(x, z, 0, time);
+        ctx.beginPath(); ctx.moveTo(first.x, first.y);
+        for (let layer = 1; layer < 4; layer++) {
+          const p = position(x, z, layer, time); ctx.lineTo(p.x, p.y);
+        }
+        ctx.strokeStyle = 'rgba(118,139,178,0.15)'; ctx.lineWidth = 0.65; ctx.stroke();
+        const at = ((time * 0.13 + i * 0.63) % 3);
+        const lower = Math.floor(at), mix = at - lower;
+        const y = elevation(x, z, lower, time) * (1 - mix) + elevation(x, z, lower + 1, time) * mix;
+        const p = project(x, y, z);
+        ctx.beginPath(); ctx.arc(p.x, p.y, 2.0 * p.scale, 0, TAU);
+        ctx.fillStyle = 'rgba(107,137,182,0.62)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(p.x, p.y, 4.8 * p.scale, 0, TAU);
+        ctx.strokeStyle = 'rgba(124,149,191,0.17)'; ctx.lineWidth = 0.8; ctx.stroke();
       }
     }
-    for (let i = 0; i < trails.length; i++) {
-      const t = trails[i];
-      const head = t.angle + time * t.speed;
-      const p = project(head, t.v);
-      const color = palette[Math.min(4, Math.floor(t.v * 5))];
-      const brightness = 0.46 + (1 - p.depth) * 0.45;
-      for (let part = 0; part < 3; part++) {
-        const start = head - 0.16 + part * 0.05;
-        pathAt(ctx, t.v, start, start + 0.057, 7);
-        ctx.strokeStyle = 'rgba(' + color + ',' + brightness * (0.2 + part * 0.25) + ')';
-        ctx.lineWidth = 1.1 * p.scale;
-        ctx.stroke();
+
+    function drawCorrelation(time) {
+      // Two phase-related sources shape the same wave field, without orbit graphics.
+      const sourceA = position(-0.47, 0, 0, time);
+      const sourceB = position(0.47, 0, 0, time);
+      ctx.beginPath(); ctx.moveTo(sourceA.x, sourceA.y); ctx.lineTo(sourceB.x, sourceB.y);
+      if (typeof ctx.setLineDash === 'function') ctx.setLineDash([2, 6]);
+      ctx.strokeStyle = 'rgba(131,139,181,0.24)'; ctx.lineWidth = 0.7; ctx.stroke();
+      if (typeof ctx.setLineDash === 'function') ctx.setLineDash([]);
+      for (const p of [sourceA, sourceB]) {
+        ctx.beginPath(); ctx.arc(p.x, p.y, 2.4 * p.scale, 0, TAU);
+        ctx.fillStyle = 'rgba(128,130,177,0.65)'; ctx.fill();
+        ctx.beginPath(); ctx.arc(p.x, p.y, (6.3 + Math.sin(time * 0.43) * 0.7) * p.scale, 0, TAU);
+        ctx.strokeStyle = 'rgba(128,145,185,0.23)'; ctx.lineWidth = 0.9; ctx.stroke();
       }
-      const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 8 * p.scale);
-      glow.addColorStop(0, 'rgba(' + color + ',' + brightness * 0.48 + ')');
-      glow.addColorStop(1, 'rgba(' + color + ',0)');
-      ctx.fillStyle = glow;
-      ctx.fillRect(p.x - 8 * p.scale, p.y - 8 * p.scale, 16 * p.scale, 16 * p.scale);
-      ctx.beginPath(); ctx.arc(p.x, p.y, 1.05 * p.scale, 0, TAU);
-      ctx.fillStyle = 'rgba(230,237,250,' + brightness + ')'; ctx.fill();
     }
 
-    // Protect the reading column without introducing a hard visual seam.
-    ctx.globalCompositeOperation = 'source-over';
-    const shade = ctx.createLinearGradient(0, 0, width, 0);
-    shade.addColorStop(0, 'rgba(8,10,15,0.99)');
-    shade.addColorStop(mobile ? 0.25 : 0.30, 'rgba(8,10,15,0.92)');
-    shade.addColorStop(mobile ? 0.68 : 0.57, 'rgba(8,10,15,0.13)');
-    shade.addColorStop(1, 'rgba(8,10,15,0)');
-    ctx.fillStyle = shade; ctx.fillRect(0, 0, width, height);
-    const edge = ctx.createLinearGradient(0, 0, 0, height);
-    edge.addColorStop(0, 'rgba(8,10,15,0.34)');
-    edge.addColorStop(0.24, 'rgba(8,10,15,0)');
-    edge.addColorStop(0.83, 'rgba(8,10,15,0)');
-    edge.addColorStop(1, 'rgba(8,10,15,0.60)');
-    ctx.fillStyle = edge; ctx.fillRect(0, 0, width, height);
+    function updateButton() {
+      if (!button) return;
+      const labels = reduced || !canAnimate ? { en: 'Static view', zh: '静态视图' }
+        : running ? { en: 'Pause motion', zh: '暂停动画' } : { en: 'Play motion', zh: '播放动画' };
+      const zh = (document.documentElement.lang || '').toLowerCase().startsWith('zh');
+      button.setAttribute('aria-pressed', running ? 'true' : 'false');
+      button.setAttribute('aria-label', labels[zh ? 'zh' : 'en']);
+      button.setAttribute('aria-controls', canvas.id);
+      button.title = labels[zh ? 'zh' : 'en'];
+      button.disabled = reduced || !canAnimate;
+      const enText = button.querySelector('.en'), zhText = button.querySelector('.zh');
+      if (enText && zhText) { enText.textContent = labels.en; zhText.textContent = labels.zh; }
+      else button.textContent = labels[zh ? 'zh' : 'en'];
+    }
+
+    function tick(now) {
+      if (!running) return;
+      const interval = 1000 / (mobile ? 24 : 30);
+      if (!previous) previous = now;
+      if (now - previous >= interval) {
+        const delta = Math.min(0.12, (now - previous) / 1000);
+        phase += delta; scrollView += (targetView - scrollView) * (1 - Math.exp(-delta * 2.4));
+        previous = now; draw(phase);
+      }
+      frame = requestAnimationFrame(tick);
+    }
+
+    function reconcile() {
+      const next = canAnimate && !reduced && !userPaused && inView && !document.hidden && !pageHidden;
+      if (running !== next) {
+        running = next;
+        if (frame) { cancelAnimationFrame(frame); frame = 0; }
+        previous = 0;
+        if (running) frame = requestAnimationFrame(tick);
+      }
+      updateButton();
+    }
+
+    function measure() {
+      const rect = container.getBoundingClientRect();
+      inView = rect.bottom > 0 && rect.top < window.innerHeight;
+      targetView = clamp((window.innerHeight - rect.top) / (window.innerHeight + Math.max(1, rect.height)), 0, 1);
+      reconcile();
+    }
+
+    function onReducedMotion() {
+      if (reduced) draw(0);
+      reconcile();
+    }
+    if (button) button.addEventListener('click', () => { userPaused = !userPaused; reconcile(); });
+    if (typeof ResizeObserver === 'function') {
+      const observer = new ResizeObserver(() => { prepare(); measure(); });
+      observer.observe(container);
+    }
+    if (typeof IntersectionObserver === 'function') {
+      const observer = new IntersectionObserver(entries => { inView = entries[0].isIntersecting; reconcile(); }, { threshold: 0 });
+      observer.observe(container);
+    }
+    prepare(); measure();
+    return { prepare: prepare, measure: measure, reconcile: reconcile, updateButton: updateButton, onReducedMotion: onReducedMotion };
   }
 
-  function updateButton() {
-    if (!button) return;
-    const isZh = (document.documentElement.lang || '').toLowerCase().startsWith('zh');
-    const labels = reduced || !canAnimate
-      ? { en: 'Static view', zh: '静态视图' }
-      : running ? { en: 'Pause motion', zh: '暂停动画' } : { en: 'Play motion', zh: '播放动画' };
-    button.setAttribute('aria-pressed', running ? 'true' : 'false');
-    button.setAttribute('aria-label', labels[isZh ? 'zh' : 'en']);
-    button.title = labels[isZh ? 'zh' : 'en'];
-    button.disabled = reduced || !canAnimate;
-    const en = button.querySelector('.en');
-    const zh = button.querySelector('.zh');
-    if (en && zh) { en.textContent = labels.en; zh.textContent = labels.zh; }
-    else button.textContent = labels[isZh ? 'zh' : 'en'];
-  }
-
-  function tick(now) {
-    if (!running) return;
-    const interval = 1000 / (mobile ? 24 : 30);
-    if (!previous) previous = now;
-    if (now - previous >= interval) {
-      phase += Math.min(0.12, (now - previous) / 1000);
-      previous = now;
-      draw(phase);
-    }
-    raf = requestAnimationFrame(tick);
-  }
-  function reconcile() {
-    const shouldRun = canAnimate && !reduced && !userPaused && inView && !document.hidden && !pageHidden;
-    if (shouldRun !== running) {
-      running = shouldRun;
-      if (raf) { cancelAnimationFrame(raf); raf = 0; }
-      previous = 0;
-      if (running) raf = requestAnimationFrame(tick);
-    }
-    updateButton();
-  }
-  function measureVisibility() {
-    const rect = container.getBoundingClientRect();
-    inView = rect.bottom > 0 && rect.top < window.innerHeight;
-    reconcile();
-  }
-  function queueResize() {
+  canvases.forEach(canvas => { const stage = makeStage(canvas); if (stage) stages.push(stage); });
+  // Shared passive listeners avoid duplicate scroll work as the page gains stages.
+  window.addEventListener('scroll', () => {
+    if (scrollTimer) return;
+    scrollTimer = setTimeout(() => { scrollTimer = 0; stages.forEach(stage => stage.measure()); }, 80);
+  }, { passive: true });
+  window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { prepare(); measureVisibility(); }, 110);
+    resizeTimer = setTimeout(() => stages.forEach(stage => { stage.prepare(); stage.measure(); }), 110);
+  }, { passive: true });
+  document.addEventListener('languagechange', () => stages.forEach(stage => stage.updateButton()));
+  document.addEventListener('visibilitychange', () => stages.forEach(stage => stage.reconcile()));
+  window.addEventListener('pagehide', () => { pageHidden = true; stages.forEach(stage => stage.reconcile()); });
+  window.addEventListener('pageshow', () => { pageHidden = false; stages.forEach(stage => stage.measure()); });
+  if (media) {
+    const changed = event => { reduced = event.matches; stages.forEach(stage => stage.onReducedMotion()); };
+    if (typeof media.addEventListener === 'function') media.addEventListener('change', changed);
+    else if (typeof media.addListener === 'function') media.addListener(changed);
   }
-  if (button) button.addEventListener('click', () => { userPaused = !userPaused; reconcile(); });
-  document.addEventListener('languagechange', updateButton);
-  document.addEventListener('visibilitychange', reconcile);
-  window.addEventListener('pagehide', () => { pageHidden = true; reconcile(); });
-  window.addEventListener('pageshow', () => { pageHidden = false; reconcile(); });
-  window.addEventListener('resize', queueResize, { passive: true });
-  if (typeof ResizeObserver === 'function') {
-    const observer = new ResizeObserver(queueResize);
-    observer.observe(container);
-  }
-  if (typeof IntersectionObserver === 'function') {
-    const observer = new IntersectionObserver(entries => { inView = entries[0].isIntersecting; reconcile(); }, { threshold: 0 });
-    observer.observe(container);
-  } else {
-    window.addEventListener('scroll', () => {
-      if (scrollTimer) return;
-      scrollTimer = setTimeout(() => { scrollTimer = 0; measureVisibility(); }, 160);
-    }, { passive: true });
-  }
-  if (motion) {
-    const onMotion = event => { reduced = event.matches; if (reduced) draw(phase); reconcile(); };
-    if (typeof motion.addEventListener === 'function') motion.addEventListener('change', onMotion);
-    else if (typeof motion.addListener === 'function') motion.addListener(onMotion);
-  }
-  prepare();
-  measureVisibility();
 })();

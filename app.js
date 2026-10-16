@@ -65,6 +65,33 @@
   window.addEventListener('popstate', () => setLang(languageFromUrl()));
   setLang(lang);
 
+  // Start nearby figures before they enter the viewport, including deep links.
+  // If a lightweight preview fails, the original figure remains available.
+  const pageImages = $$('img[src]');
+  pageImages.forEach(image => {
+    const original = image.closest('[data-zoom]');
+    function useOriginal() {
+      if (!original || image.dataset.originalTried) return;
+      const source = original.dataset.zoom;
+      if (!source || new URL(source, location.href).href === image.src) return;
+      image.dataset.originalTried = 'true';
+      image.src = source;
+    }
+    image.addEventListener('error', useOriginal, { once: true });
+    if (image.complete && !image.naturalWidth) useOriginal();
+  });
+  if (typeof IntersectionObserver === 'function') {
+    const imageObserver = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.loading = 'eager';
+        imageObserver.unobserve(entry.target);
+      }
+    }), { rootMargin: '1800px 0px' });
+    pageImages.filter(image => image.loading === 'lazy').forEach(image => imageObserver.observe(image));
+    window.addEventListener('pagehide', () => imageObserver.disconnect());
+    window.addEventListener('pageshow', () => pageImages.filter(image => !image.complete).forEach(image => imageObserver.observe(image)));
+  }
+
   // Shared, frame-throttled scroll/resize updates; nothing is queued while hidden.
   const viewportCallbacks = [];
   let viewportFrame = null;
@@ -189,7 +216,16 @@
       image.src = source; image.alt = thumbnail ? thumbnail.alt : '';
       const figure = trigger.closest('figure');
       const figureCaption = figure && $('figcaption', figure);
-      if (caption) caption.textContent = figureCaption ? figureCaption.innerText : '';
+      if (caption) {
+        caption.textContent = figureCaption ? figureCaption.innerText : '';
+        const originalLink = document.createElement('a');
+        originalLink.className = 'lightbox-original';
+        originalLink.href = source;
+        originalLink.target = '_blank';
+        originalLink.rel = 'noopener';
+        originalLink.textContent = lang === 'zh' ? '打开高清原图 ↗' : 'Open full-resolution image ↗';
+        caption.appendChild(originalLink);
+      }
       lightbox.hidden = false;
       fallback = typeof lightbox.showModal !== 'function';
       if (!fallback) {
@@ -199,7 +235,7 @@
         backdrop = document.createElement('div');
         backdrop.className = 'lightbox-fallback-backdrop';
         backdrop.setAttribute('aria-hidden', 'true');
-        Object.assign(backdrop.style, { position: 'fixed', inset: '0', background: 'rgba(0,0,0,.88)', zIndex: '9998' });
+        Object.assign(backdrop.style, { position: 'fixed', inset: '0', background: 'rgba(235,237,242,.93)', zIndex: '9998' });
         backdrop.addEventListener('click', closeLightbox);
         document.body.appendChild(backdrop);
         lightbox.classList.add('is-open'); lightbox.setAttribute('open', '');

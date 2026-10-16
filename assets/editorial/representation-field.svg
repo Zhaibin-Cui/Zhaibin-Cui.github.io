@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="800" viewBox="0 0 1600 800" role="img" aria-labelledby="title desc">
 <title id="title">Data, representation, and computation</title>
-<desc id="desc">An original conceptual research diagram. Controlled changes to a corpus feed a layered representation field. Frozen-backbone probes and oracle-conditioned readout ask different questions about accessible information. Hidden reasoning, regret, and classifier-free guidance remain research questions. Points and paths are illustrative, not measured embeddings or evidence of causality.</desc>
+<desc id="desc">An original conceptual research diagram. Controlled changes to a corpus feed a layered representation field. Frozen-backbone probes and oracle-conditioned readout ask different questions about accessible information. Hidden reasoning, regret, and context-free grammar learning remain research questions. Points and paths are illustrative, not measured embeddings or evidence of causality.</desc>
 <metadata>Original editorial illustration for Zhaibin Cui. Method context: https://github.com/Zhaibin-Cui/mini-train-sys . No experimental measurements are plotted.</metadata>
 <defs>
  <linearGradient id="plane" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#edf1fb" stop-opacity=".8"/><stop offset="1" stop-color="#ccd9fb" stop-opacity=".12"/></linearGradient>
