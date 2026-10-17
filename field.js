@@ -1,11 +1,12 @@
-/* v17. Original three-dimensional point studies.
+/* v18. Original three-dimensional point studies.
  * The MoE decoder schematic combines causal multi-head attention from Vaswani
  * et al., https://arxiv.org/abs/1706.03762, and sparse FFN routing from Shazeer
- * et al., https://arxiv.org/abs/1701.06538. Top-2-of-8 routing is an illustrative
- * configuration following Mixtral, https://arxiv.org/abs/2401.04088. The three
+ * et al., https://arxiv.org/abs/1701.06538. Selected-logit normalization follows
+ * the top-K formulation in https://arxiv.org/abs/2401.04088, section 2.1. Sixteen
+ * experts and top-2 / top-4 are illustrative, NOT Mixtral's configuration. The three
  * attention planes are parallel heads within ONE decoder block, not layers.
  * Router logits and attention highlights are synthetic explanatory values;
- * normalization/embedding operations are omitted. This is neither MiniMax's
+ * normalization/embedding operations, capacity limits and dropped tokens are omitted. This is neither MiniMax's
  * architecture nor a visualization of measured model or experimental results.
  */
 (() => {
@@ -20,24 +21,26 @@
   let hidden=false,raf=0,then=0,lastPaint=0;
   function make(canvas,host,mode,hero=false){
     let ctx;try{ctx=canvas.getContext('2d',{alpha:false});}catch(_){return;}if(!ctx)return;
-    canvas.dataset.fieldRenderer='v17';host.dataset.fieldRenderer='v17';
+    canvas.dataset.fieldRenderer='v18';host.dataset.fieldRenderer='v18';
     host.dataset.fieldShape=mode==='transformer'?'causal-moe-transformer':mode;host.dataset.fieldMode=mode;
     const isLanding=host.classList.contains('landing-moon');
     const descriptions={transformer:['Sparse MoE decoder','Select a token · trace attention and experts','Trace token'],training:['Training trajectories','Drag the landscape · compare trajectories','Trace paths'],vision:['Spatial token representation','Touch to perturb · drag to rotate','Send a ripple'],agents:['Agent coordination graph','Drag a node · route a task','Dispatch task'],world:['Action-conditioned futures','Drag to inspect · compare possible futures','Compare paths'],control:['Synchronized control channels','Drag to inspect · follow the event clock','Run sequence'],quantum:['Distributed quantum field','Drag to rotate · shift optical phase','Shift phase']};
     const description=descriptions[mode]||descriptions.transformer;
     let surface=host;
     let w=0,h=0,dpr=1,small=false,visible=false,t=0,px=0,py=0,tx=0,ty=0,pulse=-20,selected=4,step=-1,interactions=0,renderCount=0,tokenHoldUntil=9;
+    let moeTopK=4,moeBatch=true,moeFeedbackKey='',moePhaseKey='',moeClockStart=0,moeCycle=0;
+    const moeExpertCount=16;
     let g={left:0,top:0,width:1,height:1,scale:1,cx:0,cy:0},points=[],paths=[],labels=[],screenPoints=[],pickWorld=[];
     let pane=null,bar=null,status=null,pressed=false,moved=false,start=null,phaseOffset=0,dragNode=-1;
     const ripples=[],nodeOffsets=Array.from({length:7},()=>({x:0,y:0}));
     const stages=['Tokens','Q / K / V','Causal attention','Output projection','Top-2 routing','Expert FFNs','Weighted combination','Residual output'];
     function routeToken(token){
-      const scores=Array.from({length:8},(_,expert)=>({expert,score:Math.cos((token+1)*(expert+1)*.73)+.35*Math.sin(expert*.83+token)})).sort((a,b)=>b.score-a.score).slice(0,2);
+      const scores=Array.from({length:moeExpertCount},(_,expert)=>({expert,score:Math.cos((token+1)*(expert+1)*.73)+.35*Math.sin(expert*.83+token)})).sort((a,b)=>b.score-a.score).slice(0,moeTopK);
       const norm=scores.reduce((sum,v)=>sum+Math.exp(v.score),0);
       return scores.map(v=>({expert:v.expert,weight:Math.exp(v.score)/norm}));
     }
     function record(type){interactions++;host.dataset.fieldInteractions=String(interactions);host.dataset.fieldInteractionType=type;}
-    function activate(token,x=0,z=0){if(Number.isInteger(token))selected=clamp(token,0,mode==='agents'?6:7);pulse=t;tokenHoldUntil=t+12;phaseOffset+=Math.PI/3;ripples.push({x,z,t});if(ripples.length>5)ripples.shift();record(mode==='transformer'?'attention-flow':'activate');host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldPhase=String(phaseOffset);if(status){const gate=routeToken(selected);status.textContent=mode==='transformer'?`Token ${selected+1} can attend to positions 1 through ${selected+1}. The illustrative router selects experts ${gate[0].expert+1} and ${gate[1].expert+1}, with normalized weights ${gate.map(v=>Math.round(v.weight*100)+' percent').join(' and ')}. Their FFN outputs are combined and added to the residual stream.`:`${description[0]} updated.`;}}
+    function activate(token,x=0,z=0){if(Number.isInteger(token))selected=clamp(token,0,mode==='agents'?6:7);pulse=t;tokenHoldUntil=t+12;moeClockStart=t;moeCycle=0;phaseOffset+=Math.PI/3;ripples.push({x,z,t});if(ripples.length>5)ripples.shift();record(mode==='transformer'?'attention-flow':'activate');host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldPhase=String(phaseOffset);if(status){const gate=routeToken(selected);status.textContent=mode==='transformer'?`Token ${selected+1} can attend to positions 1 through ${selected+1}. The illustrative router selects ${moeTopK} of ${moeExpertCount} experts: ${gate.map(v=>v.expert+1).join(', ')}. Their normalized weights are ${gate.map(v=>Math.round(v.weight*100)+' percent').join(', ')}. Expert outputs combine separately for each token, then join that token's residual stream.`:`${description[0]} updated.`;}}
     if(hero){
       host.classList.add('field-interactive','scientific-field');if(mode==='transformer')host.classList.add('transformer-field');
       surface=document.createElement('div');surface.className='scientific-field-stage';
@@ -48,18 +51,24 @@
       surface.append(canvas);
       if(isLanding){const coordinate=host.querySelector('.landing-coordinate');if(coordinate)surface.append(coordinate);}
       pane=document.createElement('div');pane.className='field-interaction transformer-interaction';pane.tabIndex=0;pane.setAttribute('role','group');pane.setAttribute('aria-label',`Explore ${description[0].toLowerCase()}`);
-      const help=document.createElement('span');help.className='field-sr-only';help.id='transformer-help-'+scenes.length;help.textContent=mode==='transformer'?'A conceptual sparse mixture-of-experts decoder block. Three parallel attention heads share a causal mask: faint upper-triangle positions are unavailable to the selected token. A router chooses two of eight feed-forward experts; their weighted outputs join the residual stream. Heads are not stacked layers. Select a token to change its allowed attention positions and expert pair. Drag to change perspective. Arrow keys select a token; Enter traces its path; R resets. Normalization is omitted. This illustration does not show MiniMax architecture or measured routing.':`${description[0]}. ${description[1]}. Arrow keys select a state, Enter activates it, and R resets the view. This is a conceptual study, not measured experimental data.`;pane.setAttribute('aria-describedby',help.id);
+      const help=document.createElement('span');help.className='field-sr-only';help.id='transformer-help-'+scenes.length;help.textContent=mode==='transformer'?'A conceptual sparse mixture-of-experts decoder block. Three parallel attention heads share a causal mask: faint upper-triangle positions are unavailable. A router chooses two or four of sixteen feed-forward experts independently for each token, with weights normalized over that token’s selected experts. Four-token batch view shows simultaneous routes; each token retains its own weighted output and residual. Heads are not stacked layers. Select a token, switch top-K or focus the view. Drag to change perspective. Arrow keys select tokens; Enter traces; B toggles batch; K changes top-K; R resets. Normalization, capacity limits and token dropping are omitted. Synthetic explanatory routing, not MiniMax architecture.':`${description[0]}. ${description[1]}. Arrow keys select a state, Enter activates it, and R resets the view. This is a conceptual study, not measured experimental data.`;pane.setAttribute('aria-describedby',help.id);
       bar=document.createElement('div');bar.className='field-playbar transformer-playbar';bar.innerHTML=`<span class="field-play-hint">${description[1]}</span><button class="field-play-action" type="button">${description[2]}</button><button class="field-play-reset" type="button">Reset</button>`;
-      if(mode==='transformer'){const caption=document.createElement('span');caption.className='field-concept-caption';caption.textContent='Conceptual MoE decoder · illustrative top-2 routing';caption.style.cssText='flex-basis:100%;font-size:10px;line-height:1.5;letter-spacing:.015em;color:#71819a';bar.prepend(caption);}
+      if(mode==='transformer'){
+        bar.classList.add('moe-playbar');bar.innerHTML=`<span class="moe-concept">Conceptual MoE decoder · illustrative 16-expert bank</span><div class="moe-controls"><label class="moe-select-wrap"><span>Token</span><select class="moe-select" aria-label="Select token">${Array.from({length:8},(_,i)=>`<option value="${i}"${i===selected?' selected':''}>${i+1} / 8</option>`).join('')}</select></label><div class="moe-segment" role="group" aria-label="Experts per token"><button type="button" data-top-k="2" aria-pressed="false">Top 2</button><button type="button" data-top-k="4" aria-pressed="true">Top 4</button></div><button class="moe-batch" type="button" aria-pressed="true" aria-label="Show four tokens together">Batch ×4</button><button class="field-play-action" type="button">Trace</button><button class="field-play-reset" type="button">Reset</button></div><div class="moe-feedback"><strong class="moe-token-feedback">Token 5</strong><span class="moe-weights"></span></div><div class="moe-flow"><span data-phase="0">Attention</span><i>→</i><span data-phase="1">Dispatch</span><i>→</i><span data-phase="2">Compute</span><i>→</i><span data-phase="3">Combine</span></div><span class="moe-hint">Select a token to follow its routes · drag to rotate</span>`;
+        const actionPair=document.createElement('span');actionPair.className='moe-action-pair';actionPair.append(bar.querySelector('.field-play-action'),bar.querySelector('.field-play-reset'));bar.querySelector('.moe-controls').append(actionPair);
+        bar.querySelector('.moe-select').addEventListener('change',e=>activate(Number(e.target.value)));
+        bar.querySelectorAll('[data-top-k]').forEach(button=>button.addEventListener('click',()=>{moeTopK=Number(button.dataset.topK);moeFeedbackKey='';activate();record('top-k-change');}));
+        bar.querySelector('.moe-batch').addEventListener('click',()=>{moeBatch=!moeBatch;moeFeedbackKey='';activate();record('batch-toggle');});
+      }
       status=document.createElement('span');status.className='field-sr-only';status.setAttribute('role','status');status.setAttribute('aria-live','polite');surface.append(pane,bar,help,status);
       bar.querySelector('.field-play-action').addEventListener('click',()=>activate());
-      bar.querySelector('.field-play-reset').addEventListener('click',()=>{tx=ty=0;selected=4;pulse=-20;tokenHoldUntil=t+9;phaseOffset=0;ripples.length=0;nodeOffsets.forEach(n=>{n.x=n.y=0;});record('reset');status.textContent='Perspective reset. Token 5 selected.';});
+      bar.querySelector('.field-play-reset').addEventListener('click',()=>{tx=ty=0;selected=4;pulse=-20;tokenHoldUntil=t+9;moeTopK=4;moeBatch=true;moeClockStart=t;moeCycle=0;moeFeedbackKey='';phaseOffset=0;ripples.length=0;nodeOffsets.forEach(n=>{n.x=n.y=0;});record('reset');status.textContent='Perspective reset. Token 5 selected.';});
       const location=e=>{const r=surface.getBoundingClientRect();return{x:(e.clientX-r.left)*w/r.width,y:(e.clientY-r.top)*h/r.height};};
       pane.addEventListener('pointerdown',e=>{if(e.button!==0)return;pressed=true;moved=false;start={...location(e),tx,ty,id:e.pointerId};dragNode=mode==='agents'?screenPoints.findIndex(n=>Math.hypot(n.x-start.x,n.y-start.y)<25):-1;if(dragNode>=0){start.nx=nodeOffsets[dragNode].x;start.ny=nodeOffsets[dragNode].y;}try{pane.setPointerCapture(e.pointerId);}catch(_){};pane.classList.add('is-dragging');});
       pane.addEventListener('pointermove',e=>{const p=location(e);if(pressed){const dx=p.x-start.x,dy=p.y-start.y;moved=moved||Math.hypot(dx,dy)>5;if(dragNode>=0){nodeOffsets[dragNode].x=clamp(start.nx+dx/g.scale,-.4,.4);nodeOffsets[dragNode].y=clamp(start.ny+dy/g.scale,-.4,.4);}else{tx=clamp(start.tx+dx*.0028,-.32,.32);ty=clamp(start.ty+dy*.0012,-.15,.15);}}else{pane.classList.toggle('is-node-hover',screenPoints.some(n=>Math.hypot(n.x-p.x,n.y-p.y)<18));}});
       const end=(e,cancel)=>{if(!pressed)return;pressed=false;pane.classList.remove('is-dragging');if(!cancel){if(moved){record(dragNode>=0?'node-drag':'view-drag');if(dragNode>=0)host.dataset.fieldNodeOffset=String(Math.hypot(nodeOffsets[dragNode].x,nodeOffsets[dragNode].y));}else{const p=location(e);let n=selected,d=Infinity;screenPoints.forEach((q,i)=>{const dd=Math.hypot(p.x-q.x,p.y-q.y);if(dd<d){d=dd;n=i;}});activate(d<80?n:undefined,(p.x-g.cx)/g.scale,(p.y-g.cy)/g.scale);}}dragNode=-1;};
       pane.addEventListener('pointerup',e=>end(e,false));pane.addEventListener('pointercancel',e=>end(e,true));
-      pane.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();const count=mode==='agents'?7:8;selected=(selected+(['ArrowLeft','ArrowUp'].includes(e.key)?count-1:1))%count;activate(selected);}else if(['Enter',' '].includes(e.key)){e.preventDefault();activate();}else if(e.key.toLowerCase()==='r')bar.querySelector('.field-play-reset').click();});
+      pane.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();const count=mode==='agents'?7:8;selected=(selected+(['ArrowLeft','ArrowUp'].includes(e.key)?count-1:1))%count;activate(selected);}else if(['Enter',' '].includes(e.key)){e.preventDefault();activate();}else if(e.key.toLowerCase()==='r')bar.querySelector('.field-play-reset').click();else if(mode==='transformer'&&e.key.toLowerCase()==='b'){e.preventDefault();bar.querySelector('.moe-batch').click();}else if(mode==='transformer'&&e.key.toLowerCase()==='k'){e.preventDefault();bar.querySelector(`[data-top-k="${moeTopK===4?2:4}"]`).click();}});
     }else{
       host.setAttribute('aria-hidden','true');
       // Card art never captures a click, touch or wheel event. Hover is observed on
@@ -76,7 +85,9 @@
       w=Math.max(1,(parseFloat(style.width)||surface.clientWidth)-(style.boxSizing==='border-box'?borderX:0));h=Math.max(1,(parseFloat(style.height)||surface.clientHeight)-(style.boxSizing==='border-box'?borderY:0));small=hero?host.clientWidth<700:w<700;dpr=Math.min((devicePixelRatio||1)*Math.max(1,r.width/(w+borderX))*(window.visualViewport?.scale||1),hero?3:2.5);
       canvas.width=Math.ceil(w*dpr);canvas.height=Math.ceil(h*dpr);ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
       if(hero){
-        g={left:6,top:16,width:w-12,height:h-(small?96:82)-(mode==='transformer'?22:0)};
+        bar.style.cssText=`left:14px;width:${w-28}px;bottom:7px`;
+        const controls=mode==='transformer'?Math.max(160,bar.getBoundingClientRect().height/(r.width/(w+borderX))+28):(small?96:82);
+        g={left:6,top:16,width:w-12,height:h-controls};
         pane.style.cssText=`left:${g.left}px;top:${g.top}px;width:${g.width}px;height:${g.height}px`;
         bar.style.cssText=`left:${g.left+8}px;width:${g.width-16}px;bottom:7px`;
       }else g={left:10,top:8,width:w-20,height:h-16};
@@ -109,63 +120,92 @@
     }
     function arc(a,b,lift=.12,depth=0){const out=[];for(let i=0;i<=32;i++){const u=i/32;out.push([mix(a[0],b[0],u),mix(a[1],b[1],u)-Math.sin(u*Math.PI)*lift,mix(a[2],b[2],u)+Math.sin(u*Math.PI)*depth]);}return out;}
     function transformer(){
-      if(t>tokenHoldUntil&&t-pulse>9)selected=Math.floor((t-tokenHoldUntil)*.20)%8;
-      const gate=routeToken(selected),active=gate.map(v=>v.expert),vertical=hero&&w<720;
-      step=(t-pulse)*.78;host.dataset.fieldFlowStage=step>=0&&step<stages.length?stages[Math.floor(step)]:'overview';
+      // Automatic exploration changes token identity only between complete
+      // selected-token cycles; in-flight dispatch/combine paths never jump.
+      const cycle=Math.floor((t-moeClockStart)*.155);
+      if(cycle!==moeCycle){moeCycle=cycle;if(t>tokenHoldUntil&&t-pulse>9)selected=(selected+1)%8;}
+      const gate=routeToken(selected),active=gate.map(v=>v.expert),vertical=hero&&w<650;
+      const batchClock=fract((t-moeClockStart)*.155);
+      // Staggered starts share a batch boundary, so every companion output has
+      // arrived before automatic exploration replaces the displayed tokens.
+      const batch=(moeBatch?[selected,(selected+2)%8,(selected+4)%8,(selected+6)%8]:[selected]).map((token,j)=>({token,j,gate:routeToken(token),clock:clamp((batchClock-j*.055)/(1-j*.055),0,.999999),color:j===0?0:j===1?1:4}));
+      const clock=batch[0].clock,phase=clock<.27?0:clock<.51?1:clock<.65?2:3;
+      const batchActive=[...new Set(batch.flatMap(b=>b.gate.map(v=>v.expert)))];
+      host.dataset.fieldFlowStage=['Attention','Dispatch','Compute','Combine'][phase];
       host.dataset.fieldArchitecture='sparse-moe';host.dataset.fieldDecoderBlocks='1';host.dataset.fieldAttentionHeads='3';host.dataset.fieldCoreNodes='8';
-      host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldActiveExperts=active.map(i=>i+1).join(',');host.dataset.fieldExpertWeights=gate.map(v=>v.weight.toFixed(6)).join(',');host.dataset.fieldTopK='2';host.dataset.fieldExpertCount='8';host.dataset.fieldComposition=vertical?'folded':'horizontal';
+      host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldActiveExperts=active.map(i=>i+1).join(',');host.dataset.fieldExpertWeights=gate.map(v=>v.weight.toFixed(6)).join(',');host.dataset.fieldTopK=String(moeTopK);host.dataset.fieldExpertCount=String(moeExpertCount);host.dataset.fieldComposition=vertical?'folded':'horizontal';
+      host.dataset.fieldBatchSize=String(batch.length);host.dataset.fieldBatchActiveExperts=batchActive.map(i=>i+1).join(',');host.dataset.fieldBatchRoutes=JSON.stringify(batch.map(b=>({token:b.token+1,experts:b.gate.map(v=>v.expert+1),weights:b.gate.map(v=>Number(v.weight.toFixed(6)))})));host.dataset.fieldRouteCount=String(batch.length*moeTopK*2);host.dataset.fieldSeparateTokenOutputs='true';host.dataset.fieldClock=clock.toFixed(4);
       host.dataset.fieldCausalPositions=Array.from({length:selected+1},(_,i)=>i+1).join(',');host.dataset.fieldMaskedCells='84';host.dataset.fieldMaskAlpha='.14';host.dataset.fieldAllowedAlpha='.52';
-      const token=vertical?[-1.14,-1.26,0]:[-2.24,.05,0],qkv=vertical?[-.65,-1.26,0]:[-1.72,.05,0],attention=vertical?[.18,-1.28,0]:[-.79,-.08,0],projection=vertical?[1.02,-1.08,0]:[-.09,.12,0],add=vertical?[1.13,-.53,0]:[.18,.12,0],router=vertical?[0,-.02,0]:[.54,.12,0],combine=vertical?[0,1.65,0]:[2.17,.12,0],output=vertical?[0,2.0,0]:[2.58,.12,0];
-      const attSize=vertical?.85:.91;
-      function tokenPanel(c,sx,sy,color=0){for(let row=0;row<8;row++)for(let col=0;col<5;col++)for(let depth=0;depth<2;depth++)point(c[0]+(col/4-.5)*sx,c[1]+(row/7-.5)*sy,c[2]+(depth-.5)*.06,color,row===selected?.90:.47,row===selected?1.05:.78);}
-      tokenPanel(token,.19,.72);pickWorld=[];
-      for(let row=0;row<8;row++){const p=[token[0]-.17,token[1]+(row/7-.5)*.72,0];pickWorld.push(p);point(...p,row===selected?2:0,row===selected?.98:.50,row===selected?2.3:1.2);}
-      if(hero)for(let component=0;component<3;component++){const z=(component-1)*(vertical?.25:.38);tokenPanel([qkv[0],qkv[1],z],.11,.55,component%2);trace(arc([token[0]+.12,token[1],0],[qkv[0]-.08,qkv[1],z],.05),component%2,component*.08);}
+      if(bar){
+        const key=`${selected}/${moeTopK}/${moeBatch}`;
+        if(key!==moeFeedbackKey){moeFeedbackKey=key;bar.querySelector('.moe-select').value=String(selected);bar.querySelectorAll('[data-top-k]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.topK)===moeTopK)));const batchButton=bar.querySelector('.moe-batch');batchButton.setAttribute('aria-pressed',String(moeBatch));batchButton.textContent=moeBatch?'Batch ×4':'Focus ×1';bar.querySelector('.moe-token-feedback').textContent=`Token ${selected+1} →`;bar.querySelector('.moe-weights').textContent=gate.map(v=>`E${v.expert+1} ${(v.weight*100).toFixed(0)}%`).join('  ·  ');}
+        if(phase!==moePhaseKey){moePhaseKey=phase;bar.querySelectorAll('[data-phase]').forEach(el=>el.dataset.active=String(Number(el.dataset.phase)===phase));}
+      }
+      const token=vertical?[-1.15,-2.02,0]:[-3.60,.04,0],qkv=vertical?[-.65,-2.02,0]:[-3.02,.04,0],attention=vertical?[.18,-2.04,0]:[-2.07,-.10,0],projection=vertical?[1.04,-1.84,0]:[-1.27,.12,0],add=vertical?[1.13,-1.26,0]:[-.99,.12,0],router=vertical?[0,-.93,0]:[-.55,.12,0];
+      const attSize=vertical?.89:.97;
+      const selectedPackets={attention:0,dispatch:0,compute:0,combine:0,output:0};
+      const at=(coords,u)=>{const p=clamp(u,0,1)*(coords.length-1),i=Math.floor(p),a=coords[i],b=coords[Math.min(coords.length-1,i+1)];return[mix(a[0],b[0],fract(p)),mix(a[1],b[1],fract(p)),mix(a[2],b[2],fract(p))];};
+      // One clock per token keeps packets causal: dispatch precedes expert
+      // computation, which precedes the weighted return to that same token.
+      function flow(coords,c,clock,start,end,foreground=true,weight=.25){
+        path(coords,c,foreground?.53:.17,foreground?.85+weight: .55);
+        if(clock>=start&&clock<end){if(foreground)selectedPackets[start<.27?'attention':start<.51?'dispatch':start<.91?'combine':'output']++;const u=(clock-start)/(end-start);for(let n=0;n<4;n++){const v=u-n*.025;if(v>=0)point(...at(coords,v),c,(foreground?.98:.64)*(1-n*.18),foreground?(n?1.2:2.3):(n?.75:1.4));}}
+      }
+      function tokenPanel(c,sx,sy,color=0){for(let row=0;row<8;row++)for(let col=0;col<5;col++)for(let depth=0;depth<2;depth++)point(c[0]+(col/4-.5)*sx,c[1]+(row/7-.5)*sy,c[2]+(depth-.5)*.06,color,row===selected?.94:batch.some(b=>b.token===row)?.65:.32,row===selected?1.09:.79);}
+      tokenPanel(token,.19,.75);pickWorld=[];
+      for(let row=0;row<8;row++){const p=[token[0]-.17,token[1]+(row/7-.5)*.75,0];pickWorld.push(p);point(...p,row===selected?2:0,row===selected?.98:.50,row===selected?2.6:1.3);}
+      if(hero)for(let component=0;component<3;component++){const z=(component-1)*(vertical?.25:.38);tokenPanel([qkv[0],qkv[1],z],.12,.58,component%2);flow(arc([token[0]+.12,token[1],0],[qkv[0]-.08,qkv[1],z],.05),component%2,clock,0,.07);}
       for(let head=0;head<3;head++){
         const z=(head-1)*(vertical?.25:.38),c=head%2,x=attention[0]+head*.035,y=attention[1]-head*.035;
-        // Every head receives slices of all Q, K and V projections. Three
-        // projection slabs must never imply one Q-only, K-only or V-only head.
-        if(hero)for(let component=0;component<3;component++){const source=[qkv[0]+.08,qkv[1],(component-1)*(vertical?.25:.38)],target=[x-attSize*.52,y+.10+(component-1)*.055,z],route=arc(source,target,.06);if(component===1)trace(route,c,head*.11);else path(route,c,.17,.50);}
-        else trace(arc([token[0]+.12,token[1],0],[x-attSize*.52,y+.16,z],.10),c,head*.11);
-        // Full attention matrices retain unavailable future cells as faint
-        // points; only the lower triangle and diagonal can carry attention.
+        // Every parallel head receives slices of ALL Q/K/V projections.
+        if(hero)for(let component=0;component<3;component++){const source=[qkv[0]+.08,qkv[1],(component-1)*(vertical?.25:.38)],target=[x-attSize*.52,y+.10+(component-1)*.055,z];flow(arc(source,target,.06),c,clock,.07,.15,component===1);}
+        else flow(arc([token[0]+.12,token[1],0],[x-attSize*.52,y+.16,z],.10),c,clock,0,.15);
         for(let row=0;row<8;row++)for(let col=0;col<8;col++){
-          const masked=col>row,chosen=!masked&&row===selected;
-          for(let sy=0;sy<2;sy++)for(let sx=0;sx<2;sx++){
-            const dx=(col/7-.5)*attSize+(sx-.5)*attSize*.035,dy=(row/7-.5)*attSize+(sy-.5)*attSize*.035;
-            point(x+dx,y+dy,z,masked?3:c,masked?.14:chosen?.94:.52,masked?.64:chosen?1.07:.83);
-          }
-          if(chosen)point(x+(col/7-.5)*attSize,y+(row/7-.5)*attSize,z-.025,c,.98,1.25);
+          const masked=col>row,chosen=!masked&&row===selected,companion=!masked&&batch.some(b=>b.j>0&&b.token===row);
+          for(let sy=0;sy<2;sy++)for(let sx=0;sx<2;sx++){const dx=(col/7-.5)*attSize+(sx-.5)*attSize*.035,dy=(row/7-.5)*attSize+(sy-.5)*attSize*.035;point(x+dx,y+dy,z,masked?3:c,masked?.14:chosen?.94:companion?.65:.43,masked?.64:chosen?1.13:.84);}
+          if(chosen)point(x+(col/7-.5)*attSize,y+(row/7-.5)*attSize,z-.025,c,.98,1.33);
         }
         const frame=[[-.5,-.5],[.5,-.5],[.5,.5],[-.5,.5],[-.5,-.5]].map(v=>[x+v[0]*attSize,y+v[1]*attSize,z]);path(frame,3,.23,.6);
-        // Each head goes to the output projection. These planes are heads,
-        // not sequential decoder layers, and do not feed into one another.
-        trace(arc([x+attSize*.53,y+.22,z],projection,-.08),c,.30+head*.11);
+        flow(arc([x+attSize*.53,y+.22,z],projection,-.08),c,clock,.15,.23);
       }
-      tokenPanel(projection,.12,.50,1);trace(arc([projection[0]+.09,projection[1],0],add,0),1,.57);
-      const skipAttention=vertical?[[token[0],token[1]-.48,0],[token[0],-1.96,0],[1.37,-1.96,0],[1.37,-.53,0],add]:[[token[0],token[1]-.45,0],[token[0],-.98,0],[add[0],-.98,0],add];path(skipAttention,0,.23,.70);point(...add,2,.95,2.0);
-      trace(arc(add,router,vertical?-.10:0,vertical?-.08:0),0,.66);globe(router,.065,76,2,.75);ring(router,.10,.07,1,.40,.2);
-      for(let expert=0;expert<8;expert++){
-        const row=vertical?Math.floor(expert/4):expert,x=vertical?(expert%4-1.5)*.61:1.39,y=vertical?.56+row*.55:-.99+expert*.30,z=vertical?(row-.5)*.13:(expert%2-.5)*.08,chosen=active.includes(expert),rank=active.indexOf(expert),color=chosen?(rank?1:0):3;
-        const sx=vertical?.31:.45,sy=vertical?.25:.17,c=[x,y,z],incoming=vertical?[x,y-sy*.65,z]:[x-sx*.65,y,z],outgoing=vertical?[x,y+sy*.65,z]:[x+sx*.65,y,z];
-        // Each expert is a small expansion/contraction FFN. Dormant experts
-        // remain visible but receive no moving token packet or output weight.
-        for(let layer=0;layer<3;layer++)for(let j=0;j<7;j++)for(let k=0;k<2;k++){
-          const span=layer===1?sy:sy*.58;point(x+(layer-1)*sx*.43,y+(j/6-.5)*span,z+(k-.5)*.10,color,chosen?(layer===1?.88:.68):.22,chosen?.97:.75);
+      tokenPanel(projection,.12,.52,1);flow(arc([projection[0]+.09,projection[1],0],add,0),1,clock,.23,.25);
+      const skipAttention=vertical?[[token[0],token[1]-.48,0],[token[0],-2.75,0],[1.42,-2.75,0],[1.42,-1.26,0],add]:[[token[0],token[1]-.45,0],[token[0],-1.1,0],[add[0],-1.1,0],add];path(skipAttention,0,.22,.7);point(...add,2,.95,2.0);
+      flow(arc(add,router,vertical?-.10:0,vertical?-.08:0),0,clock,.25,.27);globe(router,.08,118,2,.8);ring(router,.13,.09,1,.44,.2);
+      const experts=Array.from({length:moeExpertCount},(_,expert)=>{
+        const row=Math.floor(expert/4),col=expert%4,x=vertical?(col-1.5)*.76:.23+col*.74,y=vertical?-.12+row*.67:-1.16+row*.77,z=(row-1.5)*.10+(col%2-.5)*.075;
+        const sx=vertical?.37:.43,sy=vertical?.27:.31;
+        return{expert,x,y,z,sx,sy,incoming:vertical?[x,y-sy*.64,z]:[x-sx*.61,y,z],outgoing:vertical?[x,y+sy*.64,z]:[x+sx*.61,y,z]};
+      });
+      // Four distinct weighted-combination sites preserve token identity.
+      // A batch is not an all-to-one aggregation of different token states.
+      const outputs=batch.map(b=>{const offset=batch.length===1?0:(b.j-1.5)*.49;return{...b,combine:vertical?[offset,2.72,0]:[3.29,offset,0],finalAdd:vertical?[offset,3.02,0]:[3.65,offset,0],output:vertical?[offset,3.27,0]:[3.98,offset,0]};});
+      // Companions are drawn first and at lower opacity. The selected token
+      // remains the foreground layer, even when its experts are shared.
+      for(const b of [...outputs].reverse()){
+        const foreground=b.j===0,c=b.color,source=[router[0]+(vertical?(b.j-1.5)*.035:0),router[1]+(vertical?0:(b.j-1.5)*.035),router[2]+b.j*.025];
+        for(const v of b.gate){const e=experts[v.expert],bend=(e.expert%4-1.5)*.04,depth=(Math.floor(e.expert/4)-1.5)*.085+b.j*.045;
+          const routeIn=arc(source,e.incoming,vertical?.055:(Math.floor(e.expert/4)-1.5)*.05,depth),routeOut=arc(e.outgoing,b.combine,vertical?-.04:bend,-depth*.65);
+          flow(routeIn,c,b.clock,.27,.51,foreground,v.weight);flow(routeOut,c,b.clock,.65,.91,foreground,v.weight);
         }
-        const routeIn=arc(router,incoming,vertical?.035:(expert-3.5)*.035,(expert-3.5)*.025),routeOut=arc(outgoing,combine,vertical?-.04:(expert-3.5)*-.02,(expert-3.5)*-.015);
-        if(chosen){const weight=gate[rank].weight;path(routeIn,color,.55,.85+weight*.55);path(routeOut,color,.55,.85+weight*.55);trace(routeIn,color,.73+rank*.07);trace(routeOut,color,.85+rank*.07);}else{path(routeIn,3,.10,.45);path(routeOut,3,.10,.45);}
-        if(hero)text(`E${expert+1}`,vertical?x:x+.41,vertical?y+.23:y+.02,z,color);
+        ring(b.combine,foreground?.065:.045,foreground?.065:.045,c,foreground?.65:.35,Math.PI/2);point(...b.combine,c,foreground?.98:.58,foreground?2.2:1.5);
+        flow(arc(b.combine,b.finalAdd,0),c,b.clock,.91,.97,foreground);point(...b.finalAdd,c,foreground?.94:.45,foreground?1.8:1.2);flow([b.finalAdd,b.output],c,b.clock,.97,1,foreground);globe(b.output,foreground?.035:.026,foreground?32:20,c,foreground?.88:.48);
+        const skip=vertical?[add,[1.65+b.j*.025,-1.26,b.j*.02],[1.65+b.j*.025,3.02,b.j*.02],b.finalAdd]:[add,[add[0],1.90+b.j*.035,b.j*.02],[b.finalAdd[0],1.90+b.j*.035,b.j*.02],b.finalAdd];path(skip,c,foreground?.25:.07,foreground?.8:.45);
       }
-      ring(combine,.073,.073,2,.65,Math.PI/2);point(...combine,2,.98,2.05);
-      const finalAdd=vertical?[0,1.87,0]:[2.40,.12,0];trace(arc(combine,finalAdd,0),1,.94);point(...finalAdd,2,.95,1.9);
-      const skipMoE=vertical?[add,[1.48,-.53,0],[1.48,1.87,0],finalAdd]:[add,[add[0],1.47,0],[finalAdd[0],1.47,0],finalAdd];path(skipMoE,1,.24,.75);trace([finalAdd,output],0,.98);
+      for(const e of experts){
+        const rank=active.indexOf(e.expert),chosen=rank>=0,companion=batch.some(b=>b.j>0&&b.gate.some(v=>v.expert===e.expert)),color=chosen?0:companion?4:3;
+        const computing=batch.filter(b=>b.gate.some(v=>v.expert===e.expert)&&b.clock>=.51&&b.clock<.65),flash=computing.length>0;
+        for(let layer=0;layer<3;layer++)for(let j=0;j<9;j++)for(let k=0;k<3;k++){const span=layer===1?e.sy:e.sy*.55,x=e.x+(layer-1)*e.sx*.43,y=e.y+(j/8-.5)*span,z=e.z+(k-1)*.055;point(x,y,z,color,(chosen?.68:companion?.43:.16)+(flash?.22:0),chosen?(flash?1.2:1.0):companion?.86:.69);}
+        if(chosen){const edge=vertical?[[e.x-e.sx*.52,e.y+e.sy*.65,e.z],[e.x+e.sx*.52,e.y+e.sy*.65,e.z]]:[[e.x-e.sx*.53,e.y+e.sy*.64,e.z],[e.x+e.sx*.53,e.y+e.sy*.64,e.z]];path(edge,0,.42,1);}
+        for(const b of computing){if(b.j===0)selectedPackets.compute++;const u=(b.clock-.51)/.14;point(e.x+(u-.5)*e.sx,e.y,e.z-.04,b.color,b.j===0?.98:.67,b.j===0?2.3:1.4);}
+        if(hero)text(`E${e.expert+1}`,e.x,e.y+e.sy*.65+.14,e.z,color);
+      }
       if(hero){
-        if(vertical){text('Tokens',-1.18,-.67);text('Q / K / V',-.62,-.57);text('Causal attention',.20,-1.99);text('3 heads',.22,-.67,0,1);text('Projection',1.12,-.78);text('Router · top 2',0,-.22);text('8 FFN experts',0,.29,0,1);text('Weighted sum',-.70,1.72);text('Residual',1.44,1.49,0,1);text('Output',.40,2.01);}
-        else{text('Tokens',-2.24,.67);text('Q / K / V',-1.72,.67);text('Causal attention',-.78,-1.04);text('3 parallel heads',-.78,.69,0,1);text('Projection',-.08,.68);text('Router · top 2',.54,-.40);text('8 FFN experts',1.39,-1.33,0,1);text('Weighted sum',2.18,.68);text('Residual stream',.68,1.66,0,1);text('Output',2.58,-.32);}
+        if(vertical){text('Tokens',-1.18,-1.41);text('Q / K / V',-.62,-1.31);text('Causal attention',.20,-2.82);text('3 heads',.22,-1.40,0,1);text('Projection',1.15,-1.54);text(`Router · top ${moeTopK}`,0,-1.14);text('16 FFN experts',0,-.56,0,1);text('Weighted combination',0,2.44);text('Token outputs + residual',0,3.55);}
+        else{text('Tokens',-3.60,.70);text('Q / K / V',-3.02,.70);text('Causal attention',-2.05,-1.15);text('3 parallel heads',-2.05,.72,0,1);text('Projection',-1.27,1.03);text(`Router · top ${moeTopK}`,-.55,-.40);text('16 FFN experts',1.36,-1.63,0,1);text('Weighted combination',3.33,-1.26);text('Residual stream',1.1,2.21,0,1);text('Token outputs',3.92,1.20);}
       }
-      host.dataset.fieldLabels=labels.map(l=>l.s).join(' | ');host.dataset.fieldPoints=String(points.length);
+      host.dataset.fieldFlowPackets=JSON.stringify(selectedPackets);host.dataset.fieldLabels=labels.map(l=>l.s).join(' | ');host.dataset.fieldPoints=String(points.length);
     }
+
     function globe(c,r,count,color=0,alpha=.6){
       for(let i=0;i<count;i++){const y=1-2*(i+.5)/count,a=i*2.399963,rr=Math.sqrt(1-y*y);point(c[0]+Math.cos(a)*rr*r,c[1]+y*r,c[2]+Math.sin(a)*rr*r,color,alpha*(.8+.2*rr),.88);}
     }
@@ -275,14 +315,16 @@
       if(points.length){
         // Fit the projected object, not just a theoretical bounding sphere.
         // Wide and narrow cards keep the complete surface and trajectory tips.
+        for(let fitting=0;fitting<(mode==='transformer'&&hero?3:1);fitting++){
         let loX=Infinity,loY=Infinity,hiX=-Infinity,hiY=-Infinity;
         for(const v of points){const q=project(v.x,v.y,v.z);loX=Math.min(loX,q.x);hiX=Math.max(hiX,q.x);loY=Math.min(loY,q.y);hiY=Math.max(hiY,q.y);}
         for(const p of paths)for(const v of p.coords){const q=project(...v);loX=Math.min(loX,q.x);hiX=Math.max(hiX,q.x);loY=Math.min(loY,q.y);hiY=Math.max(hiY,q.y);}
-        for(const v of labels){const q=project(v.x,v.y,v.z);const half=v.s.length*(small?2.7:3.0);loX=Math.min(loX,q.x-half);hiX=Math.max(hiX,q.x+half);loY=Math.min(loY,q.y-12);hiY=Math.max(hiY,q.y+5);}
+        for(const v of labels){const q=project(v.x,v.y,v.z);ctx.font=`500 ${mode==='transformer'?(small?10:11):(small?9:10)}px "Space Grotesk",sans-serif`;const half=mode==='transformer'?ctx.measureText(v.s).width*.5+4:v.s.length*(small?2.7:3.0);loX=Math.min(loX,q.x-half);hiX=Math.max(hiX,q.x+half);loY=Math.min(loY,q.y-12);hiY=Math.max(hiY,q.y+5);}
         const inset=hero?18:8;
         const factor=Math.min(2.1,(g.width-inset)/Math.max(1,hiX-loX),(g.height-inset)/Math.max(1,hiY-loY));
-        g.scale*=factor;g.cx=g.left+g.width*.5-((loX+hiX)*.5-g.baseCx)*factor;g.cy=g.top+g.height*.5-((loY+hiY)*.5-g.baseCy)*factor;
+        const priorCx=g.cx,priorCy=g.cy;g.scale*=factor;g.cx=g.left+g.width*.5-((loX+hiX)*.5-priorCx)*factor;g.cy=g.top+g.height*.5-((loY+hiY)*.5-priorCy)*factor;
         host.dataset.fieldArtWidth=String(Math.round((hiX-loX)*factor));host.dataset.fieldArtHeight=String(Math.round((hiY-loY)*factor));
+        }
       }
       screenPoints=pickWorld.map(v=>project(...v));
       ctx.save();ctx.beginPath();ctx.rect(g.left,g.top,g.width,g.height);ctx.clip();
@@ -294,7 +336,7 @@
       for(const v of points){const p=project(v.x,v.y,v.z),depth=Math.round(p.d*4),a=Math.round(clamp(v.a*(1-p.d*.13),.1,1)*12)/12,r=Math.max(.5,Math.round(v.r*(hero?(small?.95:1.1):h<180?.82:.97)*p.s*4)/4),key=`${depth}/${v.c}/${a}/${r}`;let b=batches.get(key);if(!b){b={depth,c:v.c,a,r,xy:[]};batches.set(key,b);}b.xy.push(p.x,p.y);}
       for(const b of [...batches.values()].sort((a,b)=>b.depth-a.depth)){ctx.globalAlpha=b.a;ctx.fillStyle=palette[b.c];ctx.beginPath();for(let i=0;i<b.xy.length;i+=2){ctx.moveTo(b.xy[i]+b.r,b.xy[i+1]);ctx.arc(b.xy[i],b.xy[i+1],b.r,0,TAU);}ctx.fill();}
       ctx.globalAlpha=1;
-      for(const l of labels){const p=project(l.x,l.y,l.z);ctx.font=`500 ${mode==='transformer'?(small?10:11):(small?9:10)}px "Space Grotesk",sans-serif`;ctx.textAlign='center';ctx.fillStyle=palette[l.c];ctx.fillText(l.s,p.x,p.y);}
+      for(const l of labels){const p=project(l.x,l.y,l.z);ctx.font=`500 ${mode==='transformer'?(small?10:11):(small?9:10)}px "Space Grotesk",sans-serif`;ctx.textAlign='center';if(mode==='transformer'){ctx.lineWidth=3.5;ctx.lineJoin='round';ctx.strokeStyle='rgba(246,245,241,.86)';ctx.strokeText(l.s,p.x,p.y);}ctx.fillStyle=palette[l.c];ctx.fillText(l.s,p.x,p.y);}
       ctx.restore();host.dataset.fieldPoints=String(points.length);host.dataset.fieldFrame=String(Math.round(t*30));host.dataset.fieldRenders=String(++renderCount);
     }
     const scene={tick(delta){t+=delta;const e=1-Math.exp(-delta*4);px+=(tx-px)*e;py+=(ty-py)*e;render();},get visible(){return visible;},setVisible(v){visible=v;host.dataset.fieldRunning=String(v&&!hidden&&!document.hidden);wake();},measure};scenes.push(scene);
@@ -302,7 +344,7 @@
     // until the next frame so they cannot re-enter ResizeObserver delivery.
     let measureFrame=0;
     const queueMeasure=()=>{if(!measureFrame)measureFrame=requestAnimationFrame(()=>{measureFrame=0;measure();});};
-    if(typeof ResizeObserver==='function')new ResizeObserver(queueMeasure).observe(surface);
+    if(typeof ResizeObserver==='function'){const observer=new ResizeObserver(queueMeasure);observer.observe(surface);if(mode==='transformer'&&bar)observer.observe(bar);}
     if(typeof IntersectionObserver==='function')new IntersectionObserver(es=>scene.setVisible(es[0].isIntersecting),{rootMargin:'30px',threshold:0}).observe(surface);
     measure();
   }

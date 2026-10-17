@@ -20,6 +20,21 @@
 .fs-records-detail{margin:0;border-bottom:0}
 .fs-records-detail:last-of-type{border-bottom:1px solid #dce3eb}
 .fs-records-detail .fs-group-heading{gap:24px}
+/* Keep gallery disclosure marks within their grid cell at every zoom level. */
+.dg-group .dg-toggle{display:grid;place-items:center;inline-size:100%;max-inline-size:28px;block-size:28px;font-size:0;line-height:1;transform:none}
+.dg-group .dg-toggle::after{content:'+';font-size:24px;line-height:1}
+.dg-group[open] .dg-toggle{transform:none}
+.dg-group[open] .dg-toggle::after{content:'−'}
+/* These chapter maps span the page; project-layout sidebars stay vertical. */
+@media(min-width:801px){
+ .qc-jump-links{padding-block:15px;container-type:inline-size;container-name:quantum-chapters}
+ .qc-jump-links .case-nav-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,7.5rem),1fr));gap:4px 24px;align-items:stretch}
+ .qc-jump-links .case-nav-links a{display:flex;align-items:center;min-width:0;min-height:40px;padding-block:8px;line-height:1.6;overflow-wrap:anywhere}
+ .qc-jump-links .case-contents>summary{min-height:34px;padding-block:5px}
+ @container quantum-chapters (max-width:740px){
+  .qc-jump-links .case-nav-links{grid-template-columns:repeat(auto-fit,minmax(min(100%,10rem),1fr))}
+ }
+}
 @media(max-width:760px){
  .quantum-detail-v17{margin:20px 0;scroll-margin-top:88px}
  .quantum-detail-v17>summary{grid-template-columns:minmax(0,1fr);gap:5px;padding:18px 31px 18px 0;min-height:72px}
@@ -66,6 +81,7 @@
  .systems-page .related-work-link{font-size:14px;line-height:1.6;padding:15px 17px}
 }
 @media(max-width:360px){
+ .dg-group .dg-toggle{inline-size:25px;block-size:25px}
  .systems-page .systems-optical-flow>div{grid-template-columns:76px minmax(0,1fr);gap:12px}
  .systems-page .systems-results>div{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:12px}
  .systems-page .systems-results strong{font-size:28px}
