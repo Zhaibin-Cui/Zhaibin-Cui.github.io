@@ -1,0 +1,74 @@
+/* The experiment stays visible; secondary implementation records open on demand. */
+.quantum-detail-v17{margin:26px 0;border-top:1px solid #ccd7e2;border-bottom:1px solid #dce3eb;color:#243e5c;min-width:0;scroll-margin-top:100px}
+.quantum-detail-v17>summary{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 24px;padding:22px 38px 22px 0;cursor:pointer;list-style:none;min-height:68px;align-items:center}
+.quantum-detail-v17>summary::-webkit-details-marker{display:none}
+.quantum-detail-v17>summary::after{content:'+';position:absolute;right:2px;top:50%;transform:translateY(-50%);font-size:24px;line-height:1;font-weight:400;color:#557699}
+.quantum-detail-v17[open]>summary::after{content:'−'}
+.quantum-detail-v17>summary>span{font-size:18px;line-height:1.45;letter-spacing:-.015em;font-weight:500}
+.quantum-detail-v17>summary>small{font-size:12px;line-height:1.65;color:#617b97;max-width:32ch;text-align:right}
+.quantum-detail-v17>summary:focus-visible{outline:2px solid #6c88ac;outline-offset:5px;border-radius:2px}
+.quantum-detail-content{min-width:0;padding:5px 0 27px}
+.quantum-detail-content>.systems-notes{margin-top:15px}
+.quantum-detail-content>.qn-pdh{padding-top:12px;margin-top:0;border-top:0}
+.quantum-detail-content>.defense-gallery{margin:8px 0 0}
+.quantum-detail-content>.fs-group-heading{margin-top:0;border-top:0;padding-top:10px}
+.quantum-detail-content>.systems-heading{margin-top:10px}
+.systems-supplement{border-top:0;padding-top:0;margin-bottom:0}
+.systems-supplement>.quantum-detail-v17{margin-top:0}
+.fullstack-full .fs-panorama{margin-bottom:26px}
+.systems-page .systems-rack>.systems-figure{width:100%;max-width:573px;margin-inline:auto}
+.fs-records-detail{margin:0;border-bottom:0}
+.fs-records-detail:last-of-type{border-bottom:1px solid #dce3eb}
+.fs-records-detail .fs-group-heading{gap:24px}
+@media(max-width:760px){
+ .quantum-detail-v17{margin:20px 0;scroll-margin-top:88px}
+ .quantum-detail-v17>summary{grid-template-columns:minmax(0,1fr);gap:5px;padding:18px 31px 18px 0;min-height:72px}
+ .quantum-detail-v17>summary>span{font-size:16px;line-height:1.5;max-width:31ch}
+ .quantum-detail-v17>summary>small{font-size:12px;line-height:1.6;text-align:left;max-width:36ch}
+ .quantum-detail-v17>summary::after{font-size:22px}
+ .quantum-detail-content{padding:7px 0 24px}
+ .quantum-detail-content .systems-notes{gap:22px;margin-top:10px}
+ .quantum-detail-content .systems-heading h2{font-size:26px;line-height:1.3}
+ .quantum-detail-content .systems-heading{margin-bottom:20px}
+ .systems-page .systems-chapter{padding-top:28px;margin-bottom:42px}
+ .systems-page .systems-supplement{padding-top:0;margin-bottom:0}
+ .systems-page .systems-heading{gap:14px;margin-bottom:23px}
+ .systems-page .systems-heading h2{font-size:clamp(27px,7.3vw,32px);line-height:1.22;max-width:22ch}
+ .systems-page .systems-heading>p,.systems-page .systems-copy p,.systems-page .systems-note p{font-size:15px;line-height:1.8}
+ .systems-page .systems-split{margin-block:23px;gap:22px}
+ .systems-page .systems-copy h3{margin-top:0;font-size:22px;line-height:1.35}
+ .systems-page .systems-opening{margin-bottom:40px}
+ .systems-page .systems-opening-note p{font-size:16px;line-height:1.75}
+ .systems-page .systems-optical-flow{padding:0;margin:24px 0;background:transparent;border:0;gap:0;display:block}
+ .systems-page .systems-optical-flow>div{display:grid;grid-template-columns:85px minmax(0,1fr);align-items:baseline;gap:15px;padding:14px 0;border-bottom:1px solid #dce3eb}
+ .systems-page .systems-optical-flow>div:first-child{border-top:1px solid #dce3eb}
+ .systems-page .systems-optical-flow>i{display:none}
+ .systems-page .systems-optical-flow span{font-size:11px;margin:0}
+ .systems-page .systems-optical-flow strong{font-size:15px;line-height:1.6;font-weight:500}
+ .systems-page .systems-rack .figure img{max-width:573px;margin-inline:auto}
+ .systems-page .systems-results{gap:16px;margin:23px 0}
+ .systems-page .systems-results>div{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:18px;align-items:baseline;padding-top:16px}
+ .systems-page .systems-results strong{font-size:30px;line-height:1.3}
+ .systems-page .systems-results span{font-size:12px;line-height:1.65}
+ .systems-page .fs-heading{gap:16px;margin-bottom:23px}
+ .systems-page .fs-heading h3{font-size:30px;line-height:1.25}
+ .systems-page .fs-heading>p{font-size:15px;line-height:1.8}
+ .systems-page .fullstack-gallery{margin:40px 0}
+ .systems-page .fs-record-heading h4{font-size:20px}
+ .systems-page .fs-provenance{font-size:11px!important;line-height:1.7!important}
+ .systems-page .fs-records-detail{margin:0}
+ .systems-page .fs-group-heading>span{font-size:10px}
+ .systems-page .fs-group-heading>p{font-size:14px;line-height:1.75}
+ .systems-page .fs-workflow-notes p,.systems-page .fs-protocol-copy p{font-size:14px;line-height:1.8}
+ .systems-page .fs-protocol-copy h4{font-size:26px;line-height:1.3}
+ .systems-page .systems-records{margin-top:38px}
+ .systems-page .related-work-grid{gap:9px}
+ .systems-page .related-work-link{font-size:14px;line-height:1.6;padding:15px 17px}
+}
+@media(max-width:360px){
+ .systems-page .systems-optical-flow>div{grid-template-columns:76px minmax(0,1fr);gap:12px}
+ .systems-page .systems-results>div{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:12px}
+ .systems-page .systems-results strong{font-size:28px}
+ .quantum-detail-v17>summary>span{font-size:15px}
+}
+@media print{.quantum-detail-v17>.quantum-detail-content{display:block!important}.quantum-detail-v17>summary::after{display:none}}

@@ -1,7 +1,12 @@
-/* v16. Original three-dimensional point studies. Transformer geometry follows the
- * token / QKV / causal multi-head attention / projection / residual / FFN structure
- * of Vaswani et al., https://arxiv.org/abs/1706.03762. This is a conceptual decoder
- * block, not a claim about a particular model, measured attention, or experiment.
+/* v17. Original three-dimensional point studies.
+ * The MoE decoder schematic combines causal multi-head attention from Vaswani
+ * et al., https://arxiv.org/abs/1706.03762, and sparse FFN routing from Shazeer
+ * et al., https://arxiv.org/abs/1701.06538. Top-2-of-8 routing is an illustrative
+ * configuration following Mixtral, https://arxiv.org/abs/2401.04088. The three
+ * attention planes are parallel heads within ONE decoder block, not layers.
+ * Router logits and attention highlights are synthetic explanatory values;
+ * normalization/embedding operations are omitted. This is neither MiniMax's
+ * architecture nor a visualization of measured model or experimental results.
  */
 (() => {
   'use strict';
@@ -15,20 +20,24 @@
   let hidden=false,raf=0,then=0,lastPaint=0;
   function make(canvas,host,mode,hero=false){
     let ctx;try{ctx=canvas.getContext('2d',{alpha:false});}catch(_){return;}if(!ctx)return;
-    canvas.dataset.fieldRenderer='v16';host.dataset.fieldRenderer='v16';
-    host.dataset.fieldShape=mode==='transformer'?'causal-transformer':mode;host.dataset.fieldMode=mode;
+    canvas.dataset.fieldRenderer='v17';host.dataset.fieldRenderer='v17';
+    host.dataset.fieldShape=mode==='transformer'?'causal-moe-transformer':mode;host.dataset.fieldMode=mode;
     const isLanding=host.classList.contains('landing-moon');
-    const descriptions={transformer:['Transformer block','Select a token · follow its attention','Trace token'],training:['Training trajectories','Drag the landscape · compare trajectories','Trace paths'],vision:['Spatial token representation','Touch to perturb · drag to rotate','Send a ripple'],agents:['Agent coordination graph','Drag a node · route a task','Dispatch task'],world:['Action-conditioned futures','Drag to inspect · compare possible futures','Compare paths'],control:['Synchronized control channels','Drag to inspect · follow the event clock','Run sequence'],quantum:['Distributed quantum field','Drag to rotate · shift optical phase','Shift phase']};
+    const descriptions={transformer:['Sparse MoE decoder','Select a token · trace attention and experts','Trace token'],training:['Training trajectories','Drag the landscape · compare trajectories','Trace paths'],vision:['Spatial token representation','Touch to perturb · drag to rotate','Send a ripple'],agents:['Agent coordination graph','Drag a node · route a task','Dispatch task'],world:['Action-conditioned futures','Drag to inspect · compare possible futures','Compare paths'],control:['Synchronized control channels','Drag to inspect · follow the event clock','Run sequence'],quantum:['Distributed quantum field','Drag to rotate · shift optical phase','Shift phase']};
     const description=descriptions[mode]||descriptions.transformer;
     let surface=host;
-    let w=0,h=0,dpr=1,small=false,visible=false,t=0,px=0,py=0,tx=0,ty=0,pulse=-20,selected=4,step=-1,interactions=0,renderCount=0;
+    let w=0,h=0,dpr=1,small=false,visible=false,t=0,px=0,py=0,tx=0,ty=0,pulse=-20,selected=4,step=-1,interactions=0,renderCount=0,tokenHoldUntil=9;
     let g={left:0,top:0,width:1,height:1,scale:1,cx:0,cy:0},points=[],paths=[],labels=[],screenPoints=[],pickWorld=[];
     let pane=null,bar=null,status=null,pressed=false,moved=false,start=null,phaseOffset=0,dragNode=-1;
     const ripples=[],nodeOffsets=Array.from({length:7},()=>({x:0,y:0}));
-    const triplets=[[-.78,.30,-.44],[-.78,.30,0],[-.78,.30,.44]];
-    const stages=['Tokens','Q / K / V','Causal attention','Projection','Residual + FFN'];
+    const stages=['Tokens','Q / K / V','Causal attention','Output projection','Top-2 routing','Expert FFNs','Weighted combination','Residual output'];
+    function routeToken(token){
+      const scores=Array.from({length:8},(_,expert)=>({expert,score:Math.cos((token+1)*(expert+1)*.73)+.35*Math.sin(expert*.83+token)})).sort((a,b)=>b.score-a.score).slice(0,2);
+      const norm=scores.reduce((sum,v)=>sum+Math.exp(v.score),0);
+      return scores.map(v=>({expert:v.expert,weight:Math.exp(v.score)/norm}));
+    }
     function record(type){interactions++;host.dataset.fieldInteractions=String(interactions);host.dataset.fieldInteractionType=type;}
-    function activate(token,x=0,z=0){if(Number.isInteger(token))selected=clamp(token,0,mode==='agents'?6:7);pulse=t;phaseOffset+=Math.PI/3;ripples.push({x,z,t});if(ripples.length>5)ripples.shift();record(mode==='transformer'?'attention-flow':'activate');host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldPhase=String(phaseOffset);if(status)status.textContent=mode==='transformer'?`Following token ${selected+1} through Q, K and V, causal attention, output projection, and residual feed-forward paths.`:`${description[0]} updated.`;}
+    function activate(token,x=0,z=0){if(Number.isInteger(token))selected=clamp(token,0,mode==='agents'?6:7);pulse=t;tokenHoldUntil=t+12;phaseOffset+=Math.PI/3;ripples.push({x,z,t});if(ripples.length>5)ripples.shift();record(mode==='transformer'?'attention-flow':'activate');host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldPhase=String(phaseOffset);if(status){const gate=routeToken(selected);status.textContent=mode==='transformer'?`Token ${selected+1} can attend to positions 1 through ${selected+1}. The illustrative router selects experts ${gate[0].expert+1} and ${gate[1].expert+1}, with normalized weights ${gate.map(v=>Math.round(v.weight*100)+' percent').join(' and ')}. Their FFN outputs are combined and added to the residual stream.`:`${description[0]} updated.`;}}
     if(hero){
       host.classList.add('field-interactive','scientific-field');if(mode==='transformer')host.classList.add('transformer-field');
       surface=document.createElement('div');surface.className='scientific-field-stage';
@@ -39,11 +48,12 @@
       surface.append(canvas);
       if(isLanding){const coordinate=host.querySelector('.landing-coordinate');if(coordinate)surface.append(coordinate);}
       pane=document.createElement('div');pane.className='field-interaction transformer-interaction';pane.tabIndex=0;pane.setAttribute('role','group');pane.setAttribute('aria-label',`Explore ${description[0].toLowerCase()}`);
-      const help=document.createElement('span');help.className='field-sr-only';help.id='transformer-help-'+scenes.length;help.textContent=mode==='transformer'?'A conceptual decoder Transformer. Select a token to follow causal attention through three heads, then projection, residual addition and the feed-forward layer. Drag horizontally to change perspective. Arrow keys select a token; Enter runs its path; R resets the view.':`${description[0]}. ${description[1]}. Arrow keys select a state, Enter activates it, and R resets the view. This is a conceptual study, not measured experimental data.`;pane.setAttribute('aria-describedby',help.id);
+      const help=document.createElement('span');help.className='field-sr-only';help.id='transformer-help-'+scenes.length;help.textContent=mode==='transformer'?'A conceptual sparse mixture-of-experts decoder block. Three parallel attention heads share a causal mask: faint upper-triangle positions are unavailable to the selected token. A router chooses two of eight feed-forward experts; their weighted outputs join the residual stream. Heads are not stacked layers. Select a token to change its allowed attention positions and expert pair. Drag to change perspective. Arrow keys select a token; Enter traces its path; R resets. Normalization is omitted. This illustration does not show MiniMax architecture or measured routing.':`${description[0]}. ${description[1]}. Arrow keys select a state, Enter activates it, and R resets the view. This is a conceptual study, not measured experimental data.`;pane.setAttribute('aria-describedby',help.id);
       bar=document.createElement('div');bar.className='field-playbar transformer-playbar';bar.innerHTML=`<span class="field-play-hint">${description[1]}</span><button class="field-play-action" type="button">${description[2]}</button><button class="field-play-reset" type="button">Reset</button>`;
+      if(mode==='transformer'){const caption=document.createElement('span');caption.className='field-concept-caption';caption.textContent='Conceptual MoE decoder · illustrative top-2 routing';caption.style.cssText='flex-basis:100%;font-size:10px;line-height:1.5;letter-spacing:.015em;color:#71819a';bar.prepend(caption);}
       status=document.createElement('span');status.className='field-sr-only';status.setAttribute('role','status');status.setAttribute('aria-live','polite');surface.append(pane,bar,help,status);
       bar.querySelector('.field-play-action').addEventListener('click',()=>activate());
-      bar.querySelector('.field-play-reset').addEventListener('click',()=>{tx=ty=0;selected=4;pulse=-20;phaseOffset=0;ripples.length=0;nodeOffsets.forEach(n=>{n.x=n.y=0;});record('reset');status.textContent='Perspective and selection reset.';});
+      bar.querySelector('.field-play-reset').addEventListener('click',()=>{tx=ty=0;selected=4;pulse=-20;tokenHoldUntil=t+9;phaseOffset=0;ripples.length=0;nodeOffsets.forEach(n=>{n.x=n.y=0;});record('reset');status.textContent='Perspective reset. Token 5 selected.';});
       const location=e=>{const r=surface.getBoundingClientRect();return{x:(e.clientX-r.left)*w/r.width,y:(e.clientY-r.top)*h/r.height};};
       pane.addEventListener('pointerdown',e=>{if(e.button!==0)return;pressed=true;moved=false;start={...location(e),tx,ty,id:e.pointerId};dragNode=mode==='agents'?screenPoints.findIndex(n=>Math.hypot(n.x-start.x,n.y-start.y)<25):-1;if(dragNode>=0){start.nx=nodeOffsets[dragNode].x;start.ny=nodeOffsets[dragNode].y;}try{pane.setPointerCapture(e.pointerId);}catch(_){};pane.classList.add('is-dragging');});
       pane.addEventListener('pointermove',e=>{const p=location(e);if(pressed){const dx=p.x-start.x,dy=p.y-start.y;moved=moved||Math.hypot(dx,dy)>5;if(dragNode>=0){nodeOffsets[dragNode].x=clamp(start.nx+dx/g.scale,-.4,.4);nodeOffsets[dragNode].y=clamp(start.ny+dy/g.scale,-.4,.4);}else{tx=clamp(start.tx+dx*.0028,-.32,.32);ty=clamp(start.ty+dy*.0012,-.15,.15);}}else{pane.classList.toggle('is-node-hover',screenPoints.some(n=>Math.hypot(n.x-p.x,n.y-p.y)<18));}});
@@ -66,7 +76,7 @@
       w=Math.max(1,(parseFloat(style.width)||surface.clientWidth)-(style.boxSizing==='border-box'?borderX:0));h=Math.max(1,(parseFloat(style.height)||surface.clientHeight)-(style.boxSizing==='border-box'?borderY:0));small=hero?host.clientWidth<700:w<700;dpr=Math.min((devicePixelRatio||1)*Math.max(1,r.width/(w+borderX))*(window.visualViewport?.scale||1),hero?3:2.5);
       canvas.width=Math.ceil(w*dpr);canvas.height=Math.ceil(h*dpr);ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
       if(hero){
-        g={left:6,top:16,width:w-12,height:h-(small?96:82)};
+        g={left:6,top:16,width:w-12,height:h-(small?96:82)-(mode==='transformer'?22:0)};
         pane.style.cssText=`left:${g.left}px;top:${g.top}px;width:${g.width}px;height:${g.height}px`;
         bar.style.cssText=`left:${g.left+8}px;width:${g.width-16}px;bottom:7px`;
       }else g={left:10,top:8,width:w-20,height:h-16};
@@ -99,51 +109,62 @@
     }
     function arc(a,b,lift=.12,depth=0){const out=[];for(let i=0;i<=32;i++){const u=i/32;out.push([mix(a[0],b[0],u),mix(a[1],b[1],u)-Math.sin(u*Math.PI)*lift,mix(a[2],b[2],u)+Math.sin(u*Math.PI)*depth]);}return out;}
     function transformer(){
-      if(!hero){
-        // Compact cards show the characteristic attention planes rather than
-        // squeezing every full-block label and component into a thumbnail.
-        for(let head=0;head<3;head++){
-          const z=(head-1)*.46,x=(head-1)*.10,y=-.03-head*.025;
-          slab(x,y,z,1.18,1.18,.08,head%2,2,true);
-          trace(arc([-1.23,.26,0],[x-.6,y+.3,z],.2),head%2,head*.16);
-          trace(arc([x+.60,y+.52,z],[1.21,.28,0],-.14),head%2,head*.16+.4);
-        }
-        for(let j=0;j<8;j++)for(let i=0;i<3;i++){point(-1.25+i*.055,(j/7-.5)*.91+.25,0,0,.59,.82);point(1.2+i*.055,(j/7-.5)*.91+.25,0,1,.59,.82);}
-        return;
-      }
-      if(t-pulse>9)selected=Math.floor(t*.24)%8;
-      step=(t-pulse)*.8;host.dataset.fieldFlowStage=step>=0&&step<5?stages[Math.floor(step)]:'overview';
-      slab(-1.38,.22,0,.33,1.13,.12,0,0);pickWorld=[];
-      for(let n=0;n<8;n++){const y=.22+(n/7-.5)*1.13;pickWorld.push([-1.62,y,0]);point(-1.62,y,0,n===selected?2:0,n===selected?.98:.45,n===selected?2:1.1);}
-      triplets.forEach((v,i)=>{slab(...v,.26,.85,.06,i===1?1:0,1);trace(arc([-1.2,.22,0],[v[0]-.15,.22,v[2]],.03),i===1?1:0,i*.18);});
+      if(t>tokenHoldUntil&&t-pulse>9)selected=Math.floor((t-tokenHoldUntil)*.20)%8;
+      const gate=routeToken(selected),active=gate.map(v=>v.expert),vertical=hero&&w<720;
+      step=(t-pulse)*.78;host.dataset.fieldFlowStage=step>=0&&step<stages.length?stages[Math.floor(step)]:'overview';
+      host.dataset.fieldArchitecture='sparse-moe';host.dataset.fieldDecoderBlocks='1';host.dataset.fieldAttentionHeads='3';host.dataset.fieldCoreNodes='8';
+      host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldActiveExperts=active.map(i=>i+1).join(',');host.dataset.fieldExpertWeights=gate.map(v=>v.weight.toFixed(6)).join(',');host.dataset.fieldTopK='2';host.dataset.fieldExpertCount='8';host.dataset.fieldComposition=vertical?'folded':'horizontal';
+      host.dataset.fieldCausalPositions=Array.from({length:selected+1},(_,i)=>i+1).join(',');host.dataset.fieldMaskedCells='84';host.dataset.fieldMaskAlpha='.14';host.dataset.fieldAllowedAlpha='.52';
+      const token=vertical?[-1.14,-1.26,0]:[-2.24,.05,0],qkv=vertical?[-.65,-1.26,0]:[-1.72,.05,0],attention=vertical?[.18,-1.28,0]:[-.79,-.08,0],projection=vertical?[1.02,-1.08,0]:[-.09,.12,0],add=vertical?[1.13,-.53,0]:[.18,.12,0],router=vertical?[0,-.02,0]:[.54,.12,0],combine=vertical?[0,1.65,0]:[2.17,.12,0],output=vertical?[0,2.0,0]:[2.58,.12,0];
+      const attSize=vertical?.85:.91;
+      function tokenPanel(c,sx,sy,color=0){for(let row=0;row<8;row++)for(let col=0;col<5;col++)for(let depth=0;depth<2;depth++)point(c[0]+(col/4-.5)*sx,c[1]+(row/7-.5)*sy,c[2]+(depth-.5)*.06,color,row===selected?.90:.47,row===selected?1.05:.78);}
+      tokenPanel(token,.19,.72);pickWorld=[];
+      for(let row=0;row<8;row++){const p=[token[0]-.17,token[1]+(row/7-.5)*.72,0];pickWorld.push(p);point(...p,row===selected?2:0,row===selected?.98:.50,row===selected?2.3:1.2);}
+      if(hero)for(let component=0;component<3;component++){const z=(component-1)*(vertical?.25:.38);tokenPanel([qkv[0],qkv[1],z],.11,.55,component%2);trace(arc([token[0]+.12,token[1],0],[qkv[0]-.08,qkv[1],z],.05),component%2,component*.08);}
       for(let head=0;head<3;head++){
-        const z=(head-1)*.54,x=.02+head*.065,y=-.20-head*.09;
-        slab(x,y,z,.90,.90,.10,head%2,2,true);
-        const frame=[[-.45,-.45],[.45,-.45],[.45,.45],[-.45,.45],[-.45,-.45]].map(q=>[x+q[0],y+q[1],z]);path(frame,head%2,.15,.6);
-        trace(arc([-.55,.24,triplets[head][2]],[x-.38,y,z],.15),head%2,head*.13);
-        trace(arc([x+.37,y+.30,z],[.69,.36,0],-.12),head%2,head*.13+.3);
-        // The selected row can attend only to its own and preceding positions.
-        const yRow=y+(selected/7-.5)*.90;
-        for(let n=0;n<=selected;n++){
-          const u=n/7,weight=.28+.55*Math.pow(Math.cos((selected-n)*.7+head),2);
-          point(x+(u-.5)*.90,yRow,z-.055,head%2,.9,1.15+weight*.6);
+        const z=(head-1)*(vertical?.25:.38),c=head%2,x=attention[0]+head*.035,y=attention[1]-head*.035;
+        // Every head receives slices of all Q, K and V projections. Three
+        // projection slabs must never imply one Q-only, K-only or V-only head.
+        if(hero)for(let component=0;component<3;component++){const source=[qkv[0]+.08,qkv[1],(component-1)*(vertical?.25:.38)],target=[x-attSize*.52,y+.10+(component-1)*.055,z],route=arc(source,target,.06);if(component===1)trace(route,c,head*.11);else path(route,c,.17,.50);}
+        else trace(arc([token[0]+.12,token[1],0],[x-attSize*.52,y+.16,z],.10),c,head*.11);
+        // Full attention matrices retain unavailable future cells as faint
+        // points; only the lower triangle and diagonal can carry attention.
+        for(let row=0;row<8;row++)for(let col=0;col<8;col++){
+          const masked=col>row,chosen=!masked&&row===selected;
+          for(let sy=0;sy<2;sy++)for(let sx=0;sx<2;sx++){
+            const dx=(col/7-.5)*attSize+(sx-.5)*attSize*.035,dy=(row/7-.5)*attSize+(sy-.5)*attSize*.035;
+            point(x+dx,y+dy,z,masked?3:c,masked?.14:chosen?.94:.52,masked?.64:chosen?1.07:.83);
+          }
+          if(chosen)point(x+(col/7-.5)*attSize,y+(row/7-.5)*attSize,z-.025,c,.98,1.25);
         }
+        const frame=[[-.5,-.5],[.5,-.5],[.5,.5],[-.5,.5],[-.5,-.5]].map(v=>[x+v[0]*attSize,y+v[1]*attSize,z]);path(frame,3,.23,.6);
+        // Each head goes to the output projection. These planes are heads,
+        // not sequential decoder layers, and do not feed into one another.
+        trace(arc([x+attSize*.53,y+.22,z],projection,-.08),c,.30+head*.11);
       }
-      slab(.79,.36,0,.24,.83,.13,1,3);
-      const add=[1.02,.36,0];point(...add,2,.92,2.1);
-      path([[-1.38,-.40,0],[-1.38,-.91,0],[1.02,-.91,0],add],0,.28,.72);
-      trace(arc([.92,.36,0],add,0),1,.6);
-      // Token-wise expansion / contraction in the feed-forward sublayer.
-      for(let layer=0;layer<3;layer++){
-        const x=1.19+layer*.16,span=layer===1?1.02:.62;
-        slab(x,.36,0,.065,span,.13,layer===1?1:0,4);
-        if(layer)for(let row=0;row<8;row+=2)path([[x-.16,.36+(row/7-.5)*(layer===1?.62:1.02),0],[x,.36+(row/7-.5)*span,0]],1,.14,.5);
+      tokenPanel(projection,.12,.50,1);trace(arc([projection[0]+.09,projection[1],0],add,0),1,.57);
+      const skipAttention=vertical?[[token[0],token[1]-.48,0],[token[0],-1.96,0],[1.37,-1.96,0],[1.37,-.53,0],add]:[[token[0],token[1]-.45,0],[token[0],-.98,0],[add[0],-.98,0],add];path(skipAttention,0,.23,.70);point(...add,2,.95,2.0);
+      trace(arc(add,router,vertical?-.10:0,vertical?-.08:0),0,.66);globe(router,.065,76,2,.75);ring(router,.10,.07,1,.40,.2);
+      for(let expert=0;expert<8;expert++){
+        const row=vertical?Math.floor(expert/4):expert,x=vertical?(expert%4-1.5)*.61:1.39,y=vertical?.56+row*.55:-.99+expert*.30,z=vertical?(row-.5)*.13:(expert%2-.5)*.08,chosen=active.includes(expert),rank=active.indexOf(expert),color=chosen?(rank?1:0):3;
+        const sx=vertical?.31:.45,sy=vertical?.25:.17,c=[x,y,z],incoming=vertical?[x,y-sy*.65,z]:[x-sx*.65,y,z],outgoing=vertical?[x,y+sy*.65,z]:[x+sx*.65,y,z];
+        // Each expert is a small expansion/contraction FFN. Dormant experts
+        // remain visible but receive no moving token packet or output weight.
+        for(let layer=0;layer<3;layer++)for(let j=0;j<7;j++)for(let k=0;k<2;k++){
+          const span=layer===1?sy:sy*.58;point(x+(layer-1)*sx*.43,y+(j/6-.5)*span,z+(k-.5)*.10,color,chosen?(layer===1?.88:.68):.22,chosen?.97:.75);
+        }
+        const routeIn=arc(router,incoming,vertical?.035:(expert-3.5)*.035,(expert-3.5)*.025),routeOut=arc(outgoing,combine,vertical?-.04:(expert-3.5)*-.02,(expert-3.5)*-.015);
+        if(chosen){const weight=gate[rank].weight;path(routeIn,color,.55,.85+weight*.55);path(routeOut,color,.55,.85+weight*.55);trace(routeIn,color,.73+rank*.07);trace(routeOut,color,.85+rank*.07);}else{path(routeIn,3,.10,.45);path(routeOut,3,.10,.45);}
+        if(hero)text(`E${expert+1}`,vertical?x:x+.41,vertical?y+.23:y+.02,z,color);
       }
-      trace([add,[1.19,.36,0],[1.35,.36,0],[1.51,.36,0]],1,.72);
-      path([[1.02,.36,0],[1.02,1.0,0],[1.59,1.0,0],[1.59,.36,0]],1,.20,.6);point(1.59,.36,0,2,.85,1.8);
-      text('TOKENS',-1.39,1.02);text('Q  K  V',-.73,1.02);text('CAUSAL ATTENTION',.05,-1.08);text('PROJECTION',.79,1.02);text('FFN',1.36,-.39);
-      if(hero){text('RESIDUAL',-1.16,-1.12,0,0);text('3 ATTENTION HEADS',.02,.73,0,1);}
-      host.dataset.fieldPoints=String(points.length);host.dataset.fieldCoreNodes='8';
+      ring(combine,.073,.073,2,.65,Math.PI/2);point(...combine,2,.98,2.05);
+      const finalAdd=vertical?[0,1.87,0]:[2.40,.12,0];trace(arc(combine,finalAdd,0),1,.94);point(...finalAdd,2,.95,1.9);
+      const skipMoE=vertical?[add,[1.48,-.53,0],[1.48,1.87,0],finalAdd]:[add,[add[0],1.47,0],[finalAdd[0],1.47,0],finalAdd];path(skipMoE,1,.24,.75);trace([finalAdd,output],0,.98);
+      if(hero){
+        if(vertical){text('Tokens',-1.18,-.67);text('Q / K / V',-.62,-.57);text('Causal attention',.20,-1.99);text('3 heads',.22,-.67,0,1);text('Projection',1.12,-.78);text('Router · top 2',0,-.22);text('8 FFN experts',0,.29,0,1);text('Weighted sum',-.70,1.72);text('Residual',1.44,1.49,0,1);text('Output',.40,2.01);}
+        else{text('Tokens',-2.24,.67);text('Q / K / V',-1.72,.67);text('Causal attention',-.78,-1.04);text('3 parallel heads',-.78,.69,0,1);text('Projection',-.08,.68);text('Router · top 2',.54,-.40);text('8 FFN experts',1.39,-1.33,0,1);text('Weighted sum',2.18,.68);text('Residual stream',.68,1.66,0,1);text('Output',2.58,-.32);}
+      }
+      host.dataset.fieldLabels=labels.map(l=>l.s).join(' | ');host.dataset.fieldPoints=String(points.length);
     }
     function globe(c,r,count,color=0,alpha=.6){
       for(let i=0;i<count;i++){const y=1-2*(i+.5)/count,a=i*2.399963,rr=Math.sqrt(1-y*y);point(c[0]+Math.cos(a)*rr*r,c[1]+y*r,c[2]+Math.sin(a)*rr*r,color,alpha*(.8+.2*rr),.88);}
@@ -273,7 +294,7 @@
       for(const v of points){const p=project(v.x,v.y,v.z),depth=Math.round(p.d*4),a=Math.round(clamp(v.a*(1-p.d*.13),.1,1)*12)/12,r=Math.max(.5,Math.round(v.r*(hero?(small?.95:1.1):h<180?.82:.97)*p.s*4)/4),key=`${depth}/${v.c}/${a}/${r}`;let b=batches.get(key);if(!b){b={depth,c:v.c,a,r,xy:[]};batches.set(key,b);}b.xy.push(p.x,p.y);}
       for(const b of [...batches.values()].sort((a,b)=>b.depth-a.depth)){ctx.globalAlpha=b.a;ctx.fillStyle=palette[b.c];ctx.beginPath();for(let i=0;i<b.xy.length;i+=2){ctx.moveTo(b.xy[i]+b.r,b.xy[i+1]);ctx.arc(b.xy[i],b.xy[i+1],b.r,0,TAU);}ctx.fill();}
       ctx.globalAlpha=1;
-      for(const l of labels){const p=project(l.x,l.y,l.z);ctx.font=`500 ${small?9:10}px "Space Grotesk",sans-serif`;ctx.textAlign='center';ctx.fillStyle=palette[l.c];ctx.fillText(l.s,p.x,p.y);}
+      for(const l of labels){const p=project(l.x,l.y,l.z);ctx.font=`500 ${mode==='transformer'?(small?10:11):(small?9:10)}px "Space Grotesk",sans-serif`;ctx.textAlign='center';ctx.fillStyle=palette[l.c];ctx.fillText(l.s,p.x,p.y);}
       ctx.restore();host.dataset.fieldPoints=String(points.length);host.dataset.fieldFrame=String(Math.round(t*30));host.dataset.fieldRenders=String(++renderCount);
     }
     const scene={tick(delta){t+=delta;const e=1-Math.exp(-delta*4);px+=(tx-px)*e;py+=(ty-py)*e;render();},get visible(){return visible;},setVisible(v){visible=v;host.dataset.fieldRunning=String(v&&!hidden&&!document.hidden);wake();},measure};scenes.push(scene);

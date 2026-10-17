@@ -1,0 +1,87 @@
+/* Reading hierarchy: a compact map, visible evidence, complete technical depth. */
+.reading-detail{min-width:0;border-block:1px solid #d2dbe5;margin:22px 0;color:#38516f}
+.reading-detail>summary{position:relative;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:48px;padding:13px 0;font-size:13px;line-height:1.6;cursor:pointer}
+.reading-detail>summary::-webkit-details-marker{display:none}
+.reading-detail>summary>span{font-size:20px;font-weight:400;flex-shrink:0;transition:transform .2s}
+.reading-detail[open]>summary>span{transform:rotate(45deg)}
+.reading-detail>summary>small{font-size:10px;margin-left:auto;color:#657c99}
+.reading-detail>summary:focus-visible{outline:2px solid #6d88aa;outline-offset:4px}
+.reading-detail-body{padding:8px 0 20px;min-width:0}
+.case-contribution-line{font-size:12px;line-height:1.8;color:#3e608a;margin:22px 0 14px}
+.case-scope{margin:15px 0 24px}
+.case-scope .project-scope-copy{font-size:15px;line-height:1.85;max-width:83ch;margin:0 0 22px}
+.case-scope .project-meta{margin-top:22px}
+.case-contents{width:100%;margin:0;border:0}
+.case-nav-links{display:grid;gap:5px}
+.case-contents .reading-detail-body{padding:0}
+.case-contents>summary{font-size:10px;letter-spacing:.04em}
+.case-method-detail{margin:20px 0 26px}
+.case-method-detail .reading-detail-body>p:last-child{margin-bottom:0}
+.overview-topics{border:0;margin:0}
+.overview-topics>summary{position:relative;z-index:3;width:100%;color:#52739c;font-size:11px;min-height:44px;padding:9px 0}
+.overview-topics .overview-tags{padding-top:5px}
+.overview-capability .overview-tags a{position:relative;z-index:3}
+@media(min-width:801px){
+ .overview-topics>summary{display:none}
+ .overview-topics:not([open])>summary{display:flex}
+ .case-contents>summary{pointer-events:none}
+ .case-contents>summary>span{display:none}
+ .case-contents:not([open])>summary{pointer-events:auto}
+ .case-contents:not([open])>summary>span{display:block}
+}
+@media(max-width:1000px){.project-nav .case-nav-links{display:flex;flex-wrap:wrap;gap:5px 9px}}
+@media(max-width:800px){
+ .home-overview .overview-capabilities{grid-template-columns:repeat(2,minmax(0,1fr));margin-top:24px}
+ .home-overview .overview-capabilities .overview-capability{padding:20px 16px!important;border-top:0;border-bottom:1px solid var(--line);border-right:1px solid var(--line);min-width:0}
+ .home-overview .overview-capabilities .overview-capability:nth-child(2n){border-right:0}
+ .home-overview .overview-capabilities .overview-capability:nth-last-child(-n+2){border-bottom:0}
+ .home-overview .overview-capability .overview-capability-field{height:112px;margin:0 0 16px;width:100%;max-width:none}
+ .home-overview .overview-capability h3{font-size:19px;line-height:1.25;margin:9px 0 12px;padding-right:12px;letter-spacing:-.025em}
+ .home-overview .overview-capability p{font-size:12px;line-height:1.65;margin:0 0 9px;min-height:0}
+ .home-overview .overview-capability .overview-index{font-size:9px}
+ .overview-capability-arrow{font-size:14px!important}
+ .home-overview .overview-capability .overview-tags{display:grid;gap:5px}
+ .home-overview .overview-capability .overview-tags a{min-height:40px;font-size:10px;line-height:1.5;padding:8px 10px;border-radius:10px;overflow-wrap:anywhere}
+ .overview-topics{margin-top:auto}
+ .home-overview .overview-section-head{gap:18px;margin-bottom:24px}
+ .case-heading-grid{gap:25px}
+ .case-study-visual-caption{font-size:10px;line-height:1.6}
+ .case-contribution-line{font-size:11px;margin:18px 0 12px}
+ .case-scope .project-scope-copy{font-size:14px;line-height:1.85}
+ .case-scope .project-meta{padding-top:18px;margin-top:22px;gap:18px}
+ .case-scope .project-meta span{font-size:12px;line-height:1.75}
+ .case-scope .project-links{margin-top:17px}
+ .case-scope{margin-bottom:16px}
+ .project-hero .project-summary{font-size:15px;line-height:1.8}
+ .project-nav{display:block;margin:0 0 28px;width:100%}
+ .case-contents{border-block:1px solid #d2dbe5}
+ .case-contents>summary{font-size:12px;min-height:52px;letter-spacing:0}
+ .case-contents[open] .reading-detail-body{padding:0 0 16px}
+ .project-nav .case-nav-links{display:grid;grid-template-columns:1fr;gap:3px}
+ .project-nav .case-nav-links a{padding:10px 0;font-size:12px;line-height:1.6;min-height:44px;border:0;background:none}
+ .qc-jump-links{display:block;border:0;padding:0;margin-top:19px}
+ .qc-jump-links .case-nav-links{grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 16px}
+ .qc-jump-links .case-nav-links a{font-size:12px}
+ .case-method-detail>summary{font-size:12px;line-height:1.6}
+ [data-case-study="minimax"] .prose-section h2{font-size:25px;line-height:1.35;margin-bottom:20px;letter-spacing:-.025em}
+ [data-case-study="minimax"] .prose-section p{font-size:15px;line-height:1.8}
+ [data-case-study="minimax"] .project-layout{margin-top:24px}
+}
+@media(max-width:500px) and (min-width:380px){
+ .home-overview .overview-capabilities .overview-capability{padding:17px 12px!important}
+ .home-overview .overview-capability h3{font-size:18px;min-height:45px}
+ .home-overview .overview-capability p{font-size:11px;line-height:1.65;min-height:55px}
+ .home-overview .overview-capability .overview-capability-field{height:100px;margin-bottom:12px}
+}
+@media(max-width:379px){
+ .home-overview .overview-capabilities{grid-template-columns:1fr}
+ .home-overview .overview-capabilities .overview-capability{display:grid;grid-template-columns:91px minmax(0,1fr);column-gap:17px;padding:19px 0!important;border-right:0;border-bottom:1px solid var(--line)}
+ .home-overview .overview-capabilities .overview-capability:nth-last-child(2){border-bottom:1px solid var(--line)}
+ .home-overview .overview-capability .overview-capability-field{grid-column:1;grid-row:1 / 4;height:101px;align-self:center;margin:0}
+ .home-overview .overview-capability .overview-index,.home-overview .overview-capability h3,.home-overview .overview-capability p{grid-column:2}
+ .home-overview .overview-capability h3{font-size:19px;margin:7px 0 9px}
+ .home-overview .overview-capability p{font-size:11px;margin:0}
+ .home-overview .overview-topics{grid-column:2}
+ .home-overview .overview-capability .overview-tags a{font-size:11px}
+}
+@media print{.reading-detail-body,.overview-topics .overview-tags{display:block!important}.reading-detail>summary>span{display:none}}
