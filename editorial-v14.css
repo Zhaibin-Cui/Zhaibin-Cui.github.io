@@ -1,0 +1,34 @@
+/* Six areas share a generous visual scale; the work itself supplies the detail. */
+.overview-capabilities{grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.overview-capabilities .overview-capability{padding:30px 27px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);grid-column:auto}
+.overview-capabilities .overview-capability:nth-child(3n){border-right:0}
+.overview-capabilities .overview-capability:nth-last-child(-n+3){border-bottom:0}
+.overview-capability .overview-capability-field,.overview-capability:last-child .overview-capability-field{height:200px;max-width:none;margin-bottom:22px}
+.overview-capability h3{font-size:24px}
+.overview-capability p{font-size:14px;min-height:46px;max-width:35ch}
+.overview-capability .overview-tags a{font-size:11px;min-height:35px;display:inline-flex;align-items:center}
+.overview-cover{flex:0 0 auto;min-width:0;width:100%;position:relative;aspect-ratio:1.85}
+.overview-cover img{position:absolute;inset:0;display:block;width:100%;height:100%;max-width:100%;object-fit:contain}
+.overview-card-copy,.overview-industry-copy,.overview-work-card,.overview-industry-grid>*{min-width:0}
+.overview-industry-grid{grid-template-columns:minmax(0,.95fr) minmax(0,1.1fr)}
+.overview-inline-facts strong{font-size:clamp(20px,2vw,28px)}
+.home-overview .overview-notebook{padding-block:12px 75px}
+.rn-teaser-link{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:50px;align-items:center;padding:40px 0;border-block:1px solid var(--line)}
+.home-overview .rn-teaser-copy h2{font-size:clamp(33px,3.6vw,53px);line-height:1.18;letter-spacing:-.045em;margin:17px 0 24px}
+.rn-teaser-copy p{font-size:15px;line-height:1.85;color:var(--muted);max-width:54ch}
+.rn-teaser-art{min-width:0}.rn-teaser-art img{width:100%;height:auto;border-radius:14px}
+.rn-teaser-link:hover .text-link{color:var(--accent);text-decoration:underline;text-underline-offset:5px}
+.rn-profile-link{display:inline-block;margin-top:18px;font-size:13px;color:#526c90}
+.rn-writing-links{display:flex;flex-wrap:wrap;gap:18px 28px;align-items:center;margin-top:30px}
+.rn-origin{color:var(--muted);font-size:13px;line-height:1.8;max-width:78ch;margin-top:22px}
+.research-notes-page .project-hero h1{max-width:1000px;line-height:1.13}
+.research-notes-page .prose-section>p{max-width:75ch}
+.research-notes-page .rn-citations{font-size:13px;line-height:1.9;padding-top:14px;border-top:1px solid var(--line);color:#526c90}
+.rn-related{display:grid;border-top:1px solid var(--line);margin-block:35px}
+.rn-related a{padding:16px 0;border-bottom:1px solid var(--line);font-size:15px}
+/* Flex wrapping also handles CSS text/zoom environments whose media queries
+   retain desktop dimensions. No hidden overflow is used to conceal content. */
+@media(min-width:761px){.site-header{height:auto;min-height:78px}.site-header .nav-inner{min-height:78px;height:auto;flex-wrap:wrap;gap:10px 24px;padding-block:12px}.site-header .main-nav{min-width:0;flex-wrap:wrap;gap:8px 22px;margin-left:auto}.site-header .nav-actions{display:none}}
+@media(max-width:1000px){.overview-capabilities{grid-template-columns:repeat(2,minmax(0,1fr))}.overview-capabilities .overview-capability{border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:25px 22px}.overview-capabilities .overview-capability:nth-child(3n){border-right:1px solid var(--line)}.overview-capabilities .overview-capability:nth-child(2n){border-right:0}.overview-capabilities .overview-capability:nth-last-child(-n+3){border-bottom:1px solid var(--line)}.overview-capabilities .overview-capability:nth-last-child(-n+2){border-bottom:0}.overview-capability .overview-capability-field,.overview-capability:last-child .overview-capability-field{height:180px}.rn-teaser-link{gap:30px}}
+@media(max-width:760px){.overview-industry-grid,.rn-teaser-link{grid-template-columns:minmax(0,1fr)}.rn-teaser-link{gap:20px;padding-block:28px}.rn-teaser-art{order:2}.home-overview .overview-notebook{padding-bottom:46px}.research-notes-page .project-hero h1{font-size:clamp(32px,7.5vw,48px)}.rn-writing-links{gap:18px;font-size:13px}.rn-origin{font-size:12px}.overview-industry-copy>p{max-width:none}}
+@media(max-width:520px){.overview-capabilities{grid-template-columns:minmax(0,1fr)}.overview-capabilities .overview-capability,.overview-capabilities .overview-capability:nth-child(3n),.overview-capabilities .overview-capability:nth-last-child(-n+2){border-right:0;border-bottom:1px solid var(--line);padding:24px 4px 27px}.overview-capabilities .overview-capability:last-child{border-bottom:0}.overview-capability .overview-capability-field,.overview-capability:last-child .overview-capability-field{height:170px}.overview-capability p{max-width:46ch;min-height:0;margin-bottom:19px}.overview-capability h3{font-size:25px}.overview-capability .overview-tags a{min-height:40px;font-size:12px}.rn-teaser-copy p{font-size:14px}}

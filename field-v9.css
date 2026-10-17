@@ -10,32 +10,6 @@
 .field-play-action:hover,.field-play-reset:hover{color:#152e53;opacity:1}.field-play-action:focus-visible,.field-play-reset:focus-visible{outline-offset:3px}
 .field-sr-only{position:absolute!important;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .field-interactive.landing-moon .landing-coordinate{top:74px;right:4%;font-size:9px;color:#6a7e99;pointer-events:none}
-@media(min-width:1001px){
-  .field-interactive.landing-moon .landing-content{pointer-events:none}
-  .field-interactive.landing-moon .landing-content a,.field-interactive.landing-moon .landing-content button{pointer-events:auto}
-  .field-interactive.landing-moon h1{max-width:49%}
-  .field-interactive.landing-moon .landing-intro{max-width:47%}
-  .field-interactive.landing-moon .hero-name{max-width:48%}
-  .field-interactive.quantum-field-stage .quantum-field-copy h3{max-width:48%}
-  .field-interactive.quantum-field-stage .quantum-field-copy p{max-width:44%}
-}
-@media(max-width:1200px) and (min-width:1001px){
-  .field-play-hint{flex-basis:100%;margin-bottom:-5px}.field-playbar{gap:0 18px}.field-play-action,.field-play-reset{min-height:38px}
-}
-@media(max-width:1000px){
-  .research-field.field-interactive.landing-moon .landing-content{padding-bottom:540px}
-  .research-field.field-interactive.field-stage .field-stage-copy,.research-field.field-interactive.field-stage .field-copy{padding-bottom:464px}
-  .research-field.field-interactive.quantum-field-stage .quantum-field-copy{padding-bottom:464px}
-  .field-interactive.landing-moon .landing-coordinate{display:none}
-  .field-playbar{gap:4px 18px}.field-play-hint{font-size:11px}.field-play-action,.field-play-reset{font-size:12px}
-}
-@media(max-width:620px){
-  .research-field.field-interactive.landing-moon .landing-content{padding-bottom:480px}
-  .research-field.field-interactive.field-stage .field-stage-copy,.research-field.field-interactive.field-stage .field-copy{padding-bottom:414px}
-  .research-field.field-interactive.quantum-field-stage .quantum-field-copy{padding-bottom:414px}
-  .field-playbar{gap:0 17px;padding-inline:4px}.field-play-hint{flex-basis:100%;font-size:10px;margin-bottom:-1px}
-  .field-play-action,.field-play-reset{min-height:40px;font-size:11px}.field-interaction{border-radius:12px}
-}
 @media print{.field-interaction,.field-playbar{display:none!important}}
 
 /* v13: diagrams occupy their own space; native card links remain the hit target. */
@@ -45,11 +19,77 @@
 .transformer-playbar{align-items:center;gap:4px 16px}
 .transformer-playbar .field-play-hint{font-size:10px;line-height:1.4}
 .transformer-playbar .field-play-action,.transformer-playbar .field-play-reset{min-height:44px}
-@media(max-width:1000px){.research-field.transformer-field.landing-moon .landing-content{padding-bottom:560px}}
 @media(max-width:620px){
- .research-field.transformer-field.landing-moon .landing-content{padding-bottom:490px}
  .topic-field{min-height:0;aspect-ratio:1.75}
  .transformer-playbar .field-play-hint{flex-basis:100%;font-size:10px}
  .transformer-playbar{padding-inline:3px;gap:0 17px}
 }
 @media print{.topic-field{display:none}}
+
+/* v14: real layout columns keep visualizations out of the text at every zoom.
+   Canvas geometry is measured in local CSS pixels, including embedded webviews. */
+.research-field.scientific-field{container-type:inline-size;container-name:scientific-field}
+.research-field.scientific-field .scientific-field-layout{display:flex;flex-wrap:wrap;gap:32px;align-items:center;min-width:0}
+.research-field.scientific-field .scientific-field-copy{flex:.94 1 480px;min-width:0;max-width:100%;width:auto;position:relative;z-index:2;pointer-events:auto}
+.research-field.scientific-field .scientific-field-copy a,.research-field.scientific-field .scientific-field-copy button{pointer-events:auto}
+.research-field.scientific-field .scientific-field-copy :is(h1,h3,p,.hero-name,.landing-intro,.overview-hero-capabilities){max-width:100%;width:auto}
+.research-field.scientific-field .scientific-field-stage{flex:1.06 1 540px;position:relative;isolation:isolate;min-width:0;width:100%;height:100%;min-height:530px;overflow:hidden;pointer-events:auto;align-self:stretch;background:var(--paper,#f6f5f1)}
+.research-field.scientific-field.landing-moon .scientific-field-stage{min-height:clamp(560px,46vw,740px)}
+.research-field.scientific-field .scientific-field-stage>canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.research-field.scientific-field .scientific-field-stage .field-interaction{z-index:2;border-radius:0}
+.research-field.scientific-field:not(.landing-moon){min-height:0}
+.research-field.scientific-field:not(.landing-moon) .scientific-field-layout{padding:28px 32px;max-width:var(--max,1380px);margin-inline:auto;box-sizing:border-box}
+.research-field.scientific-field:not(.landing-moon) .scientific-field-copy{padding:0}
+.research-field.scientific-field .field-playbar{box-sizing:border-box}
+.research-field.scientific-field .scientific-field-stage .landing-coordinate{top:12px;right:14px;max-width:calc(100% - 28px);font-size:9px;line-height:1.7;z-index:1}
+/* CSS zoom can shrink a containing block without changing viewport media
+   queries. These rules follow the space actually available to the artwork. */
+@container scientific-field (max-width:1100px){
+ .research-field.scientific-field .scientific-field-layout{grid-template-columns:minmax(0,1fr);gap:24px}
+ .research-field.scientific-field.landing-moon .landing-content{padding-bottom:112px}
+ .research-field.scientific-field.landing-moon .scientific-field-copy h1{font-size:clamp(48px,7.8cqi,76px);max-width:100%;overflow-wrap:normal;word-break:normal}
+ .research-field.scientific-field.landing-moon .scientific-field-stage{min-height:0;height:clamp(380px,62cqi,620px)}
+ .research-field.scientific-field:not(.landing-moon) .scientific-field-stage{height:440px;min-height:0}
+ .research-field.scientific-field .field-play-hint{flex-basis:auto}
+}
+@container scientific-field (max-width:620px){
+ .research-field.scientific-field .scientific-field-layout{gap:12px}
+ .research-field.scientific-field.landing-moon .scientific-field-copy h1{font-size:clamp(36px,10.8cqi,62px)}
+ .research-field.scientific-field.landing-moon .landing-content{padding-bottom:106px}
+ .research-field.scientific-field.landing-moon .scientific-field-stage{height:410px}
+ .research-field.scientific-field:not(.landing-moon) .scientific-field-layout{padding:28px 18px}
+ .research-field.scientific-field:not(.landing-moon) .scientific-field-stage{height:350px}
+ .research-field.scientific-field .field-play-hint{flex-basis:100%}
+ .research-field.scientific-field .field-playbar{gap:0 18px}
+}
+@media(max-width:1100px){
+ .research-field.scientific-field .scientific-field-layout{grid-template-columns:minmax(0,1fr);gap:24px}
+ .research-field.scientific-field.landing-moon .landing-content{padding-bottom:112px}
+ .research-field.scientific-field.landing-moon .scientific-field-stage{min-height:0;height:clamp(380px,62vw,620px)}
+ .research-field.scientific-field:not(.landing-moon) .scientific-field-stage{height:440px;min-height:0}
+ .research-field.scientific-field .field-play-hint{flex-basis:auto}
+ .field-interactive.landing-moon .landing-coordinate{display:none}
+}
+@media(max-width:620px){
+ .research-field.scientific-field .scientific-field-layout{gap:12px}
+ .research-field.scientific-field.landing-moon .landing-content{padding-bottom:106px}
+ .research-field.scientific-field.landing-moon .scientific-field-stage{height:410px}
+ .research-field.scientific-field:not(.landing-moon) .scientific-field-layout{padding:28px 18px}
+ .research-field.scientific-field:not(.landing-moon) .scientific-field-stage{height:350px}
+ .research-field.scientific-field .field-play-hint{flex-basis:100%}
+ .research-field.scientific-field .field-playbar{gap:0 18px}
+}
+/* Firefox currently evaluates container queries against pre-zoom dimensions.
+   The renderer supplies actual local width, while flex wrapping is the fallback. */
+.research-field.scientific-field[data-field-layout="stacked"] .scientific-field-copy,
+.research-field.scientific-field[data-field-layout="stacked"] .scientific-field-stage{flex-basis:100%}
+.research-field.scientific-field.landing-moon[data-field-layout="stacked"] .scientific-field-copy h1{font-size:var(--field-title-size,60px);max-width:100%;overflow-wrap:normal;word-break:normal}
+.research-field.scientific-field[data-field-layout="stacked"] .scientific-field-layout{gap:24px}
+.research-field.scientific-field.landing-moon[data-field-layout="stacked"] .scientific-field-stage{height:auto;aspect-ratio:1.55;min-height:350px;max-height:620px;align-self:auto}
+.research-field.scientific-field:not(.landing-moon)[data-field-layout="stacked"] .scientific-field-stage{height:440px;min-height:0;align-self:auto}
+@media(max-width:620px){
+ .research-field.scientific-field[data-field-layout="stacked"] .scientific-field-layout{gap:12px}
+ .research-field.scientific-field.landing-moon[data-field-layout="stacked"] .scientific-field-stage{height:410px;aspect-ratio:auto;min-height:0}
+ .research-field.scientific-field:not(.landing-moon)[data-field-layout="stacked"] .scientific-field-stage{height:350px}
+}
+@media print{.scientific-field-stage{display:none!important}.research-field.scientific-field .scientific-field-layout{display:block;padding:0!important}}
