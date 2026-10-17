@@ -37,3 +37,21 @@
 /* Keep the overview invitation compact; full methods remain one click away. */
 .wm-teaser{padding-block:56px}.wm-teaser h2{margin-bottom:18px}.wm-teaser-copy>p{margin-bottom:17px}.wm-teaser-tags{margin-bottom:19px}
 @media(max-width:620px){.wm-teaser{padding-block:36px;gap:23px}.wm-teaser h2{font-size:32px;margin-top:13px;margin-bottom:16px}.wm-teaser-copy>p{font-size:14px;line-height:1.8}.wm-teaser-tags{gap:6px;margin-bottom:18px}.wm-teaser-tags a{padding:5px 9px}.wm-teaser-art>span{padding:12px 15px}.wm-teaser-art>span b{font-size:18px}}
+
+/* A single native link extends over the invitation; topic links remain independent. */
+.wm-teaser{position:relative;isolation:isolate}
+.wm-teaser-copy>.text-link::after{content:"";position:absolute;inset:0;z-index:1;border-radius:3px}
+.wm-teaser-tags a,.wm-teaser-art{position:relative;z-index:2}
+.wm-teaser-copy>.text-link:focus-visible{outline:none}
+.wm-teaser-copy>.text-link:focus-visible::after{outline:2px solid #56759a;outline-offset:9px}
+.wm-teaser:hover h2,.wm-teaser:focus-within h2{color:#3f6389}
+.wm-teaser:hover .wm-teaser-art{border-color:#9baec6}
+
+/* Quieter framing and stronger small type keep the technical reading legible. */
+.wm-hero .handshake-stage{border-radius:0;background:var(--paper);border-block:1px solid #dce2e9;margin-top:42px}
+.wm-hero-caption{font-size:10px;line-height:1.7;color:#5c708c;letter-spacing:.025em}
+.wm-topic-nav{gap:0 28px;padding-block:14px;margin-top:29px}
+.wm-topic-nav a{display:inline-flex;align-items:center;min-height:44px;text-decoration:none;font-size:12px;border-bottom:1px solid transparent;transition:color .18s,border-color .18s}
+.wm-topic-nav a:hover,.wm-topic-nav a:focus-visible{color:#223f63;border-bottom-color:#5d7a9d}
+.wm-sources li>span,.wm-inline-source,.wm-timeline .wm-inline-source,.wm-figure figcaption small{font-size:11px;line-height:1.8;color:#5c708c}
+@media(max-width:620px){.wm-hero .handshake-stage{margin-top:28px;margin-inline:0}.wm-hero-caption{font-size:10px;line-height:1.7}.wm-hero-caption span+span{margin-top:7px}.wm-topic-nav{gap:0 20px;padding-block:12px;margin-top:23px}.wm-topic-nav a{font-size:11px}.wm-figure figcaption small,.wm-timeline .wm-inline-source,.wm-sources li>span{font-size:11px}}
