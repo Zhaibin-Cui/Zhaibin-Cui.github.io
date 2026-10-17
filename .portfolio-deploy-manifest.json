@@ -5,30 +5,60 @@
       "git_blob_sha1": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
       "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
+    "affiliations-v10.css": {
+      "bytes": 3216,
+      "git_blob_sha1": "6bd9ed8560e288de19113518792fea723b94f95f",
+      "sha256": "272bde147749db8fef295db387991faa7b38ae94af153e5bd5df7cf49fd56d9d"
+    },
     "app.js": {
-      "bytes": 30674,
-      "git_blob_sha1": "f3cc9090a1bd222954a9e1ceb869aeeb2558507f",
-      "sha256": "1bdad7427934733016e542c473edd0410aa9c6a4663266bebc971a914cb6edb6"
+      "bytes": 31149,
+      "git_blob_sha1": "099367a97eb93d447a2070bf4cf75357760fd753",
+      "sha256": "5aea861b75e4c22f84e9be7e5299f1cdfad829089590fffbaa0e0b62b047f9b9"
+    },
+    "assets/affiliations/iiis-mark.png": {
+      "bytes": 17197,
+      "git_blob_sha1": "1978e6b62a43f9e64771c83de1966be2ebb9c2ee",
+      "sha256": "99aed1cce8bab0061982c568f90fbc4b76e3c58fac860d1a31e80a15a271d810"
     },
     "assets/affiliations/iiis.png": {
       "bytes": 19701,
       "git_blob_sha1": "108e4029858227021800e5ef05c31070feddaead",
       "sha256": "727dc03866fb93c80eaf73b80b525fdf1d75dfc402c402042f188236c271dc82"
     },
+    "assets/affiliations/minimax-mark.png": {
+      "bytes": 302096,
+      "git_blob_sha1": "f30ee743d050503f2527ce59823992416e0aa4e8",
+      "sha256": "65a195ca0410ff0a915715f5fd91ae10ad53dd89c18dce618104ffa97c071ce7"
+    },
     "assets/affiliations/minimax.webp": {
       "bytes": 7122,
       "git_blob_sha1": "af8b7edbb4a2951ce32f229f7d23703b5eb9064c",
       "sha256": "7459aaaecb55eeb47c9a754ecc4c982a469d73f783084adc044d538cb4e593c5"
+    },
+    "assets/affiliations/pkuschool-mark.png": {
+      "bytes": 125810,
+      "git_blob_sha1": "b6a750335f5a144c132871ab6619a512b611db1f",
+      "sha256": "2308be632fbe1e9054b3c71c428a6ef3c71dfff7893a2ef1ca0c8bd1b79f95f5"
     },
     "assets/affiliations/pkuschool.png": {
       "bytes": 125810,
       "git_blob_sha1": "b6a750335f5a144c132871ab6619a512b611db1f",
       "sha256": "2308be632fbe1e9054b3c71c428a6ef3c71dfff7893a2ef1ca0c8bd1b79f95f5"
     },
+    "assets/affiliations/tsinghua-mark.png": {
+      "bytes": 118217,
+      "git_blob_sha1": "762698a83ec0ed62e97c53a5abda2849e2046b98",
+      "sha256": "c35237438e86e13066e9f907c0ad21c70a8b1ef11b769104d70d162e87e94869"
+    },
     "assets/affiliations/tsinghua.jpg": {
       "bytes": 98663,
       "git_blob_sha1": "d040c3238cfa807226c39fb2dfb09aa910958ca1",
       "sha256": "5bba2316fe2a231b67c1de13e9c3229db963c81ade4eb5a747813e60ba8d8197"
+    },
+    "assets/affiliations/ustc-mark.svg": {
+      "bytes": 201107,
+      "git_blob_sha1": "bd6ec11f472f97444b2d4af21e83b48d148541a3",
+      "sha256": "c2c30e493ecf22cde65f1d7f123c628254be8f20d9fe0411ae1c43f8c369a65c"
     },
     "assets/affiliations/ustc.svg": {
       "bytes": 200991,
@@ -95,6 +125,31 @@
       "git_blob_sha1": "f3c2600dcba5eac0f782ee858e8311b754f06386",
       "sha256": "65ec25b3b6bc253fdf21f1f85e8caa0b1f62a4009da217be95733a2f34c9f5e5"
     },
+    "assets/control-systems/fullstack-command-routing.png": {
+      "bytes": 317289,
+      "git_blob_sha1": "92f380dfaf4d6c0f1fde2b2df7dc0d3b2d502361",
+      "sha256": "7047b24bb28b4c0d0ee6cf6f377e29fa4a789efd2a3b015d0c26d10a651500eb"
+    },
+    "assets/control-systems/fullstack-experiment-desktop.png": {
+      "bytes": 4233242,
+      "git_blob_sha1": "2ef42a028d1034cf42478d573370b1e75815c2e4",
+      "sha256": "dda093a3731a2eb2885b87236230efc6ea7009d89408a4285d9ee25ef58cdd9e"
+    },
+    "assets/control-systems/fullstack-frequency-locks.png": {
+      "bytes": 1917077,
+      "git_blob_sha1": "8b9df7a404c9b11cf0fdb1eed03fd320852dade8",
+      "sha256": "31b9b1c69b69f18d185b9fed7a75623b04a4bfc36f1a244184ca14407dbaaf1d"
+    },
+    "assets/control-systems/fullstack-laser-controls.png": {
+      "bytes": 1916070,
+      "git_blob_sha1": "15fda12bb125175c3f762d6cd32ecc70cc0727d4",
+      "sha256": "8234faa90074c41eb0bc3675333d8f5ef0f0960b8807fe0450368141ab53f155"
+    },
+    "assets/control-systems/fullstack-pulse-imaging-workflow.png": {
+      "bytes": 2123486,
+      "git_blob_sha1": "7a1f8a09f754f075318f3c2aa5e3bd057d9b13b6",
+      "sha256": "c8e296ed5af68dd8823f3b8fdab1bacd3e2e4de079be788feaf72afdbc1cbb6b"
+    },
     "assets/control-systems/objective-interface.webp": {
       "bytes": 1394598,
       "git_blob_sha1": "95ea01951c2eef046d1623774554511c9912b0d5",
@@ -105,10 +160,350 @@
       "git_blob_sha1": "489265227957216106ffeee185b7436161629dca",
       "sha256": "d92af1f4924dff80aaf88c4a7f14a0cf411242a4b234ff0c2b9f92fe5bed92b4"
     },
+    "assets/defense-gallery/s02-009-entanglement-control-and-photon-acquisition.png": {
+      "bytes": 1374609,
+      "git_blob_sha1": "801c846990dbe6561340c5b0396da3c4db6c8365",
+      "sha256": "86496ae403b6a3beaee80703d3c2a986bd5a35e8e0cf77246debc13819797cfe"
+    },
+    "assets/defense-gallery/s02-010-sequencer-verification-in-simulation.png": {
+      "bytes": 148273,
+      "git_blob_sha1": "62502387772bf065cfc8a4110b35dae592122c48",
+      "sha256": "66a6032465873f62d3377f2aac3300cb3f230b774db1eddb5957da9c7ab26417"
+    },
+    "assets/defense-gallery/s02-012-control-board-routing.png": {
+      "bytes": 687258,
+      "git_blob_sha1": "ca30169967894566f073dbd5528570ffafe860b2",
+      "sha256": "c7052b6723eea7965f92f093f8fd0e3ccd1aabf163090088f9a9add2e592d3c0"
+    },
+    "assets/defense-gallery/s02-013-the-electronics-workbench.jpg": {
+      "bytes": 369545,
+      "git_blob_sha1": "91bc11e266feb2eb7e0dbcd034d82c731160489f",
+      "sha256": "89150982cf8ffb622e24c976bdcef2a7b56a294fccc4f4ffd3d3a63ab6221915"
+    },
+    "assets/defense-gallery/s02-014-coordinating-client-and-server-sequencers.png": {
+      "bytes": 2057867,
+      "git_blob_sha1": "8f5a0e4fd9263bf44de66a57197a83abcdcdf951",
+      "sha256": "4e3b848e600e860c197ef6d598f92867ef3dfac4dfefd5abb08a8d20e336f4eb"
+    },
+    "assets/defense-gallery/s03-018-apparatus-layout-and-optical-access.png": {
+      "bytes": 1553325,
+      "git_blob_sha1": "17c2b9baa98ad2a0322ceb3a75fe06dc8bf4b059",
+      "sha256": "6bdc9c84b77191a8c284b8ae85379dd2c47c22419a6f1969b49eef24b7b271fe"
+    },
+    "assets/defense-gallery/s03-019-spatially-resolved-optical-array.png": {
+      "bytes": 36330,
+      "git_blob_sha1": "c844624af5785a8d6a3fc46d2f3f0528023d28ff",
+      "sha256": "589a4e1393c233f4983f3933a3c507f5b678f2dda3f8bc479309bf41ff403dbc"
+    },
+    "assets/defense-gallery/s03-020-inspecting-a-structured-beam-profile.jpg": {
+      "bytes": 100145,
+      "git_blob_sha1": "60a7bddd520844dd24563033556f8539a2a93c05",
+      "sha256": "8648a67d880f8b7a7c2e03691202b2a40038f863047c2fefe77f3beb0b26e942"
+    },
+    "assets/defense-gallery/s03-021-the-trap-assembly-inside-the-chamber.png": {
+      "bytes": 453521,
+      "git_blob_sha1": "f28ce38b91f3a72b43b23414178ea2eae748bad0",
+      "sha256": "bd201cc296419c11f62f4cd3868fd7fae68e7ba660799d3f4932b261ac19a758"
+    },
+    "assets/defense-gallery/s03-022-multi-element-optical-design-in-zemax.jpg": {
+      "bytes": 139646,
+      "git_blob_sha1": "e38ae0f04c97d6aa3c7b51e71f1297de500bfd15",
+      "sha256": "4788bc2dc8283413d026428d8157a25b38c5416ed8918673b888456b2812bcb1"
+    },
+    "assets/defense-gallery/s03-023-mechanical-enclosure-design.jpg": {
+      "bytes": 95246,
+      "git_blob_sha1": "ab3d8a5f401fba94ccc3e0185832fc5824d96faf",
+      "sha256": "4af7af447433cb39118ae78314d17da444f33121b4367c6e3e3623f7ae407a17"
+    },
+    "assets/defense-gallery/s03-024-ion-chain-imaging-in-andor-solis.jpg": {
+      "bytes": 119047,
+      "git_blob_sha1": "8fe264e44155c24f3ffd0205068d0fa4df81c383",
+      "sha256": "fd85f1259944280a16619f41c0416b360e0536f3fbf7b5ef895a978cf3a383f3"
+    },
+    "assets/defense-gallery/s03-025-optical-access-around-the-vacuum-apparatus.jpg": {
+      "bytes": 430603,
+      "git_blob_sha1": "7e86d0acc0762ea0b02d224e728ccf487736bf7e",
+      "sha256": "3ebbee38e694e0c93022fb616c7d75f461bc0a8646eb108a89c051e8335780f5"
+    },
+    "assets/defense-gallery/s04-045-ray-tracing-and-spot-diagrams.png": {
+      "bytes": 324770,
+      "git_blob_sha1": "9f586922058733b5e21760de06e980e31ea9d8f7",
+      "sha256": "d1fa57a0b48a6270096ec3d6c27444ea49e74d88be14d4ef8319821f708ff0bd"
+    },
+    "assets/defense-gallery/s04-046-collection-efficiency-and-numerical-aperture.png": {
+      "bytes": 498781,
+      "git_blob_sha1": "3807e967f7b6c235624bc4bf41eb34b33f04b8a5",
+      "sha256": "0ad152d3283eef469a2d17ff6eec24deeb6447be6a0dc9827b87a128989f5406"
+    },
+    "assets/defense-gallery/s04-047-spatial-optical-mode-profiles.png": {
+      "bytes": 171894,
+      "git_blob_sha1": "975d091e0509a278737295a827a6bf52bb69f54f",
+      "sha256": "a491c07bf442ccb8456700ebb92e915a70d2c3350b8fb54b7df2645158985824"
+    },
+    "assets/defense-gallery/s04-048-zernike-modes-for-wavefront-analysis.png": {
+      "bytes": 266647,
+      "git_blob_sha1": "3c8a2d9528df66c581e8bcb06cbcfccf23e47abd",
+      "sha256": "60daf3a1f0e89ec331dcf5b1454cc43a7a318e8a795b1ac330c15bb28a5be691"
+    },
+    "assets/defense-gallery/s04-049-point-spread-function-and-aberration-components.png": {
+      "bytes": 145337,
+      "git_blob_sha1": "aab53f28ce2980fbc00ea25cef6b3a953b9929a6",
+      "sha256": "4ad98ac3426045133df6b0b6a5fb6ee837b950e875b54ce02cc9fb4e373951c6"
+    },
+    "assets/defense-gallery/s04-050-frequency-domain-description-of-a-photon-wavepacket.png": {
+      "bytes": 33433,
+      "git_blob_sha1": "4c6f1bb1f12793c1ef5b1fbbbec3505620a06934",
+      "sha256": "74e102f4ff995ab5ef4ef24d05b74c4e49294dd1d4f14570a695da50eb9b9419"
+    },
+    "assets/defense-gallery/s04-051-phase-contributions-in-the-entanglement-model.png": {
+      "bytes": 24299,
+      "git_blob_sha1": "8bd7b74790589632c8974fd5b998ad52ef0058d4",
+      "sha256": "072555f5ab430635b5f4473c1f2f34c38fab70817dde45e0ec88dcce5792c217"
+    },
+    "assets/defense-gallery/s04-052-event-dependent-phase-correction.png": {
+      "bytes": 12774,
+      "git_blob_sha1": "5f02108e69b67133d0f6b06a4a12d1b0f1fbf7df",
+      "sha256": "197ed8be99f54d57c39a4539618f8a25badb296a6122498879410528a8025fd6"
+    },
+    "assets/defense-gallery/s04-053-temporal-interference-under-different-detunings.png": {
+      "bytes": 47052,
+      "git_blob_sha1": "149cc39a35a2d769267558fd25adf7c0ab9fbca7",
+      "sha256": "05768dff2fc47bbce2bbe25139d451afee039d3905d4496b76342b037b4aadd9"
+    },
+    "assets/defense-gallery/s04-054-two-ion-frequency-offsets.png": {
+      "bytes": 29467,
+      "git_blob_sha1": "0978268867998010ed58afee8db7f566871a95e5",
+      "sha256": "a8ed2ea7c8cc534e9d717e982e67a7d682afdb158c112ed0de3f6e33d0e18b94"
+    },
+    "assets/defense-gallery/s04-055-coincidence-structure-and-interference-envelope.png": {
+      "bytes": 154235,
+      "git_blob_sha1": "6a91e8fae545dc8f1c89d261a44d6b8e642fc8a7",
+      "sha256": "375fe5af23087e67cf0797a7c29d28ae225b44c2f8644e32939f4c3aa6942243"
+    },
+    "assets/defense-gallery/s04-056-relative-phase-in-the-entangled-state-subspace.png": {
+      "bytes": 35711,
+      "git_blob_sha1": "1b1f04556ae2c3ab48fdf6e960c7d12879c82928",
+      "sha256": "220c7c070abcc951482fa34c99118e3f9db685f1fe2c36ae4d6f1563cbbd76ef"
+    },
+    "assets/defense-gallery/s05-057-a-modular-architecture-with-photonic-interconnects.png": {
+      "bytes": 434808,
+      "git_blob_sha1": "2afaea48e0afb52722c63600c58875d51bb984db",
+      "sha256": "de3dd7011153ec5c360bbf4a8f8944bb50d38b471af9ff7f9906f6a2fe9d4321"
+    },
+    "assets/defense-gallery/s05-058-distributed-quantum-computation-across-a-network-link.png": {
+      "bytes": 149331,
+      "git_blob_sha1": "fd2e6b37ab11b24d5ec22a35b4a0b67103b9714e",
+      "sha256": "b41c480aab4ea90c1ec7b35595faa6cfa6110dd52797ac06564d8f0ee7d3994a"
+    },
+    "assets/defense-gallery/s05-059-circuit-description-of-a-distributed-operation.png": {
+      "bytes": 28617,
+      "git_blob_sha1": "0cc23d617a2fe3848b1d6cb3aa4bea7e8c85c2e8",
+      "sha256": "01f3cc552cab936ed35bf6aaf81662c9715e8204913b62b58ae6376b6e5bb82c"
+    },
+    "assets/defense-gallery/s05-062-apparatus-and-protocol-overview.png": {
+      "bytes": 580668,
+      "git_blob_sha1": "ad0fb4baaa89777759d698604cc727c6306469e9",
+      "sha256": "6aa1d407858cd7c561851e96535de3b97e9169d49c97f1c9085ae24ac6e58396"
+    },
+    "assets/defense-gallery/s05-063-optical-spot-pattern-inspection.png": {
+      "bytes": 96810,
+      "git_blob_sha1": "4d90475559463dd95bfa09c52bb4e81cf8e2c7d4",
+      "sha256": "915b12f8799f7682f4d56f234d8b38a37412f3a9c1dc8dc21da72b59d38b83b2"
+    },
+    "assets/defense-gallery/s05-064-magnetic-field-variation-and-qubit-response.png": {
+      "bytes": 286081,
+      "git_blob_sha1": "853874ebca2644b2a01d0ed609995a0bdd02a38e",
+      "sha256": "dbec6d1b5fdc8c8186635abe0ea274505f267c5188c05aa8ed40e7d4f552c1e2"
+    },
+    "assets/defense-gallery/s05-065-phase-dependent-bright-state-response.png": {
+      "bytes": 101752,
+      "git_blob_sha1": "dc956963185d9b88c23dd4391b68f16d5740a8e5",
+      "sha256": "7380689f74ee6677c819f7842d1791df07fbbeba36f4479836afd5a871127c86"
+    },
+    "assets/defense-gallery/s06-066-finite-element-field-model.png": {
+      "bytes": 424070,
+      "git_blob_sha1": "32f51b196997d236147fa44d181cd190038a0265",
+      "sha256": "d28373863bf9dc97fa428c226c5276fe46d98d21ec508d8294baaa65ca3940f7"
+    },
+    "assets/defense-gallery/s06-067-rf-amplitude-stabilization-loop.png": {
+      "bytes": 39905,
+      "git_blob_sha1": "3768443d31490a7c5d05fb8db4ad616fe2275e98",
+      "sha256": "34573b803e6de39ecefe892e3fb6238f2f5f1b49bb3397ae74c469337f806ac8"
+    },
+    "assets/defense-gallery/s06-068-phase-scans-in-two-optical-paths.png": {
+      "bytes": 108996,
+      "git_blob_sha1": "f77579bbbfb37fbabe91a7dbe4a268f9e9d0cf23",
+      "sha256": "1a11862e63c25f6cf229bc4ec95e0db6219db7c271aef24ab0ba1de4eb7b5148"
+    },
+    "assets/defense-gallery/s06-069-pulse-preparation-and-trigger-routing.png": {
+      "bytes": 69968,
+      "git_blob_sha1": "5df09564bf07111ac8c311d073e1e98738089c1a",
+      "sha256": "6de55fbe08b1ed24b7a7b88f6a7d050024aa44a7bed0e3535268b9419adf707a"
+    },
+    "assets/defense-gallery/s06-070-cross-section-of-the-experimental-enclosure.png": {
+      "bytes": 152933,
+      "git_blob_sha1": "1a68590c131749bde4b8b6d004deb8b30703f44a",
+      "sha256": "df2f487efab3c757ca573fa81ce9c9fdf08a69d9e808333091fe20650ab63df9"
+    },
+    "assets/defense-gallery/s06-071-addressing-and-detection-optical-paths.png": {
+      "bytes": 60534,
+      "git_blob_sha1": "5376cd1372eb4b3ce579eff27ba42eb5156359d2",
+      "sha256": "16e629e87330a7afcba85c18077bab4e49085652c41dba3e31cd996b854aa65e"
+    },
+    "assets/defense-gallery/s06-072-multiplexed-excitation-and-memory-sequence.png": {
+      "bytes": 170019,
+      "git_blob_sha1": "ffa470834b5d0a74be6647fb334d7c658fc9b64f",
+      "sha256": "428410cfc0339d287f5885d52316e361e401ed5a065b3682354db009031678f4"
+    },
+    "assets/defense-gallery/s06-073-cooling-and-motional-heating-checks.png": {
+      "bytes": 119658,
+      "git_blob_sha1": "84bc72eaedd219da13a1b1255870ce62d0436100",
+      "sha256": "a68259557b15579c5d8143254834d3ab083985797627ddf5ef7bd6140ee63ad0"
+    },
+    "assets/defense-gallery/s06-074-individual-optical-addressing-and-crosstalk.png": {
+      "bytes": 119509,
+      "git_blob_sha1": "c623bae30feb9ba142bce74cb2ca9244845ca14f",
+      "sha256": "bfc5e8fb073545c16ee46504e4594a8f6e08761e15b6a195abe3d2937f27a6b3"
+    },
+    "assets/defense-gallery/s06-079-preparation-and-repumping-pathways.png": {
+      "bytes": 76615,
+      "git_blob_sha1": "971feb087c0a72ef0f49fee114eaf1209bf61630",
+      "sha256": "d39d997e2958b106c108471fc423c3ab3553af239439e62d52e465d1261c7d00"
+    },
+    "assets/defense-gallery/s07-080-comparing-photon-arrival-distributions-at-alice-and-bob.png": {
+      "bytes": 94462,
+      "git_blob_sha1": "88a177a27116c8f3c7fc432c7ab6a243910e18c7",
+      "sha256": "1fbdc8b2b31a91bb6fe1a6f434380741eb840a50ad2cf7e60bef673ba941885b"
+    },
+    "assets/defense-gallery/s07-081-photon-detection-windows-and-intermediate-pumping.png": {
+      "bytes": 119195,
+      "git_blob_sha1": "6890c03282d15100a740d5d6548b663fc03c9c72",
+      "sha256": "39e79b343e3001aecd417054013b5c65309ad2c014d9afd85d79dde9f8ec7c9c"
+    },
+    "assets/defense-gallery/s07-082-background-and-excitation-pulse-timing.png": {
+      "bytes": 42339,
+      "git_blob_sha1": "ce836affec4c2af4599bc22b4b3e920c2810a984",
+      "sha256": "146d8e94d3c8c7e16a8fe481db37de9faf8da39a8951a692f3c95a0983c24894"
+    },
+    "assets/defense-gallery/s07-083-repeated-excitation-windows.png": {
+      "bytes": 61623,
+      "git_blob_sha1": "fae25d175d22c835a3db1676e03ad96d06af75f4",
+      "sha256": "e01cddc4ef4be7d03b68f85db7d9652c5bdd5ceba58d50fbc20691dd34099a82"
+    },
+    "assets/defense-gallery/s07-084-a-temporal-mode-sequence-in-the-detector-record.png": {
+      "bytes": 204272,
+      "git_blob_sha1": "f61c83cbac116d29397cee16c1d27803506a4cfc",
+      "sha256": "f732444c21e725e767573aa6e2ec3e7fb5ca7dd0d358835bba63584ee4eca52c"
+    },
+    "assets/defense-gallery/s07-085-repumping-after-photon-generation.png": {
+      "bytes": 34846,
+      "git_blob_sha1": "7da1217362a211423ddcea5aebd29c45d8a369d6",
+      "sha256": "884e06c10911a91032215d479b854ae6e6c2e03c86a6a471f6cebec26663b060"
+    },
+    "assets/defense-gallery/s07-086-optical-pumping-and-entanglement-cycle.png": {
+      "bytes": 151980,
+      "git_blob_sha1": "a02721d2cf3ce3da9bf6b92b15cb1aa4600c1eed",
+      "sha256": "cacead04fe301fbb11a54b8d2d55a257ed853944d355fc0572e442ba631e7c4c"
+    },
+    "assets/defense-gallery/s07-087-communication-and-memory-subspaces.png": {
+      "bytes": 79250,
+      "git_blob_sha1": "e5ed0305abc203fb786bafbcad5230befe5f8f42",
+      "sha256": "bcc68101a6b58b29e6e30611078e1499224471a9c568858a1203d09af5d27c07"
+    },
+    "assets/defense-gallery/s08-090-agent-assisted-experiment-planning.png": {
+      "bytes": 66337,
+      "git_blob_sha1": "3d20725bafca1ed5d15f01a0408b62ee5936530c",
+      "sha256": "c4a2bdfee2a0f459aeb4bc13785652f5c8aeb996f83a4b4eac3e01bdc45adde6"
+    },
+    "assets/defense-gallery/s08-091-a-distributed-experimental-control-plane.png": {
+      "bytes": 435568,
+      "git_blob_sha1": "815bcd9e25e13e64a23070cbab78622c57d11b3a",
+      "sha256": "a08228e72d5c258d183aa58dd759106a4fcf1580ef269aadb8fdb1cb729a1803"
+    },
+    "assets/defense-gallery/s08-092-research-commands-and-deterministic-execution.png": {
+      "bytes": 59402,
+      "git_blob_sha1": "10b95f44663d89ab95c8aa4ee800c5d6f2530c25",
+      "sha256": "54e5749244d0fd948ece5f5ef4ac9760249c3f6163fe34aafabd330453b88b95"
+    },
+    "assets/defense-gallery/s08-093-compiler-front-end-intermediate-representation-and-hardware-back-end.png": {
+      "bytes": 1231046,
+      "git_blob_sha1": "2a2f3080a9580f4e3708496da4cb4af2056bbe10",
+      "sha256": "3a942e7abad09bd736c3980e938e5d3af88c499873c8be99fe0eaa99b8737480"
+    },
+    "assets/defense-gallery/s08-094-compilation-from-experiment-description-to-control-program.png": {
+      "bytes": 2573951,
+      "git_blob_sha1": "2530e6838557b366a9255d65a1b1077af641e5f6",
+      "sha256": "2f8ebbcc973a27135988ed81f24dbb56c5fdda0ab8163bc0d206d3483bffc0aa"
+    },
+    "assets/defense-gallery/s09-096-light-matter-interaction-concept.jpg": {
+      "bytes": 76329,
+      "git_blob_sha1": "718647ea53464cca632838263470fac16ae71891",
+      "sha256": "b8e6142ad1859a34364d9221cf1acbe814097827627e7248ea6eedc0bb81acbf"
+    },
+    "assets/defense-gallery/s09-097-entanglement-across-an-optical-link.jpg": {
+      "bytes": 54000,
+      "git_blob_sha1": "d399e0de4dd619ff457ae72500422d9e88da6ddf",
+      "sha256": "dc9341bf82c4d7a9536d779f12b4f2df834d9483ac0c5555d50d661b13fee2ef"
+    },
+    "assets/defense-gallery/s09-098-a-photonic-bridge-between-quantum-nodes.png": {
+      "bytes": 1660059,
+      "git_blob_sha1": "e2987248e92cc99a1ed4165b667ebf8a3f18f2c0",
+      "sha256": "aa1fc2430971c7936b8df3c27af8cd8f1dc14f0ff20157723cbd8e66e6b65220"
+    },
+    "assets/defense-gallery/s09-099-temporal-multiplexing-at-a-network-node.png": {
+      "bytes": 315793,
+      "git_blob_sha1": "7686772941b02df44ee2e3b670da49997f25ec81",
+      "sha256": "a0c2be5ff03d117ddf53edd25d83a571771b6a8bab4c4ebe18c375f3d24be792"
+    },
+    "assets/defense-gallery/s09-100-ion-shuttling-and-optical-interfaces.png": {
+      "bytes": 116063,
+      "git_blob_sha1": "6cee7b99275592cd12848022d317a1b45c918a8e",
+      "sha256": "5a9f477592916c1f7148811b4f5816fd0b398be25108e6a1ce33614d4ff4d32f"
+    },
+    "assets/defense-gallery/s09-101-communication-qubit-state-reconstruction.png": {
+      "bytes": 62027,
+      "git_blob_sha1": "804619442656c87b36dd533d1d7f87e652a00534",
+      "sha256": "e5978d00837df06b2e3ea57ca961827a791d8cbfe45b61a82947c6a464740753"
+    },
+    "assets/defense-gallery/s09-102-entanglement-and-memory-state-reconstruction.png": {
+      "bytes": 98133,
+      "git_blob_sha1": "d4993a90e96824913aa323fc888efe6a044d138c",
+      "sha256": "ef6358d4628ae18fe98b006a0db9b04f888d62758eb1ff9aeabc431e4cc7a016"
+    },
+    "assets/defense-gallery/s09-103-correlations-in-complementary-measurement-bases.png": {
+      "bytes": 25722,
+      "git_blob_sha1": "a310257052de7eb95ac6d32a2c52363c2a4bb0ec",
+      "sha256": "e0832a42c48e4813fa15ff8c081347d25ce4c1a93c0e0d99e7c92e578e3b49c4"
+    },
+    "assets/defense-gallery/s10-104-the-alice-bob-photonic-link.png": {
+      "bytes": 202283,
+      "git_blob_sha1": "b9127a3940a2e5761eb96ca7430709788fe236c6",
+      "sha256": "9312e41718089656474560113a3f963d075309b1c773797176ef77c1febd05b0"
+    },
+    "assets/defense-gallery/s13-132-frequency-conversion-optical-interface.png": {
+      "bytes": 368423,
+      "git_blob_sha1": "4262fff62bb589f90ce9ce3482876f71312aeb80",
+      "sha256": "a7ad9ef7124b1cc645f113d5ab3eaa39f7cd43605cdd799c3794e173e782cea3"
+    },
+    "assets/defense-gallery/s13-134-writing-an-excitation-into-an-atomic-ensemble.png": {
+      "bytes": 35176,
+      "git_blob_sha1": "2e1d1bb23f17051e7d8a14d70a3bc02c2f4122dc",
+      "sha256": "833b31fd4fb12bc0e183d11afb880fdc34ce5e657837264482ec178c492d5113"
+    },
+    "assets/defense-gallery/s13-135-atomic-ensemble-photon-collection.png": {
+      "bytes": 139959,
+      "git_blob_sha1": "87b9d0b9137be19f2a29e5fa83c603a896bbce8d",
+      "sha256": "9e71597f357f98438b38a13f1aca67726b75a35d0a36bc6f10725adf53c8ffd5"
+    },
     "assets/editorial/bell-fpga-hardware.jpg": {
       "bytes": 239504,
       "git_blob_sha1": "ced305edcfb096d9ea6d832233e7ac1831bc2c85",
       "sha256": "6813738f402e22838a454ff9b86efa168023cf885b29b80480a240c2dd9bfc17"
+    },
+    "assets/editorial/cat-particles-poster.svg": {
+      "bytes": 152784,
+      "git_blob_sha1": "67b6cc82f96cebed528dcc94be53091ca22c1549",
+      "sha256": "3ee68eb9ce1978ab4cdff9cda6d5459326fa7db8fff095ad219bcbf670095438"
     },
     "assets/editorial/data-evaluation.svg": {
       "bytes": 4765,
@@ -191,9 +586,9 @@
       "sha256": "564ce565c371c5e5bbf286006565a7c9aa55a9f56e7ca58d56e05d649dd61a72"
     },
     "assets/fonts/research-sans.woff2": {
-      "bytes": 167832,
-      "git_blob_sha1": "5a50ce581e03947c437f50f1e630d81e4c5c4a8b",
-      "sha256": "2a78af3a8143846a7930aff1c973718d7c6da68d9cb35a657b8e5f1a480fb987"
+      "bytes": 166844,
+      "git_blob_sha1": "4e86683fe7368ae5d4d2406c909f6cb2d93c32d7",
+      "sha256": "c267be9763ac484401846ff5c47714bbc5971a908c73fbd87eeac301a4ef2780"
     },
     "assets/fonts/space-grotesk.woff2": {
       "bytes": 26952,
@@ -235,6 +630,16 @@
       "git_blob_sha1": "40a88edc063c4c29b6a142ef35cb3e2dc74381a9",
       "sha256": "661acc65e1229afb308b93756d53b930f638afe66ee52a659c8930931da210d9"
     },
+    "assets/previews/alice-ion-trap-node-original.webp": {
+      "bytes": 720578,
+      "git_blob_sha1": "ceb9b0746a4f0e0d897fd5bcca4425ae7e1f6597",
+      "sha256": "c6e58a2265cc8db4a7912c53edc8c06eb0b3534d81e484419ca643d7fb6c2ee3"
+    },
+    "assets/previews/bob-ion-trap-node-original.webp": {
+      "bytes": 718618,
+      "git_blob_sha1": "d1fac524400eec177390191fc1a03377cb0e1091",
+      "sha256": "94f953de71e3c1b15b96c07cccb269b5c856fd862b99aa24e356b68e2104f362"
+    },
     "assets/previews/continuum-collaboration-detail.webp": {
       "bytes": 151272,
       "git_blob_sha1": "2a3effac64fbd0092e5d3696231db446386643a2",
@@ -259,6 +664,26 @@
       "bytes": 51238,
       "git_blob_sha1": "acac1bbef6c66e00d7761c087782e6f170692461",
       "sha256": "9a97af7ce0411609b35a887c03a513dcd3bdc762b615479c400e5168354e5526"
+    },
+    "assets/previews/fullstack-experiment-desktop.webp": {
+      "bytes": 295372,
+      "git_blob_sha1": "8bedc739f895cf8f63bc206f0ead0ff0ec9fe608",
+      "sha256": "1ac9abfa1b78d06eb66bf4f6c267616f093bec3580c44338adac0176823c523f"
+    },
+    "assets/previews/fullstack-frequency-locks.webp": {
+      "bytes": 457060,
+      "git_blob_sha1": "1b27e234ca3d72d4a018ea06878f91f466cd1416",
+      "sha256": "0c7d7a82c32278350f4e17023bf907b5f458039f8ca476730d6402d05987bcb1"
+    },
+    "assets/previews/fullstack-laser-controls.webp": {
+      "bytes": 456914,
+      "git_blob_sha1": "be573c0c1ed19b4b03999d2685784aaaeebcdc46",
+      "sha256": "72e9d82668e7a67a23babd5469492c8f0e487c9fb3f340903fdf22a4dfa0c3aa"
+    },
+    "assets/previews/fullstack-pulse-imaging-workflow.webp": {
+      "bytes": 732618,
+      "git_blob_sha1": "31cc575647d21d966797d1cc6ba905fd5cb500e8",
+      "sha256": "c05bf2d98e837f13d8e555ca030b1a670f95bd2ee37df11b67714a3581d36ec3"
     },
     "assets/previews/ion-trap-camera.webp": {
       "bytes": 1798024,
@@ -300,10 +725,70 @@
       "git_blob_sha1": "64c80f91ef345b91b8763525800fa0329a92d5dc",
       "sha256": "14edb3c8ed2d60c96f4617e2fa2748270ff9e30080a79839d879eae28f737fac"
     },
+    "assets/previews/pdh-stabilization-optics-original.webp": {
+      "bytes": 1040098,
+      "git_blob_sha1": "2967cfaec292e6fd4dfaeb3120178053b4782d4b",
+      "sha256": "09b110cbef6c3d0401ab19a35f39f50780579cdca66159778bfccfdd092a040c"
+    },
+    "assets/previews/quctrl-control-rack.webp": {
+      "bytes": 394544,
+      "git_blob_sha1": "42a57bc4333ac674d619c5351d507d3ae74ebc3a",
+      "sha256": "7415b98630b30a6da38c1117a75584eaf08134ebd05c85990c489d97e9b3f2be"
+    },
     "assets/previews/quctrl-rack.webp": {
       "bytes": 389586,
       "git_blob_sha1": "06c3eefe4112ea159b4d6db19614c7e740c31074",
       "sha256": "1fe0150f7ec2f987a9fdd9cada1d69264dd44e5c9bfb74097e065ff390ba97c2"
+    },
+    "assets/previews/research-poster-preview.webp": {
+      "bytes": 520318,
+      "git_blob_sha1": "23886c8db094a1ef1e1f0cb2c5d0401c9dfdf201",
+      "sha256": "bcee33680e83c7edc53e8bf57fd6d80940a5ea70c0974abd1049a6b7c9b09473"
+    },
+    "assets/previews/s02-009-entanglement-control-and-photon-acquisition.webp": {
+      "bytes": 447598,
+      "git_blob_sha1": "25662a9a8fc653c8bc79c337d24644ac50c8e7b5",
+      "sha256": "6bbb33b23a317778b8b6e567942a8f53672783b465b05dad706d294005fb5513"
+    },
+    "assets/previews/s02-012-control-board-routing.webp": {
+      "bytes": 159602,
+      "git_blob_sha1": "26d0dd99a5f941d3ca376cf3ba84164c01e02dd5",
+      "sha256": "443842203ed242248ad6554f704a34d2e0c642295cbc793da327afad7d8cf5e6"
+    },
+    "assets/previews/s02-014-coordinating-client-and-server-sequencers.webp": {
+      "bytes": 403214,
+      "git_blob_sha1": "6373ad57ce0503e37fa4ce7c3b5cc4bddb91d5b2",
+      "sha256": "47ac93df358835caea909aaaf70fb0729778a98d26e7912bf8ed6577138fe295"
+    },
+    "assets/previews/s03-018-apparatus-layout-and-optical-access.webp": {
+      "bytes": 348618,
+      "git_blob_sha1": "358bdab98de25c3329f3dc086b28d7a90af33562",
+      "sha256": "28081e6dd83ad3734f7980a64b9d51744d9352c787c46669726c98742b446096"
+    },
+    "assets/previews/s05-062-apparatus-and-protocol-overview.webp": {
+      "bytes": 201740,
+      "git_blob_sha1": "af4528545a325fdb8cbbb50e9d75604c8c503899",
+      "sha256": "c1195fa01d7d1d1609418179d1170121d9b40807d6cd11119b91113c1db9f241"
+    },
+    "assets/previews/s08-093-compiler-front-end-intermediate-representation-and-hardware-back-end.webp": {
+      "bytes": 162836,
+      "git_blob_sha1": "dc5df66c29d457eeaa8b440abeb855267564556a",
+      "sha256": "532fb2cb1aa9de4248f438ca69aa43584c724fb7b4225ee3ea932dacf43eca8a"
+    },
+    "assets/previews/s08-094-compilation-from-experiment-description-to-control-program.webp": {
+      "bytes": 145846,
+      "git_blob_sha1": "17966f6153c88959ee5fd62c93f34dbebab99631",
+      "sha256": "25a583cc65026cc39862ddf9f65c1a8281b144fd9828956c055333943a9040eb"
+    },
+    "assets/previews/s09-098-a-photonic-bridge-between-quantum-nodes.webp": {
+      "bytes": 113512,
+      "git_blob_sha1": "b94189b9abb566c583d1823a497c6ffb508e1c8a",
+      "sha256": "f30104d966d8e64ba77d69b404fd10a59feea3a49154b45e7b18875662587937"
+    },
+    "assets/previews/zhaibin-cui-cv-preview.webp": {
+      "bytes": 231040,
+      "git_blob_sha1": "4a464023d741fe3a06ca5d3c8d0e8c77c8eede2a",
+      "sha256": "a10ede5b911952e36d6a9a650714d0217ece8cb2aed1c9fd9ad292ab61d1d58a"
     },
     "assets/profile/portrait.jpg": {
       "bytes": 398375,
@@ -370,6 +855,11 @@
       "git_blob_sha1": "2fd5b422829cf3a2f7865807a0ab46a4dc189b2c",
       "sha256": "551081b6e4e02264a975d8e31f32c5f2df75343d0c9437ca6dbe82c6a3a317d8"
     },
+    "assets/quantum/alice-ion-trap-node-original.jpg": {
+      "bytes": 2599816,
+      "git_blob_sha1": "996f26197107cbcb0717e375954ed32d1a41e720",
+      "sha256": "7594f7d8227914525c7c00f883febf08d862f12c3d079d45423b3d1c46d3995c"
+    },
     "assets/quantum/bell-architecture.webp": {
       "bytes": 162264,
       "git_blob_sha1": "489654854670a65e1d42b5d946372a1757682d3d",
@@ -394,6 +884,11 @@
       "bytes": 301782,
       "git_blob_sha1": "bfc88c512db086b9e83def85373d3b3631e46eb6",
       "sha256": "cc4a061db30479e2acd7ef93088b0c072da4e274f3e0ea3d419ed7d64914172e"
+    },
+    "assets/quantum/bob-ion-trap-node-original.jpg": {
+      "bytes": 2732849,
+      "git_blob_sha1": "b10567b1334ae6cf013e2321539b739ffe7cc46d",
+      "sha256": "fbbb44e877f75568b3effbfba19329111dcf1aec696cb20485649f67966c9c67"
     },
     "assets/quantum/control-calibration.png": {
       "bytes": 139843,
@@ -445,6 +940,11 @@
       "git_blob_sha1": "4aa6dcae96d07af5d7993e4ae82c8bd7c8c730dc",
       "sha256": "ebef7cc54a69efea1840c6b51b44313065beccd14a6a724be98af4b6ca082560"
     },
+    "assets/quantum/pdh-stabilization-optics-original.jpg": {
+      "bytes": 3735430,
+      "git_blob_sha1": "9f7fbc9c14459c70b39bf5a24d057fca73af6737",
+      "sha256": "9abd2cdfb1ccd945c1c1f8a3d938743148529eb6c892a1e2dabf19d4b3957d0e"
+    },
     "assets/quantum/quantum-network-keyvisual.png": {
       "bytes": 2806666,
       "git_blob_sha1": "19fac5dcd2cb7c8e0c26dcdb49bbfcb07a96645e",
@@ -485,10 +985,85 @@
       "git_blob_sha1": "320bceaa165fd15afa8db78424972f6e1d64d250",
       "sha256": "130ef639e27cea1fca69b999fdc010adf4aa9ff2c2905d2bf2a902c77ef539e2"
     },
+    "assets/world-models/counterfactual-rollouts.svg": {
+      "bytes": 18017,
+      "git_blob_sha1": "11c8dc2c14380f6a30471bc03fb6994da28c7240",
+      "sha256": "2918605d73a62cf2f08c457a927c67e7e48b7491e93f667e98154fc2217918da"
+    },
+    "assets/world-models/dreamerv3-figure-1.png": {
+      "bytes": 187458,
+      "git_blob_sha1": "dcdb9d457c004b33fc74488fa69e1ca4db4111c1",
+      "sha256": "50358f60b8a75c8ee385023563d464975bdbc7d49bdc1cf98bf5c3af03248af8"
+    },
+    "assets/world-models/dreamerv3-figure-3.png": {
+      "bytes": 850466,
+      "git_blob_sha1": "1c706baa71e39f769d02225b72de20e8e46a849b",
+      "sha256": "612adf1529ec66e1a30a2ccbe181f8ef2fabfdc09e6f08615c5c0237449a80dc"
+    },
+    "assets/world-models/embodiment-transfer.svg": {
+      "bytes": 4779,
+      "git_blob_sha1": "0e525733637a019451688ef73baa53c02d29482e",
+      "sha256": "779427308fbfef757d619ed9cfeed8232d1a76c598ee4f321932e63c9a5682e5"
+    },
+    "assets/world-models/evaluation-matrix-mobile.svg": {
+      "bytes": 3717,
+      "git_blob_sha1": "7f7b2ccfd14fcb0e93f8bb7a5f208e2d6f692050",
+      "sha256": "60c7b558157edbe83383852bc88b8bcb14d9bf37378fa443a57434a6ec9fa133"
+    },
+    "assets/world-models/evaluation-matrix.svg": {
+      "bytes": 6556,
+      "git_blob_sha1": "ced15c10ff10b4b2f377d4d9ba08d797153c1522",
+      "sha256": "13b287d3a7d25a041dc5b1ec73ff6c67267aa1d8125b1cb7b25f0f3f60ed5df3"
+    },
+    "assets/world-models/model-families-mobile.svg": {
+      "bytes": 3268,
+      "git_blob_sha1": "0c05044b38e5dab0e97779cba13b951e1d0ba238",
+      "sha256": "7241d503b3c66d1d5b171ea979581f6a676d157f210e4871aa4985ff67d66e22"
+    },
+    "assets/world-models/model-families.svg": {
+      "bytes": 6539,
+      "git_blob_sha1": "5d4b49fddf8b2177bf9e147a151477357b714adf",
+      "sha256": "a57b865ce35ca9697b4ec6ae9bb8501371613e5b05220894bdf6fc2c60149eb4"
+    },
+    "assets/world-models/prediction-action-loop.svg": {
+      "bytes": 6848,
+      "git_blob_sha1": "e07d70930b9642929020cf9f7da80a87b14a5085",
+      "sha256": "81982e22cae692b4b7e365a053a27ef8f587c5665d6cd004e526b0305ac2b5bd"
+    },
+    "assets/world-models/sources.json": {
+      "bytes": 4332,
+      "git_blob_sha1": "567d70b51d50f5c7c15a391770665e162fc929e0",
+      "sha256": "97a5d8c7994a5d63bd66e7c282523b6af071aba500a9d62f8099aa1ecd11aa79"
+    },
+    "cat-particles.js": {
+      "bytes": 8779,
+      "git_blob_sha1": "228546816746e8476639f0a7ea6c813782b41c9c",
+      "sha256": "a517ed7a26c1027da2a81de49a17039c21a4cf5f229866fc2b4546bd7029921f"
+    },
+    "circuit-lab.css": {
+      "bytes": 7811,
+      "git_blob_sha1": "5e27d72c203d9697897bfd940b8437dd75978604",
+      "sha256": "1985bc97695f1243f5e224bf01fd864c826ebe5bcb4515c8a1c253d6f2380b48"
+    },
+    "circuit-lab.js": {
+      "bytes": 8274,
+      "git_blob_sha1": "9dce425fce2e70d5883f2072b05bbf058bdec81c",
+      "sha256": "1234d308c32c26664527f20339ba2f9993db4d2efeabfbc1cb990739eddc1279"
+    },
+    "defense-gallery-v10.css": {
+      "bytes": 6230,
+      "git_blob_sha1": "6adeb0c216574959e0322434af5381a8802f560f",
+      "sha256": "a773eb52bc2d337649cc3f568cfa7de8682198a36228818746ab1bb4a7f8b173"
+    },
+    "defense-gallery-v10.js": {
+      "bytes": 836,
+      "git_blob_sha1": "435550ac174344bbad025dd4a3bcc57288960fea",
+      "sha256": "076187b17127247bd11bcaf0784c2c0ecfb58a39c25f339cebf23d62359697af"
+    },
     "edition.css": {
-      "bytes": 28300,
-      "git_blob_sha1": "82e49ee03b99f39c9b28c68b5b0928b408671da1",
-      "sha256": "d16ba27c3b62e4ff999fa859e95900fddec2a1ceda080b93a19247dcc2f85613"
+      "bytes": 28417,
+      "git_blob_sha1": "bb9c1b13184039b4fe6a9edbc4d9dc9cffadfad2",
+      "sha256": "725cca03b612f67c013ae36822cf6bea7c188273e06e7356b98688683287ed5b"
     },
     "favicon.svg": {
       "bytes": 285,
@@ -506,14 +1081,34 @@
       "sha256": "f178dda4a203097a0e602ab5c3739321bc722d36e58b9eb7d30aaf54aefca290"
     },
     "field.js": {
-      "bytes": 24418,
-      "git_blob_sha1": "2da1cc474b55084e69135f9581b573ae790852f9",
-      "sha256": "425b3319d72f627648859e69d4dd684f9e91a826c6d04055c14216bdeef443f4"
+      "bytes": 28934,
+      "git_blob_sha1": "e7d4391345e6ed1dda3de4123efa18912879d619",
+      "sha256": "f86ce8eb2f05d010dba2e2235045693453eb590bd131308452129a5087fa32fd"
+    },
+    "fullstack-v10.css": {
+      "bytes": 5547,
+      "git_blob_sha1": "3b62895e7a99e355a7d0f8e0ea943c684e458d66",
+      "sha256": "d06dad9a344316d6b40f4add0c77dc17ae864eb8316bbd25c9ce84cf92049c38"
+    },
+    "handshake-field.css": {
+      "bytes": 663,
+      "git_blob_sha1": "c7c0e7e4562dbdb97c1f36bffed33878fa44f0e6",
+      "sha256": "1e1c88b5883741dcd6386ed1343be9a7e10d2eef5e0f431bd5ec4f6db3e503b7"
+    },
+    "handshake-field.js": {
+      "bytes": 14448,
+      "git_blob_sha1": "c817e9ce576b01c2e79e6031466afe3b219c3b6c",
+      "sha256": "22045815ee26251bf5457880d9e772bed388323d6305fc6e85fc624d447551f5"
+    },
+    "home-overview-v10.css": {
+      "bytes": 14866,
+      "git_blob_sha1": "87f93354924d9c330f029f922c2a0d5fb2a1b2f1",
+      "sha256": "f3d7997647856d43a2545bbc73d596b0d1a342b54086ac3c8be627aba81ed050"
     },
     "index.html": {
-      "bytes": 87264,
-      "git_blob_sha1": "a1dbc81851071c07fc70e4d38e44c090548a7b25",
-      "sha256": "18f51490efd592e796d225e1848f67f1a8220f497e7da34be3257400ab8b609b"
+      "bytes": 29161,
+      "git_blob_sha1": "b82a51390be9501b84e93a763afbb1a65c142bbb",
+      "sha256": "caa05f746ce6b6b20a93ccfb4a89cc1b79f308c3b377344bacaaed53e75ad4b6"
     },
     "materials/bell-feedforward-manuscript.pdf": {
       "bytes": 2940481,
@@ -555,20 +1150,40 @@
       "git_blob_sha1": "53d9474c7e3575a916a58cc116248068012efd67",
       "sha256": "53993b0662c7efe4d1f1d82c7c641bab75e1d222f3bf3ff8f81ace094d77da5f"
     },
+    "pretraining-methods-v10.css": {
+      "bytes": 3292,
+      "git_blob_sha1": "d9dd87d5ed7052c3e9311fa5e673c71c95fe5ae2",
+      "sha256": "99d0e3506ed43e0f70b6102dfde41d2222c21327b8505b78f8ee119f3385b73c"
+    },
+    "quantum-engine.js": {
+      "bytes": 3096,
+      "git_blob_sha1": "886672b2d63a2b0236f85033ff6a47c5dc1314d2",
+      "sha256": "9cba256527768d9712714acb261c1d78bc00f0c9f2309f8b0a6761a3dc567dcc"
+    },
+    "quantum-nodes-v10.css": {
+      "bytes": 3476,
+      "git_blob_sha1": "f8a9ff328fa1dfe73a45db737ce74e51be66509d",
+      "sha256": "adc144faa4d47eff45a3c5c4a8335a3a4b22b4eeffcb9b53ab5a66c4ef6a78cd"
+    },
     "quantum-playground.css": {
-      "bytes": 8458,
-      "git_blob_sha1": "83f3dd6adeb8fcd24dc6d1ab93d6be27f03a1cc2",
-      "sha256": "4c56d53486e24da7316fb936c3fedee062d4e678c12b97d79d8f7ce97878f4e7"
+      "bytes": 8999,
+      "git_blob_sha1": "e74f353492937a6c2390814211ed143fda2a0a6c",
+      "sha256": "60f186701cc9abc1fa3c4562461d7578ce59dc560e1bc6aa2e2e2f5eb53715b9"
     },
     "quantum-playground.js": {
-      "bytes": 14215,
-      "git_blob_sha1": "e98dc19f95f89edb4be6e2c4dbe5b544e22600ed",
-      "sha256": "776f0878144234d8095557fa85c5ce317663938d9355824fb164c299a4675444"
+      "bytes": 5290,
+      "git_blob_sha1": "4f84901bca51ad4309e9d132c926840b80ca6413",
+      "sha256": "057136e2caf48a90bb34f095436c3c767bc6a426cd69acba762fcb8889833d7d"
     },
     "refinement.css": {
       "bytes": 28898,
       "git_blob_sha1": "ab11aa0405161f946407b17e6f559e9d82dfd625",
       "sha256": "c542526cf77e4ff4c598b920f22332d8db4fb318a7e5bffb8d29fd0f0aee25f5"
+    },
+    "research.html": {
+      "bytes": 84073,
+      "git_blob_sha1": "25dd47e36422c544577061049ab085051ad564dd",
+      "sha256": "dc53afd09f726d9c493c17363d6486ed3efac117a2d4a34d8cfc1f4514c2443f"
     },
     "showcase-v9.css": {
       "bytes": 5775,
@@ -576,9 +1191,9 @@
       "sha256": "79a726f9f5ca79e90cc6d4abd88af9903045e6762f5e3b1e5c92ccde68c95cc3"
     },
     "sources.html": {
-      "bytes": 16443,
-      "git_blob_sha1": "56acdeb734b827f22ef72fd6fb102b3cd8e7bc46",
-      "sha256": "b03b308cfedb603aea26ff5b399c0d7ad40cf5a6aed554164823c68bef26d3b8"
+      "bytes": 21286,
+      "git_blob_sha1": "59355dd5338d8c397db065470794df2a66b7ffb7",
+      "sha256": "9cf02562adfae7613c007f19048020d6def5d7e8990b65fb6625a4bc05588d44"
     },
     "style.css": {
       "bytes": 22510,
@@ -591,49 +1206,69 @@
       "sha256": "4fdfee82bea4d1aa2b16ad00702836b4365d3a2e98268795260f4aa5d063479e"
     },
     "work/bell-control.html": {
-      "bytes": 16200,
-      "git_blob_sha1": "14d652616b2e305491ed35551b872a4724080218",
-      "sha256": "1c887f3a1303d7cd0b836988e7033421e008cc5c329030ad3c748745b46b7817"
+      "bytes": 16618,
+      "git_blob_sha1": "22200cbc806ac4e0f6153e210460be3dbb439384",
+      "sha256": "78c27b7ae3f25a85b33f5c703921bf047de5ff5911185bcd974ceb4cbdbbf178"
     },
     "work/harness.html": {
-      "bytes": 18672,
-      "git_blob_sha1": "e8de282c8b2cf7bd3aa9679955c60bc60f175cc5",
-      "sha256": "c6b14b6eff208ddba4d31fd8b2ba3e5bf87b6e1150f8950243c556a50cc6488a"
+      "bytes": 18875,
+      "git_blob_sha1": "4eee8ffc686665b583eae48e8c0fd0beca0b3b31",
+      "sha256": "dda4d9e58c057455b7db0b91420e377de985f71632c27f8f795d587ea586e703"
     },
     "work/minimax.html": {
-      "bytes": 20826,
-      "git_blob_sha1": "81acf25b2fcb20ee64e569ca71a38d671b3681b0",
-      "sha256": "98335190fe26e4f52dd26c99d5639e656bc2d61cd0bc03e1589e30fedaa2ccc5"
+      "bytes": 30636,
+      "git_blob_sha1": "5bc496895d493215926ca341adb2fcd6e922856b",
+      "sha256": "c4ecb2fb85632b7b13eebdeb2268b2cee4a588dc14d46f81c7d771426c8a09bd"
     },
     "work/minitrainsys.html": {
-      "bytes": 20548,
-      "git_blob_sha1": "8061184e3ecb0b68314f4c5c92af0b710f1a96ba",
-      "sha256": "0796fedd8c05b02e49b8d333b402215516ca35c2e49c1d5be6e12dce09f47725"
+      "bytes": 21879,
+      "git_blob_sha1": "cd04727f514c403afaa1d22e08765a373e32ed78",
+      "sha256": "7eba15fecfff41807ea2c2a67ba7ce148cb9692c5fca70871a27f77c64d70b42"
     },
     "work/page.html": {
-      "bytes": 16499,
-      "git_blob_sha1": "e5598b2f476f02e56c3d34db143d8acf014fd2b5",
-      "sha256": "f72724fca090379ded541237910fce94596667a1d02518feb3a466d1c3a2b37e"
+      "bytes": 16700,
+      "git_blob_sha1": "6f54073215030651a40901bad655077f02f5769b",
+      "sha256": "8fa9c6181310c631210a321500f0d009a58d2a1603a048134044c5ea40339c20"
     },
     "work/quantum-control.html": {
-      "bytes": 16403,
-      "git_blob_sha1": "9003260c2c24133b0d94341f09d2a4cc567725ed",
-      "sha256": "dce4e2b20bd9fcd6aecae8c7c2eef57fa26f510f5fb29aa2ae4e451201c97340"
+      "bytes": 16626,
+      "git_blob_sha1": "cc97cf6cb3c81c41e7f6cf0b92273e94bf265213",
+      "sha256": "e6d1953ed930cdb838a90af6914c2885c024bbd0b28b1c2c2a9e6a6a9f75dad1"
+    },
+    "work/quantum-gallery.html": {
+      "bytes": 93214,
+      "git_blob_sha1": "0df5dd998640acd441f4bcbbe48e8a1e17156e55",
+      "sha256": "2a9d1c0f9ee0aa0a56bdcdbf07e34dbfd84efd3f4305344a35a842c295e42fd4"
+    },
+    "work/quantum-lab.html": {
+      "bytes": 11456,
+      "git_blob_sha1": "d0fc8b8f8897eb260f8835d35d8ae486409d7b5e",
+      "sha256": "9e4942d9754e1e83fbff41b622329ce90293906178645ac2cbf5f5e6ae7788d3"
     },
     "work/quantum-networks.html": {
-      "bytes": 19711,
-      "git_blob_sha1": "ea9e55d883715857d1500ad4cccea64e85dfa1bc",
-      "sha256": "6c696496173db8d5d7badc2cdc381e791ae39f6b22c210df1e5dd507dc91fe40"
+      "bytes": 29904,
+      "git_blob_sha1": "8d40c4b8bdc6c56e5e18c7235f6ddc5eede0d794",
+      "sha256": "61e814f1467f2505231576e67979f20f1a9e22177865858dabbd98d8d3a9d93c"
     },
     "work/quantum-research.html": {
-      "bytes": 34447,
-      "git_blob_sha1": "697611c4654342fe1a3d4ed1ae4294f6dcb7a404",
-      "sha256": "292db448f2b513a95babbfde9b24cef16e039a7e3308b0e3fdbb39e2963516b4"
+      "bytes": 35006,
+      "git_blob_sha1": "1350ce93cf4e7739990919afd9411d8d057deeba",
+      "sha256": "c7403fd87c418bfc4e99016ba3e2244e688af03925fd917ab49468f05ca408c5"
     },
     "work/quantum-systems.html": {
-      "bytes": 21163,
-      "git_blob_sha1": "88fe3291da1a6a82bc5372395c1ad4d711529651",
-      "sha256": "21e3494fc864f2f85b97c6f5d318efb92d410c71308507582f4a7fe947c2ae21"
+      "bytes": 38743,
+      "git_blob_sha1": "1a4fdb76ced857ed849355b3b43a559e7ac9919a",
+      "sha256": "7af1802363f771ffbeec1545cacaaaad6a2b5bdd57974a3b1e35d36a2c7b5fb8"
+    },
+    "work/world-models.html": {
+      "bytes": 32581,
+      "git_blob_sha1": "0e0cd5d7ed810376795c72138600a14f6bb9dbd6",
+      "sha256": "c5ade20bcf2319873ed4cee4fafd30ae6a2598e85244653d6d20588f9e6796fe"
+    },
+    "world-models-v10.css": {
+      "bytes": 11161,
+      "git_blob_sha1": "92154154bfbead1a1a521315016c1c3b2140dcb5",
+      "sha256": "27e97b5c9fdeac8c8b0fe8ab206b83450eaa5a69dc4da2a538e08343c3f3449b"
     }
   },
   "repository": "Zhaibin-Cui/Zhaibin-Cui.github.io",

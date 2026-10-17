@@ -1,0 +1,31 @@
+/* Standalone institutional emblems, balanced optically rather than by source canvas size. */
+#affiliations.affiliations-v10{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;justify-items:center;gap:20px;min-height:142px;padding-block:28px;border-bottom:1px solid var(--line)}
+#affiliations.affiliations-v10>.affiliation{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;min-height:80px;padding:10px;text-decoration:none;border:0;border-radius:10px;background:none;transition:background .2s}
+#affiliations.affiliations-v10>.affiliation:hover{background:#7a8ba008}
+#affiliations.affiliations-v10>.affiliation:focus-visible{outline:1px solid var(--accent);outline-offset:0}
+#affiliations.affiliations-v10 .affiliation img{display:block;width:auto!important;height:60px!important;max-height:60px!important;max-width:80px!important;object-fit:contain;filter:none!important;opacity:1!important;transform:none!important}
+#affiliations.affiliations-v10 .affiliation-minimax img{height:58px!important;max-height:58px!important;max-width:74px!important}
+#affiliations.affiliations-v10 .affiliation-iiis img{height:54px!important;max-height:54px!important;max-width:78px!important}
+#affiliations.affiliations-v10 .affiliation-pkuschool img{height:57px!important;max-height:57px!important;max-width:57px!important}
+@media(max-width:800px){
+  #affiliations.affiliations-v10{gap:10px;min-height:120px;padding-block:22px}
+  #affiliations.affiliations-v10>.affiliation{min-height:70px;padding:8px}
+  #affiliations.affiliations-v10 .affiliation img{height:52px!important;max-height:52px!important;max-width:64px!important}
+  #affiliations.affiliations-v10 .affiliation-iiis img{height:46px!important;max-height:46px!important;max-width:65px!important}
+  #affiliations.affiliations-v10 .affiliation-pkuschool img{height:50px!important;max-height:50px!important;max-width:50px!important}
+}
+@media(max-width:480px){
+  #affiliations.affiliations-v10{gap:5px;min-height:100px;padding-block:18px}
+  #affiliations.affiliations-v10>.affiliation{min-height:60px;padding:3px}
+  #affiliations.affiliations-v10 .affiliation img{height:42px!important;max-height:42px!important;max-width:48px!important}
+  #affiliations.affiliations-v10 .affiliation-minimax img{height:40px!important;max-height:40px!important;max-width:48px!important}
+  #affiliations.affiliations-v10 .affiliation-iiis img{height:34px!important;max-height:34px!important;max-width:48px!important}
+  #affiliations.affiliations-v10 .affiliation-pkuschool img{height:40px!important;max-height:40px!important;max-width:40px!important}
+}
+@media(max-width:360px){
+  #affiliations.affiliations-v10{gap:3px}
+  #affiliations.affiliations-v10 .affiliation img{height:38px!important;max-height:38px!important;max-width:43px!important}
+  #affiliations.affiliations-v10 .affiliation-minimax img{height:36px!important;max-height:36px!important;max-width:43px!important}
+  #affiliations.affiliations-v10 .affiliation-iiis img{height:31px!important;max-height:31px!important;max-width:43px!important}
+  #affiliations.affiliations-v10 .affiliation-pkuschool img{height:37px!important;max-height:37px!important;max-width:37px!important}
+}

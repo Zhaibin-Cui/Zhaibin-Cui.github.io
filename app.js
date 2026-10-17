@@ -7,6 +7,14 @@
   'use strict';
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+  // Existing deep links to detailed evidence continue to resolve after the overview redesign.
+  if(document.body.classList.contains('home-overview') && location.hash){
+    const target=decodeURIComponent(location.hash.slice(1));
+    if(!document.getElementById(target) && /^(stack-|work-|approach$|pub-)/.test(target)){
+      location.replace('research.html'+location.search+location.hash);
+      return;
+    }
+  }
   // Full-width artwork uses the layout viewport, excluding desktop scrollbars.
   const syncPageWidth = () => document.documentElement.style.setProperty('--page-width', document.documentElement.clientWidth + 'px');
   syncPageWidth();
@@ -309,7 +317,10 @@
       sizeOriginal();
       (closeButton || lightbox).focus();
     }
-    $$('[data-zoom]').forEach(trigger => trigger.addEventListener('click', () => openLightbox(trigger)));
+    $$('[data-zoom]').forEach(trigger => trigger.addEventListener('click', event => {
+      event.preventDefault();
+      openLightbox(trigger);
+    }));
     if (closeButton) closeButton.addEventListener('click', closeLightbox);
     lightbox.addEventListener('close', cleanup);
     lightbox.addEventListener('cancel', event => { event.preventDefault(); closeLightbox(); });

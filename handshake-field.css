@@ -1,0 +1,6 @@
+/* The page owns the stage dimensions; artwork never occupies the text region. */
+.handshake-stage{position:relative;overflow:hidden;isolation:isolate}
+canvas[data-handshake-field]{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:pan-y pinch-zoom;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;outline:none}
+canvas[data-handshake-field]:focus-visible{outline:1px solid #8399b4;outline-offset:-7px}
+.handshake-sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+@media print{canvas[data-handshake-field]{position:relative;aspect-ratio:2.15}}

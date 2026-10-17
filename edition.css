@@ -293,3 +293,6 @@ p,li{overflow-wrap:break-word}
   .lightbox .caption{max-height:22vh;max-height:22dvh;padding-top:12px}
   .demo-main select,.pub-search{font-size:16px}
 }
+
+/* Keep dense figures and headlines from ghosting through the navigation. */
+.site-header{background:var(--paper)}

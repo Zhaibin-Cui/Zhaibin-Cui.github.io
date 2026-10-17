@@ -1,0 +1,112 @@
+{
+  "checked": "2026-10-17",
+  "scope": "Personal research interests and reading notes; no completed robotics project claimed.",
+  "sources": [
+    {
+      "key": "wm2018",
+      "title": "Ha & Schmidhuber · World Models",
+      "url": "https://worldmodels.github.io/",
+      "status": "2018 · interactive paper; revised work at NeurIPS 2018"
+    },
+    {
+      "key": "muzero",
+      "title": "Schrittwieser et al. · MuZero",
+      "url": "https://www.nature.com/articles/s41586-020-03051-4",
+      "status": "2019 preprint · Nature 588, 604–609, December 2020"
+    },
+    {
+      "key": "dreamer1",
+      "title": "Hafner et al. · Dream to Control",
+      "url": "https://dreamrl.github.io/",
+      "status": "2019 preprint · ICLR 2020 Spotlight"
+    },
+    {
+      "key": "dreamer",
+      "title": "Hafner et al. · Mastering diverse control tasks through world models",
+      "url": "https://www.nature.com/articles/s41586-025-08744-2",
+      "status": "2023 preprint · Nature 640, 647–653, April 2025"
+    },
+    {
+      "key": "rt2",
+      "title": "Brohan et al. · RT-2",
+      "url": "https://robotics-transformer2.github.io/",
+      "status": "2023 · research paper and project"
+    },
+    {
+      "key": "openx",
+      "title": "Open X-Embodiment Collaboration · datasets and RT-X",
+      "url": "https://robotics-transformer-x.github.io/",
+      "status": "2023 project release · ICRA 2024 paper"
+    },
+    {
+      "key": "pi0",
+      "title": "Physical Intelligence · π0",
+      "url": "https://www.pi.website/blog/pi0",
+      "status": "October 2024 · research release"
+    },
+    {
+      "key": "pi05",
+      "title": "Physical Intelligence · π0.5",
+      "url": "https://www.pi.website/blog/pi05",
+      "status": "April 2025 · research release"
+    },
+    {
+      "key": "vjepa",
+      "title": "Meta · V-JEPA 2 / V-JEPA 2-AC",
+      "url": "https://github.com/facebookresearch/vjepa2",
+      "status": "June 2025 · official research code and model documentation"
+    },
+    {
+      "key": "genie2",
+      "title": "Google DeepMind · Genie 2",
+      "url": "https://deepmind.google/blog/genie-2-a-large-scale-foundation-world-model/",
+      "status": "December 2024 · research announcement"
+    },
+    {
+      "key": "genie3",
+      "title": "Google DeepMind · Genie 3",
+      "url": "https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/",
+      "status": "August 2025 · research announcement"
+    },
+    {
+      "key": "dreamzero",
+      "title": "Ye et al. / NVIDIA · DreamZero",
+      "url": "https://dreamzero0.github.io/",
+      "status": "February 2026 · arXiv:2602.15922; preprint"
+    }
+  ],
+  "original_diagrams": [
+    "prediction-action-loop.svg",
+    "model-families.svg",
+    "counterfactual-rollouts.svg",
+    "embodiment-transfer.svg",
+    "evaluation-matrix.svg"
+  ],
+  "responsive_variants": [
+    "model-families-mobile.svg",
+    "evaluation-matrix-mobile.svg"
+  ],
+  "paper_figures": [
+    {
+      "file": "dreamerv3-figure-1.png",
+      "source": "https://www.nature.com/articles/s41586-025-08744-2/figures/1",
+      "author": "Hafner, Pasukonis, Ba & Lillicrap (2025)",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "changes": "None. Original full-resolution publisher PNG; displayed with CSS fitting only.",
+      "download": "https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41586-025-08744-2/MediaObjects/41586_2025_8744_Fig1_HTML.png"
+    },
+    {
+      "file": "dreamerv3-figure-3.png",
+      "source": "https://www.nature.com/articles/s41586-025-08744-2/figures/3",
+      "author": "Hafner, Pasukonis, Ba & Lillicrap (2025)",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "changes": "None. Original full-resolution publisher PNG; displayed with CSS fitting only.",
+      "download": "https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41586-025-08744-2/MediaObjects/41586_2025_8744_Fig3_HTML.png"
+    }
+  ],
+  "user_reference": {
+    "url": "https://my.feishu.cn/wiki/I9lnw0rSli73qRko0NlcJTkjnId",
+    "title": "WAM基础",
+    "access": "Title seen; body inaccessible. No substantive claims attributed to this document."
+  }
+}

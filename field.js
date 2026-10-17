@@ -9,13 +9,13 @@
   const TAU=Math.PI*2,PAPER='#f6f5f1';
   const INK=[47,76,119],BLUE=[71,105,165],PLUM=[116,88,142],PALE=[130,153,186];
   const MODES=['ai','training','agents','vision','quantum'];
-  const SHAPES={ai:'neural-network',training:'optimization-landscape',agents:'agent-network',vision:'feature-manifold',quantum:'interference-sphere'};
+  const SHAPES={ai:'neural-network',training:'optimization-landscape',agents:'agent-network',vision:'feature-manifold',quantum:'entangled-node-fields'};
   const COPY={
-    ai:{name:'Neural signal study',hint:'Drag a neuron · send a signal',action:'Send signal',detail:'A conceptual layered network. Drag a node horizontally, or focus this canvas and use arrow keys to move a selected node. Enter sends a signal; R resets the positions.'},
+    ai:{name:'Neural signal study',hint:'Drag a neuron · send a signal',action:'Send signal',detail:'A conceptual layered network within a flowing particle field, not measured model activations. Drag a node horizontally, or focus this canvas and use arrow keys to move a selected node. Enter sends a signal; R resets the positions.'},
     training:{name:'Optimization landscape',hint:'Explore a training trajectory',action:'Trace a path',detail:'An illustrative optimization surface and three model-scale trajectories, not measured training curves. Drag horizontally to change the view; Enter traces a path; R resets the view.'},
     agents:{name:'Coordinated agents',hint:'Move a node · dispatch a task',action:'Dispatch task',detail:'A conceptual collaboration graph. Drag a node horizontally, or use arrow keys when this canvas is focused. Enter dispatches a task; R resets the positions.'},
     vision:{name:'Spatial representation',hint:'Touch the field to perturb it',action:'Create ripple',detail:'A conceptual spatial-feature manifold. Click or tap to perturb the surface. Arrow keys move the focus point; Enter creates a ripple; R resets the view.'},
-    quantum:{name:'Interference and phase',hint:'Drag to rotate · shift the phase',action:'Shift phase',detail:'An artistic illustration of interference and a quantum-state sphere, not an experimental simulation. Drag horizontally to rotate it. Arrow keys rotate the view; Enter shifts the phase; R resets the view.'}
+    quantum:{name:'Interference and linked quantum nodes',hint:'Drag to rotate · shift the phase',action:'Shift phase',detail:'A conceptual particle field morphs into two linked quantum-network nodes, labeled Alice and Bob. The surrounding rings and optical channel are artistic motifs, not a statevector or an experimental simulation. Drag horizontally to rotate it. Arrow keys rotate the view; Enter shifts the phase; R resets the view.'}
   };
   const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
   const mix=(a,b,t)=>a+(b-a)*t;
@@ -48,6 +48,28 @@
     let pressed=false,dragId=null,dragStart=null,dragIndex=-1,hoverIndex=-1,selected=0,moved=false;
     let signal=-10,interactions=0,phaseShift=0,focusX=0,focusZ=0;
     const ripples=[],nodes=[],edges=[],positions=[];
+    let neuralSamples=[],quantumSamples=[],sampleSize='';
+    const fract=n=>n-Math.floor(n);
+    function prepareParticles(){
+      const key=small?'small':'large';if(sampleSize===key)return;sampleSize=key;
+      if(mode==='ai'){
+        const strands=small?30:44,steps=small?66:94;
+        neuralSamples=[];
+        for(let j=0;j<strands;j++)for(let i=0;i<steps;i++){
+          const u=(i+fract(j*.6180339)*.7)/(steps-1),v=(j+.5)/strands;
+          neuralSamples.push({u,v,angle:j*.6180339*TAU,weight:.62+fract(i*.754877+j*.56984)*.38});
+        }
+      }else if(mode==='quantum'){
+        const rows=small?30:42,cols=small?64:88;
+        quantumSamples=[];
+        for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++){
+          const index=j*(cols+1)+i,group=(index*7)%20;
+          quantumSamples.push({x:(i/cols-.5)*2.75,z:(j/rows-.5)*2,group,
+            a:fract(index*.61803398875)*TAU,b:fract(index*.7548776662)*TAU,
+            t:fract(index*.569840291),shade:fract(index*.41421356),row:j,col:i});
+        }
+      }
+    }
 
     if(mode==='ai') {
       const counts=[5,9,14,18,22,18,14,9,5],layers=[];
@@ -110,22 +132,44 @@
 
     function neural(time){
       const auto=(time*.43)%9.7,manual=(time-signal)*2.0;
+      const propagation=manual>=0&&manual<9.5?manual:auto;
+      // Fine filaments give the network a continuous volume. The larger nodes
+      // below retain the original, draggable topology and signal interaction.
+      for(const s of neuralSamples){
+        const u=fract(s.u+time*.012),envelope=.24+.77*Math.sin(u*Math.PI);
+        const curl=Math.sin(s.angle+u*TAU*.56+time*.095);
+        const x=-1.37+u*2.74;
+        const y=(s.v-.5)*envelope*1.84+.043*curl*Math.sin(u*Math.PI);
+        const z=Math.cos(s.angle+u*3.8+time*.075)*(.08+.16*Math.sin(u*Math.PI));
+        const p=project(x,y,z),crest=Math.exp(-Math.pow((u*8-propagation)*2.5,2));
+        const breath=.86+.14*Math.sin(time*.3+s.angle),depth=clamp(1-p.depth*.28,.65,1.2);
+        dot(p,(small?.56:.72)*p.scale,s.v>.52?PLUM:BLUE,(.16+.21*crest)*s.weight*depth*breath);
+      }
       positions.length=0;
       nodes.forEach(n=>positions.push(project(n.x+n.dx,n.y+n.dy+Math.sin(time*.42+n.l*.5+n.n*.15)*.018,n.z+Math.sin(time*.23+n.l)*.04)));
       for(const edge of edges){
         const a=positions[edge.a],b=positions[edge.b],hot=manual>=edge.l&&manual<=edge.l+1.1;
-        traceEdge(a,b,edge.l%2?PLUM:BLUE,(hot?.45:.21)*edge.weight,hot?1.1:.70);
+        // A few structural connections anchor the particle field; low-contrast
+        // secondary links avoid turning the image into a dense wire mesh.
+        if(hot||(edge.a+edge.b)%3===0)traceEdge(a,b,edge.l%2?PLUM:BLUE,(hot?.28:.10)*edge.weight,hot?.85:.48);
         const t=(hot?manual:auto)-edge.l;
-        if(t>=0&&t<=1&&(hot||(edge.a+edge.b)%4===0)){const p=bezier(a,b,t);dot(p,hot?2:1.3,edge.l%2?PLUM:BLUE,hot?.85:.5);}
+        if(t>=0&&t<=1&&(hot||(edge.a+edge.b)%4===0)){
+          const p=bezier(a,b,t);dot(p,hot?1.8:1.15,edge.l%2?PLUM:BLUE,hot?.82:.5);
+          for(let tail=1;tail<=3;tail++){const tt=t-tail*.023;if(tt>=0)dot(bezier(a,b,tt),.55,edge.l%2?PLUM:BLUE,(hot?.24:.13)*(1-tail*.2));}
+        }
       }
       nodes.forEach((n,i)=>{
-        const p=positions[i],wave=Math.max(0,1-Math.abs((manual>0&&manual<9.5?manual:auto)-n.l)/.8),active=i===dragIndex||i===hoverIndex;
-        const r=(small?2.0:2.65)*(1+wave*.36)*p.scale;
+        const p=positions[i],wave=Math.max(0,1-Math.abs(propagation-n.l)/.8),active=i===dragIndex||i===hoverIndex;
+        const r=(small?1.7:2.25)*(1+wave*.36)*p.scale;
+        for(let j=0;j<7;j++){
+          const a=j*2.39996+i*.7+time*.025,spread=(small?3.4:4.7)*Math.sqrt((j+1)/7);
+          dot({x:p.x+Math.cos(a)*spread,y:p.y+Math.sin(a)*spread},small?.38:.48,n.l%2?PLUM:BLUE,.15+wave*.1);
+        }
         if(active||wave>.7){bloom(p,active?20:11,BLUE,active?.20:.08);ring(p,r+(active?7:4),BLUE,active?.66:.25);}
         dot(p,r,n.l%2?PLUM:INK,.65+wave*.30);if(active)dot(p,1.05,[255,255,255],1);
       });
       [-1.3,0,1.3].forEach((x,i)=>{label(['INPUT','REPRESENTATION','OUTPUT'][i],project(x,i===1?1.12:.67,.05),BLUE,.79);});
-      host.dataset.fieldMorph='connected';host.dataset.fieldAggregation='1';
+      host.dataset.fieldMorph='connected';host.dataset.fieldAggregation='1';host.dataset.fieldPoints=String(neuralSamples.length+nodes.length*8);host.dataset.fieldCoreNodes=String(nodes.length);
     }
     function loss(x,z,time){return -.45+.62*Math.exp(-((x+.95)**2*1.4+z*z*.48))+.13*(x+.4)**2+.11*z*z+.045*Math.sin(x*3.1+z*2.3+time*.13);}
     function training(time){
@@ -174,24 +218,54 @@
       label('POSITION × REPRESENTATION',project(.1,.55,1),BLUE,.62);host.dataset.fieldMorph='manifold';
     }
     function quantum(time){
-      const cycle=time%34,gathered=cycle<10?0:cycle<15?smooth((cycle-10)/5):cycle<28?1:1-smooth((cycle-28)/6);
-      const rows=small?27:38,cols=small?50:72,grid=[];
-      for(let j=0;j<=rows;j++){
-        const v=j/rows,z=(v-.5)*2.0,row=[];
-        for(let i=0;i<=cols;i++){
-          const u=i/cols,x=(u-.5)*2.75,a=Math.hypot(x+.46,z),b=Math.hypot(x-.46,z);
-          const wave=.25*(Math.sin(a*8-time*.95)/Math.sqrt(a+.5)+Math.sin(b*8-time*.95+phaseShift)/Math.sqrt(b+.5))+displacement(x,z,time);
-          const theta=u*TAU,phi=v*Math.PI,r=.88,sx=r*Math.sin(phi)*Math.cos(theta),sy=r*Math.cos(phi),sz=r*Math.sin(phi)*Math.sin(theta);
-          row.push(project(mix(x,sx,gathered),mix(wave,sy,gathered),mix(z,sz,gathered)));
+      const cycle=time%30,gathered=cycle<5?0:cycle<11?smooth((cycle-5)/6):cycle<23?1:1-smooth((cycle-23)/7);
+      const projected=[],waveRows=[];
+      for(const s of quantumSamples){
+        const a=Math.hypot(s.x+.46,s.z),b=Math.hypot(s.x-.46,s.z);
+        const wave=.22*(Math.sin(a*8-time*.95)/Math.sqrt(a+.5)+Math.sin(b*8-time*.95+phaseShift)/Math.sqrt(b+.5))+displacement(s.x,s.z,time);
+        let tx,ty,tz;
+        if(s.group<16){
+          const side=s.group<8?-1:1,azimuth=s.a+time*.055*side;
+          const minor=.073+.024*Math.sin(s.a*3+phaseShift+time*.12);
+          const radius=.36+minor*Math.cos(s.b),localX=radius*Math.cos(azimuth);
+          // Paired toroidal field motifs surround the two atom-like cores.
+          // They are not Bloch spheres or a simulation of an atomic orbital.
+          tx=side*.83+localX;
+          ty=radius*Math.sin(azimuth)*1.08;
+          tz=minor*Math.sin(s.b)+localX*side*.23;
+        }else{
+          const t=s.t,envelope=Math.sin(t*Math.PI),angle=s.b+time*.8+phaseShift;
+          tx=mix(-.83,.83,t);
+          ty=Math.sin(t*TAU+phaseShift)*.085+Math.cos(angle)*.055*envelope;
+          tz=Math.cos(t*TAU+phaseShift)*.065+Math.sin(angle)*.055*envelope;
         }
-        grid.push(row);if(j%2===0)line(row,j%6===0?PLUM:BLUE,j%6===0?.40:.21,j%6===0?.80:.55);
+        const p=project(mix(s.x,tx,gathered),mix(wave,ty,gathered),mix(s.z,tz,gathered));
+        const color=s.group<8?BLUE:s.group<16?PLUM:BLUE;
+        projected.push({p,color,alpha:(.29+.22*s.shade)*clamp(1-p.depth*.22,.7,1.2),radius:(small?.64:.81)*(s.group<16?1:1.05)*p.scale});
+        if(s.row%5===0){if(!waveRows[s.row])waveRows[s.row]=[];waveRows[s.row].push(p);}
       }
-      for(let i=0;i<=cols;i+=5)line(grid.map(row=>row[i]),BLUE,.17,.65);
-      for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++){const p=grid[j][i];dot(p,small?.85:1.05,(i+j)%5?BLUE:PLUM,.39+(1-p.depth)*.1);}
-      if(gathered>.1){const origin=project(0,0,0),angle=time*.10+phaseShift,tip=project(.63*Math.cos(angle),-.51,.38*Math.sin(angle));line([origin,tip],INK,gathered*.83,1.65);bloom(tip,19,BLUE,.15*gathered);dot(tip,4,INK,gathered);ring(tip,9,BLUE,gathered*.30);}
+      if(gathered<.92)waveRows.forEach(row=>{if(row)line(row,BLUE,.16*(1-gathered),.5);});
+      projected.sort((a,b)=>b.p.depth-a.p.depth).forEach(item=>dot(item.p,item.radius,item.color,item.alpha));
+      if(gathered>.12){
+        for(const side of [-1,1]){
+          const core=project(side*.83,0,0),color=side<0?BLUE:PLUM;
+          bloom(core,small?17:27,color,.14*gathered);dot(core,small?2.6:3.5,color,.9*gathered);ring(core,small?6:9,color,.32*gathered);
+          for(let n=0;n<44;n++){
+            const a=n*2.39996+time*.08,r=.088*Math.sqrt((n+.5)/44);
+            const p=project(side*.83+Math.cos(a)*r,Math.sin(a)*r,Math.sin(n*1.7)*.055);
+            dot(p,small?.58:.77,color,.35*gathered);
+          }
+          label(side<0?'ALICE':'BOB',project(side*.83,.66,.03),color,.74*gathered);
+        }
+        for(let branch=0;branch<2;branch++){
+          const path=[];for(let i=0;i<=80;i++){const t=i/80,angle=t*TAU+phaseShift+branch*Math.PI;path.push(project(mix(-.83,.83,t),Math.sin(angle)*.085,Math.cos(angle)*.065));}
+          line(path,branch?PLUM:BLUE,.32*gathered,.65);
+          const travel=fract(time*.13+branch*.5),p=path[Math.floor(travel*80)];bloom(p,12,branch?PLUM:BLUE,.09*gathered);dot(p,small?1.5:2,branch?PLUM:BLUE,.85*gathered);
+        }
+      }
       if(gathered<.8)[-.46,.46].forEach((x,i)=>{const p=project(x,0,0);bloom(p,20,i?PLUM:BLUE,.13*(1-gathered));ring(p,7,i?PLUM:BLUE,.55*(1-gathered));dot(p,2,i?PLUM:BLUE,.8*(1-gathered));});
-      label(gathered>.5?'STATE SPACE / PHASE':'SUPERPOSITION / INTERFERENCE',project(.05,1.03,.05),BLUE,.65);
-      host.dataset.fieldMorph=gathered>.88?'assembled':gathered<.12?'wave':'morphing';host.dataset.fieldAggregation=gathered.toFixed(2);
+      label(gathered>.5?'LINKED NODES / CONCEPTUAL FIELD':'SUPERPOSITION / INTERFERENCE',project(.05,.98,.05),BLUE,.62);
+      host.dataset.fieldMorph=gathered>.88?'assembled':gathered<.12?'wave':'morphing';host.dataset.fieldAggregation=gathered.toFixed(2);host.dataset.fieldPoints=String(quantumSamples.length+88);
     }
     const renderers={ai:neural,training,agents,vision,quantum};
     function draw(time){if(!geometry||width<2||height<2)return;sceneGeometry();ctx.fillStyle=PAPER;ctx.fillRect(0,0,width,height);ctx.fillStyle=gradient;ctx.fillRect(geometry.left-30,geometry.top-35,geometry.aw+60,geometry.ah+70);ctx.save();ctx.beginPath();ctx.rect(geometry.left-3,geometry.top-12,geometry.aw+6,geometry.ah+22);ctx.clip();renderers[mode](time);ctx.restore();host.dataset.fieldFrame=String(Math.round(time*30));}
@@ -228,9 +302,10 @@
     function prepare(){
       const r=host.getBoundingClientRect(),w=Math.max(1,Math.round(r.width)),h=Math.max(1,Math.round(r.height)),isNarrow=window.innerWidth<=1000,ratio=Math.min(window.devicePixelRatio||1,2);
       if(w===width&&h===height&&dpr===ratio&&narrow===isNarrow)return;width=w;height=h;dpr=ratio;narrow=isNarrow;small=w<700;
+      prepareParticles();
       canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);canvas.style.width='100%';canvas.style.height='100%';ctx.setTransform(dpr,0,0,dpr,0,0);
       sceneGeometry();gradient=ctx.createRadialGradient(geometry.cx,geometry.cy,0,geometry.cx,geometry.cy,geometry.aw*.58);gradient.addColorStop(0,'rgba(213,223,238,.38)');gradient.addColorStop(.52,'rgba(225,220,235,.23)');gradient.addColorStop(1,'rgba(246,245,241,0)');
-      draw(phase);host.dataset.fieldReady='true';host.dataset.fieldPoints=String(nodes.length||((small?28:39)*(small?51:73)));
+      draw(phase);host.dataset.fieldReady='true';if(mode!=='ai'&&mode!=='quantum')host.dataset.fieldPoints=String(nodes.length||((small?28:39)*(small?51:73)));
     }
     function tick(now){
       if(!running)return;const interval=1000/(small?28:32);if(!lastTick){lastTick=now;lastDraw=now;}const elapsed=now-lastTick;

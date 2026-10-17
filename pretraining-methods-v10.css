@@ -1,0 +1,27 @@
+/* On-demand methodological depth for the MiniMax project page. */
+.pretraining-methods{margin-top:80px;padding-top:44px;border-top:1px solid var(--line);max-width:100%}
+.pretraining-methods .pm-kicker{display:block;font:10px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.09em;color:var(--accent)}
+.pretraining-methods h2{font-size:34px;line-height:1.2;letter-spacing:-.035em;margin:16px 0 22px}
+.pretraining-methods .pm-intro{font-size:14px;line-height:1.85;color:var(--muted);max-width:82ch;margin:0 0 30px}
+.pm-note{border-top:1px solid #d8dfe8;scroll-margin-top:100px}.pm-note:last-child{border-bottom:1px solid #d8dfe8}
+.pm-note>summary{display:grid;grid-template-columns:30px minmax(0,1fr) 22px;gap:15px;align-items:start;list-style:none;cursor:pointer;padding:23px 0}
+.pm-note>summary::-webkit-details-marker{display:none}
+.pm-note>summary:focus-visible{outline:2px solid #829bbd;outline-offset:6px;border-radius:4px}
+.pm-number{font:10px/1.8 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--accent);padding-top:4px}
+.pm-summary-copy>strong{display:block;font-size:20px;line-height:1.45;letter-spacing:-.025em;font-weight:500;color:var(--ink)}
+.pm-summary-copy>span{display:block;font-size:13px;line-height:1.7;color:var(--muted);margin-top:6px;max-width:70ch}
+.pm-expand{font-size:0;line-height:1;color:var(--accent);display:grid;place-items:center;min-height:26px}
+.pm-expand::before{content:"+";font-size:23px;line-height:1}
+.pm-note[open] .pm-expand::before{content:"−"}
+.pm-body{padding:0 37px 28px 45px}
+.pretraining-methods .pm-body p{font-size:14px;line-height:1.85;margin:0 0 18px;max-width:80ch}
+.pm-body strong{font-weight:550}
+.pm-observables{margin:24px 0 0;padding:15px 18px;background:#edf0f5;border-left:2px solid #93a7c3;border-radius:0 5px 5px 0}
+.pm-observables dt{font-size:10px;line-height:1.7;letter-spacing:.06em;text-transform:uppercase;color:#4a668c}
+.pm-observables dd{font-size:12px;line-height:1.8;color:var(--muted);margin:7px 0 0}
+.pretraining-methods .pm-source{font-size:11px!important;line-height:1.8!important;color:var(--muted);margin:19px 0 0!important}
+.pm-source a{color:#496892;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px;overflow-wrap:anywhere}
+.pm-equation{padding:22px 20px;margin:21px 0 23px;border:1px solid #dce2eb;border-radius:8px;background:#f1f3f6;text-align:center;overflow-x:auto}
+.pm-equation math{font-size:25px;color:#314c74;margin:0 auto 13px;max-width:100%;font-family:"Cambria Math",STIXGeneral,serif}
+.pm-equation>span{display:block;font-size:11px;line-height:1.7;color:var(--muted);max-width:65ch;margin:auto}
+@media(max-width:720px){.pretraining-methods{margin-top:48px;padding-top:32px}.pretraining-methods h2{font-size:28px;line-height:1.25}.pretraining-methods .pm-intro{font-size:13px;line-height:1.85}.pm-note>summary{grid-template-columns:22px minmax(0,1fr) 17px;gap:10px;padding:21px 0}.pm-summary-copy>strong{font-size:18px;line-height:1.45}.pm-summary-copy>span{font-size:12px;line-height:1.7}.pm-number{font-size:9px}.pm-expand::before{font-size:21px}.pm-body{padding:0 0 25px 0}.pretraining-methods .pm-body p{font-size:14px;line-height:1.85}.pm-observables{padding:14px 16px}.pm-equation{padding:19px 13px}.pm-equation math{font-size:23px}}

@@ -12,3 +12,10 @@
 @media(max-width:1000px){.qp-panel{grid-template-columns:1fr 1fr}.qp-controls{padding-left:24px}.qp-scene-label,.qp-scene-foot{padding-inline:10px}.qp-scene-label{font-size:8px}.qp-cat-art{min-height:290px}.qp-bloch-canvas{height:420px}.qp-state-expression{font-size:17px}.qp-heading{gap:5%}}
 @media(max-width:720px){.quantum-playground{margin:45px 0 60px}.qp-heading{grid-template-columns:1fr;gap:20px;margin-bottom:22px}.qp-heading h3{font-size:34px;max-width:350px}.qp-heading>p{font-size:15px}.qp-tabs{gap:26px}.qp-tab{font-size:10px;gap:9px}.qp-tab span{font-size:13px}.qp-panel{grid-template-columns:1fr}.qp-controls{border-left:0;border-top:1px solid #dbe1e8;margin:0;padding:27px 0 30px}.qp-controls h4{font-size:29px}.qp-scene{min-height:350px}.qp-cat-art{min-height:0;height:auto;aspect-ratio:720/500;flex:0 0 auto;max-height:400px}.qp-scene-label{padding:20px 0 0;font-size:9px}.qp-scene-foot{padding:0 0 20px;font-size:10px}.qp-bloch-canvas{height:350px;min-height:290px;flex:0 0 auto}.qp-explanation{font-size:15px}.qp-state-expression{font-size:20px;line-height:1.9;margin:20px 0}.qp-range-label{font-size:13px}.qp-range{height:34px}.qp-model-note{font-size:12px}.qp-trials{font-size:12px}.qp-primary,.qp-secondary{font-size:13px;min-height:46px}.qp-probability-readout strong{font-size:25px}}
 @media(max-width:380px){.qp-heading h3{font-size:31px}.qp-scene{min-height:300px}.qp-scene-label{font-size:8px;gap:8px}.qp-scene-foot{font-size:9px}.qp-state-expression{font-size:17px}.qp-actions{gap:9px}.qp-primary,.qp-secondary{font-size:12px;padding:10px 12px}.qp-bloch-canvas{height:300px}}
+
+/* v10 particle illustration; the entire artwork is an accessible control. */
+.qp-cat-art{position:relative;aspect-ratio:720/500;touch-action:pan-y pinch-zoom;overflow:hidden;isolation:isolate}
+.qp-cat-canvas,.qp-cat-poster{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:contain;pointer-events:none}
+.qp-cat-canvas{z-index:1}.qp-cat-poster{z-index:0;transition:opacity .35s}
+.qp-cat-art[data-cat-ready=true] .qp-cat-poster{opacity:0}
+@media(max-width:720px){.qp-cat-art{min-height:280px;max-height:400px}}
