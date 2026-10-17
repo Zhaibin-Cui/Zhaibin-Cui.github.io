@@ -1,0 +1,41 @@
+/* A compact instrument panel. The diagram itself is always fully expanded. */
+.research-field.landing-moon.transformer-field .moe-playbar{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px;padding-top:12px;font-size:11px}
+.research-field.landing-moon.transformer-field .moe-playbar>*{grid-column:auto;grid-row:auto}
+.transformer-field .attention-presets{display:flex;align-items:center;flex-wrap:wrap;gap:3px;border:1px solid #c6cfdd95;border-radius:6px;padding:3px;flex:0 1 auto}
+.transformer-field .attention-presets button{appearance:none;border:0;background:transparent;color:#61718a;font:500 11px 'Space Grotesk',sans-serif;letter-spacing:.035em;min-height:38px;min-width:48px;padding:8px 12px;border-radius:3px;cursor:pointer}
+.transformer-field .attention-presets button[aria-pressed="true"]{background:#e1e7f0;color:#244f7d;box-shadow:0 1px 3px #193d6210}
+.transformer-field .attention-presets button:hover{color:#244f7d;background:#e6ebf270}
+.transformer-field .attention-presets button:focus-visible,.transformer-field .moe-details summary:focus-visible{outline:2px solid #6480a5;outline-offset:3px}
+.research-field.landing-moon.transformer-field .moe-controls{width:auto;flex:1 1 auto;justify-content:flex-end;gap:6px 16px;align-items:center}
+.transformer-field .moe-segment>span{color:#8190a5;font-size:10px;margin-right:5px}
+.transformer-field .moe-select{min-width:35px;max-width:48px}
+.transformer-field .moe-details{position:relative;border:0;margin:0;padding:0;max-width:100%;min-width:0}
+.transformer-field .moe-details>summary{list-style:none;cursor:pointer;min-height:44px;display:flex;align-items:center;font-size:10px;color:#657994;gap:8px;white-space:nowrap;padding:0 4px}
+.transformer-field .moe-details>summary::-webkit-details-marker{display:none}
+.transformer-field .moe-details>summary::after{content:'+';font-size:15px;position:static;transform:none}
+.transformer-field .moe-details[open]{flex-basis:100%;width:100%;border-top:1px solid #c8d1de70}
+.transformer-field .moe-details[open]>summary::after{content:'−'}
+.transformer-field .moe-details-body{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 22px;padding:0 2px 10px;font-size:11px;color:#67758c;line-height:1.6}
+.transformer-field .moe-details-body p{margin:0;font:inherit;max-width:88ch}
+.transformer-field .attention-name{display:block;color:#365477;font-weight:500;margin-bottom:4px}
+.transformer-field .attention-note{display:inline}
+.transformer-field .attention-source{color:#496f9b;text-decoration:none;white-space:nowrap}
+.transformer-field .moe-boundary{font-size:10px!important;grid-column:1}
+.transformer-field .moe-advanced{display:flex;gap:14px;align-items:center;grid-column:2;grid-row:1}
+.transformer-field .moe-feedback{grid-column:1 / -1;font-size:10px;min-height:0}
+.research-field.landing-moon.transformer-field .moe-details-body>p:first-child{grid-column:1;grid-row:1}
+.research-field.landing-moon.transformer-field .moe-details-body>.moe-boundary{grid-column:1;grid-row:2}
+.research-field.landing-moon.transformer-field .moe-details-body>.moe-feedback{grid-column:1 / -1;grid-row:3}
+.research-field.landing-moon[data-field-presentation="portrait"] .moe-playbar{justify-content:flex-start;gap:4px 14px}
+.research-field.landing-moon[data-field-presentation="portrait"] .moe-controls{justify-content:flex-start;gap:3px 10px}
+.research-field.landing-moon[data-field-presentation="portrait"] .attention-presets{gap:1px;padding:2px}
+.research-field.landing-moon[data-field-presentation="portrait"] .attention-presets button{min-width:42px;min-height:40px;padding:7px 10px}
+.research-field.landing-moon[data-field-presentation="portrait"] .moe-details-body{display:block}
+.research-field.landing-moon[data-field-presentation="portrait"] .moe-details-body>*+*{margin-top:10px}
+@media(max-width:380px){
+ .research-field.landing-moon[data-field-presentation="portrait"] .attention-presets button{min-width:38px;padding-inline:8px}
+ .research-field.landing-moon.transformer-field .moe-controls{column-gap:8px}
+ .transformer-field .moe-select-wrap{gap:3px}
+ .transformer-field .moe-segment button{padding-inline:5px}
+}
+@media print{.attention-presets,.moe-details{display:none!important}}

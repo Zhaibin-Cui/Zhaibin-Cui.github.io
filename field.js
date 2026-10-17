@@ -1,4 +1,4 @@
-/* v20. Original three-dimensional point studies.
+/* v21. Original three-dimensional point studies.
  * The MoE decoder schematic combines causal multi-head attention from Vaswani
  * et al., https://arxiv.org/abs/1706.03762, and sparse FFN routing from Shazeer
  * et al., https://arxiv.org/abs/1701.06538. Selected-logit normalization follows
@@ -21,7 +21,7 @@
   let hidden=false,raf=0,then=0,lastPaint=0;
   function make(canvas,host,mode,hero=false){
     let ctx;try{ctx=canvas.getContext('2d',{alpha:false});}catch(_){return;}if(!ctx)return;
-    canvas.dataset.fieldRenderer='v20';host.dataset.fieldRenderer='v20';
+    canvas.dataset.fieldRenderer='v21';host.dataset.fieldRenderer='v21';
     host.dataset.fieldShape=mode==='transformer'?'causal-moe-transformer':mode;host.dataset.fieldMode=mode;
     const isLanding=host.classList.contains('landing-moon');
     const descriptions={transformer:['Sparse MoE decoder','Select a token · trace attention and experts','Trace token'],training:['Training trajectories','Drag the landscape · compare trajectories','Trace paths'],vision:['Spatial token representation','Touch to perturb · drag to rotate','Send a ripple'],agents:['Agent coordination graph','Drag a node · route a task','Dispatch task'],world:['Action-conditioned futures','Drag to inspect · compare possible futures','Compare paths'],control:['Synchronized control channels','Drag to inspect · follow the event clock','Run sequence'],quantum:['Distributed quantum field','Drag to rotate · shift optical phase','Shift phase']};
@@ -30,6 +30,14 @@
     let w=0,h=0,dpr=1,small=false,visible=false,t=0,px=0,py=0,tx=0,ty=0,pulse=-20,selected=4,step=-1,interactions=0,renderCount=0,tokenHoldUntil=9;
     let moeTopK=4,moeBatch=true,moeFeedbackKey='',moePhaseKey='',moeClockStart=0,moeCycle=0;
     const moeExpertCount=16;
+    let attentionMode='mha';
+    const attentionModes={
+      mha:{name:'Multi-head attention',short:'Parallel causal heads',source:'https://arxiv.org/abs/1706.03762',note:'Three parallel heads within one attention layer, followed by an output projection.'},
+      mla:{name:'Multi-head latent attention',short:'Low-rank KV memory',source:'https://arxiv.org/abs/2412.19437',note:'Compresses KV features per token while retaining full causal attention. The cache also retains decoupled positional keys; up-projection is shown conceptually.'},
+      kda:{name:'Kimi Delta Attention',short:'Gated recurrent memory',source:'https://arxiv.org/abs/2510.26692',note:'Channel-wise decay and a delta-rule update modify a fixed-size state; queries read that state. This is the KDA module, not the complete Kimi Linear hybrid.'},
+      csa:{name:'Compressed Sparse Attention',short:'Query-selected compressed history',source:'https://arxiv.org/abs/2606.19348',note:'Compresses completed sequence blocks, selects relevant history for each query, and retains a local token window. History selection is separate from MoE expert routing.'},
+      hca:{name:'Heavily Compressed Attention',short:'Dense reads of compressed history',source:'https://arxiv.org/abs/2606.19348',note:'Uses stronger sequence compression and attends to all eligible compressed history, alongside a local token window. There is no sparse history selector.'}
+    };
     let g={left:0,top:0,width:1,height:1,scale:1,cx:0,cy:0},points=[],paths=[],labels=[],screenPoints=[],pickWorld=[];
     let pane=null,bar=null,status=null,pressed=false,moved=false,start=null,phaseOffset=0,dragNode=-1;
     const ripples=[],nodeOffsets=Array.from({length:7},()=>({x:0,y:0}));
@@ -40,7 +48,7 @@
       return scores.map(v=>({expert:v.expert,weight:Math.exp(v.score)/norm}));
     }
     function record(type){interactions++;host.dataset.fieldInteractions=String(interactions);host.dataset.fieldInteractionType=type;}
-    function activate(token,x=0,z=0){if(Number.isInteger(token))selected=clamp(token,0,mode==='agents'?6:7);pulse=t;tokenHoldUntil=t+12;moeClockStart=t;moeCycle=0;phaseOffset+=Math.PI/3;ripples.push({x,z,t});if(ripples.length>5)ripples.shift();record(mode==='transformer'?'attention-flow':'activate');host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldPhase=String(phaseOffset);if(status){const gate=routeToken(selected);status.textContent=mode==='transformer'?`Token ${selected+1} can attend to positions 1 through ${selected+1}. The illustrative router selects ${moeTopK} of ${moeExpertCount} experts: ${gate.map(v=>v.expert+1).join(', ')}. Their normalized weights are ${gate.map(v=>Math.round(v.weight*100)+' percent').join(', ')}. Expert outputs combine separately for each token, then join that token's residual stream.`:`${description[0]} updated.`;}}
+    function activate(token,x=0,z=0){if(Number.isInteger(token))selected=clamp(token,0,mode==='agents'?6:7);pulse=t;tokenHoldUntil=t+12;moeClockStart=t;moeCycle=0;phaseOffset+=Math.PI/3;ripples.push({x,z,t});if(ripples.length>5)ripples.shift();record(mode==='transformer'?'attention-flow':'activate');host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldPhase=String(phaseOffset);if(status){const gate=routeToken(selected);status.textContent=mode==='transformer'?`Token ${selected+1} uses the ${attentionMode.toUpperCase()} mechanism over its available prefix. The illustrative router selects ${moeTopK} of ${moeExpertCount} experts: ${gate.map(v=>v.expert+1).join(', ')}. Their normalized weights are ${gate.map(v=>Math.round(v.weight*100)+' percent').join(', ')}. Expert outputs combine separately for each token, then join that token's residual stream.`:`${description[0]} updated.`;}}
     if(hero){
       host.classList.add('field-interactive','scientific-field');if(mode==='transformer')host.classList.add('transformer-field');
       surface=document.createElement('div');surface.className='scientific-field-stage';
@@ -54,8 +62,11 @@
       const help=document.createElement('span');help.className='field-sr-only';help.id='transformer-help-'+scenes.length;help.textContent=mode==='transformer'?'A conceptual sparse mixture-of-experts decoder block. Three parallel attention heads share a causal mask: faint upper-triangle positions are unavailable. A router chooses two or four of sixteen feed-forward experts independently for each token, with weights normalized over that token’s selected experts. Four-token batch view shows simultaneous routes; each token retains its own weighted output and residual. Heads are not stacked layers. Select a token, switch top-K or focus the view. Drag to change perspective. Arrow keys select tokens; Enter traces; B toggles batch; K changes top-K; R resets. Normalization, capacity limits and token dropping are omitted. Synthetic explanatory routing, not MiniMax architecture.':`${description[0]}. ${description[1]}. Arrow keys select a state, Enter activates it, and R resets the view. This is a conceptual study, not measured experimental data.`;pane.setAttribute('aria-describedby',help.id);
       bar=document.createElement('div');bar.className='field-playbar transformer-playbar';bar.innerHTML=`<span class="field-play-hint">${description[1]}</span><button class="field-play-action" type="button">${description[2]}</button><button class="field-play-reset" type="button">Reset</button>`;
       if(mode==='transformer'){
-        bar.classList.add('moe-playbar');bar.innerHTML=`<span class="moe-concept">Conceptual decoder · attention & MoE</span><div class="moe-controls"><label class="moe-select-wrap"><span>Token</span><select class="moe-select" aria-label="Select token">${Array.from({length:8},(_,i)=>`<option value="${i}"${i===selected?' selected':''}>${i+1} / 8</option>`).join('')}</select></label><div class="moe-segment" role="group" aria-label="Experts per token"><button type="button" data-top-k="2" aria-pressed="false">Top 2</button><button type="button" data-top-k="4" aria-pressed="true">Top 4</button></div><button class="moe-batch" type="button" aria-pressed="true" aria-label="Show four tokens together">Batch ×4</button><button class="field-play-action" type="button">Trace</button><button class="field-play-reset" type="button">Reset</button></div><div class="moe-feedback"><strong class="moe-token-feedback">Token 5</strong><span class="moe-weights"></span></div><div class="moe-flow"><span data-phase="0">Attention</span><i>→</i><span data-phase="1">Dispatch</span><i>→</i><span data-phase="2">Compute</span><i>→</i><span data-phase="3">Combine</span></div><span class="moe-hint">Select a token to follow its routes · drag to rotate</span>`;
-        const actionPair=document.createElement('span');actionPair.className='moe-action-pair';actionPair.append(bar.querySelector('.field-play-action'),bar.querySelector('.field-play-reset'));bar.querySelector('.moe-controls').append(actionPair);
+        bar.classList.add('moe-playbar');bar.innerHTML=`<div class="attention-presets" role="group" aria-label="Attention mechanism">${Object.entries(attentionModes).map(([key,value])=>`<button type="button" data-attention-mode="${key}" aria-pressed="${key===attentionMode}" title="${value.name}">${key.toUpperCase()}</button>`).join('')}</div><div class="moe-controls"><label class="moe-select-wrap"><span>Token</span><select class="moe-select" aria-label="Select token">${Array.from({length:8},(_,i)=>`<option value="${i}"${i===selected?' selected':''}>${i+1}</option>`).join('')}</select></label><div class="moe-segment" role="group" aria-label="MoE experts per token"><span>MoE</span><button type="button" data-top-k="2" aria-pressed="false">Top 2</button><button type="button" data-top-k="4" aria-pressed="true">Top 4</button></div><button class="field-play-action" type="button">Trace ↗</button><details class="moe-details"><summary aria-label="Diagram details and more controls">About / controls</summary><div class="moe-details-body"><p><strong class="attention-name">Multi-head attention</strong><span class="attention-note"></span> <a class="attention-source" target="_blank" rel="noopener noreferrer">Paper ↗</a></p><p class="moe-boundary">Mechanism study · illustrative dimensions and routing, not a vendor model configuration.</p><div class="moe-advanced"><button class="moe-batch" type="button" aria-pressed="true" aria-label="Show four tokens together">Batch ×4</button><button class="field-play-reset" type="button">Reset view</button></div><div class="moe-feedback"><strong class="moe-token-feedback">Token 5</strong><span class="moe-weights"></span></div></div></details></div>`;
+        function updateAttention(){const item=attentionModes[attentionMode];bar.querySelectorAll('[data-attention-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.attentionMode===attentionMode)));bar.querySelector('.attention-name').textContent=item.name;bar.querySelector('.attention-note').textContent=item.note;const source=bar.querySelector('.attention-source');source.href=item.source;source.setAttribute('aria-label',item.name+' technical report');help.textContent='Interactive mechanism study. '+item.note+' Each token is routed independently to two or four MoE experts. Illustrative routing, not MiniMax architecture. Drag to rotate. Arrow keys select tokens, Enter traces, B toggles batch, K changes MoE top-k, R resets.';}
+        updateAttention();
+        bar.querySelectorAll('[data-attention-mode]').forEach(button=>button.addEventListener('click',()=>{attentionMode=button.dataset.attentionMode;moeFeedbackKey='';updateAttention();activate();record('attention-mode-change');}));
+        bar.querySelector('.moe-details').addEventListener('toggle',()=>queueMeasure());
         bar.querySelector('.moe-select').addEventListener('change',e=>activate(Number(e.target.value)));
         bar.querySelectorAll('[data-top-k]').forEach(button=>button.addEventListener('click',()=>{moeTopK=Number(button.dataset.topK);moeFeedbackKey='';activate();record('top-k-change');}));
         bar.querySelector('.moe-batch').addEventListener('click',()=>{moeBatch=!moeBatch;moeFeedbackKey='';activate();record('batch-toggle');});
@@ -78,7 +89,7 @@
       card.addEventListener('pointerleave',()=>{tx=ty=0;},{passive:true});
     }
     function measure(){
-      if(hero){const layout=surface.parentElement,ls=getComputedStyle(layout),available=layout.clientWidth-(parseFloat(ls.paddingLeft)||0)-(parseFloat(ls.paddingRight)||0),stacked=isLanding||available<1100;host.dataset.fieldLayout=stacked?'stacked':'split';if(isLanding&&mode==='transformer'){host.dataset.fieldPresentation=available>=900?'panoramic':'portrait';host.style.setProperty('--moe-stage-height',`${available>=900?clamp(available*.43,570,690):clamp(available*1.45+460,850,1150)}px`);}const localWidth=host.clientWidth;host.style.setProperty('--field-title-size',`${localWidth<620?clamp(localWidth*.108,36,62):clamp(localWidth*.078,48,76)}px`);}
+      if(hero){const layout=surface.parentElement,ls=getComputedStyle(layout),available=layout.clientWidth-(parseFloat(ls.paddingLeft)||0)-(parseFloat(ls.paddingRight)||0),stacked=isLanding||available<1100;host.dataset.fieldLayout=stacked?'stacked':'split';if(isLanding&&mode==='transformer'){host.dataset.fieldPresentation=available>=900?'panoramic':'portrait';host.style.setProperty('--moe-stage-height',`${(available>=900?clamp(available*.43,570,690):clamp(available*1.60+160,700,980))+(bar?.querySelector('.moe-details[open] .moe-details-body')?.offsetHeight||0)}px`);}const localWidth=host.clientWidth;host.style.setProperty('--field-title-size',`${localWidth<620?clamp(localWidth*.108,36,62):clamp(localWidth*.078,48,76)}px`);}
       const r=surface.getBoundingClientRect(),style=getComputedStyle(surface),borderX=(parseFloat(style.borderLeftWidth)||0)+(parseFloat(style.borderRightWidth)||0),borderY=(parseFloat(style.borderTopWidth)||0)+(parseFloat(style.borderBottomWidth)||0);
       // Fractional CSS sizes matter under browser / embedded-view CSS zoom;
       // integer clientHeight can undersize a tall backing surface in WebKit.
@@ -86,7 +97,7 @@
       canvas.width=Math.ceil(w*dpr);canvas.height=Math.ceil(h*dpr);ctx.setTransform(canvas.width/w,0,0,canvas.height/h,0,0);
       if(hero){
         bar.style.cssText=`left:14px;width:${w-28}px;bottom:7px`;
-        const controls=mode==='transformer'?Math.max(160,bar.getBoundingClientRect().height/(r.width/(w+borderX))+28):(small?96:82);
+        const controls=mode==='transformer'?Math.max(106,bar.getBoundingClientRect().height/(r.width/(w+borderX))+22):(small?96:82);
         g={left:6,top:16,width:w-12,height:h-controls};
         pane.style.cssText=`left:${g.left}px;top:${g.top}px;width:${g.width}px;height:${g.height}px`;
         bar.style.cssText=`left:${g.left+8}px;width:${g.width-16}px;bottom:7px`;
@@ -99,12 +110,14 @@
     }
     function project(x,y,z){
       const portrait=mode==='transformer'&&hero&&w<900;
-      const yaw=(mode==='control'?-.22:portrait?-.16:-.26)+px*(portrait?.65:1),tilt=(mode==='transformer'?.31:mode==='agents'?.34:mode==='training'&&!hero?.40:.56)+py*(portrait?.55:1);
-      const X=x*Math.cos(yaw)+z*Math.sin(yaw),Z=z*Math.cos(yaw)-x*Math.sin(yaw),Y=y*Math.cos(tilt)-Z*Math.sin(tilt),D=y*Math.sin(tilt)+Z*Math.cos(tilt),depth=portrait?Z:D,pers=1/(1+depth*(portrait?.08:.13));
-      // A long portrait flow uses depth perspective without making its lower
-      // expert stage recede solely because it appears further down the page.
-      return{x:g.cx+X*g.scale*pers,y:g.cy+Y*g.scale*pers,d:depth,s:pers};
+      const yaw=(mode==='transformer'?-.48:mode==='control'?-.22:-.26)+px*(portrait?.65:1),tilt=(mode==='transformer'?.24:mode==='agents'?.34:mode==='training'&&!hero?.40:.56)+py*(portrait?.55:1);
+      const X=x*Math.cos(yaw)+z*Math.sin(yaw),Z=z*Math.cos(yaw)-x*Math.sin(yaw),Y=y*Math.cos(tilt)-Z*Math.sin(tilt),D=y*Math.sin(tilt)+Z*Math.cos(tilt);
+      // Orthographic architectural projection preserves stage scale. Portrait
+      // rotates the complete projection, including wires and picking targets.
+      const pers=mode==='transformer'?1:1/(1+D*.13),sx=portrait?-Y:X,sy=portrait?X:Y;
+      return{x:g.cx+sx*g.scale*pers,y:g.cy+sy*g.scale*pers,d:mode==='transformer'?z*.35:D,s:pers};
     }
+
     function point(x,y,z,c=0,a=.6,r=1){points.push({x,y,z,c,a,r});}
     function path(coords,c=0,a=.25,width=.65,flow=0){paths.push({coords,c,a,width,flow});}
     function text(s,x,y,z=0,c=2){if(hero)labels.push({s,x,y,z,c});}
@@ -125,21 +138,21 @@
     function transformer(){
       const cycle=Math.floor((t-moeClockStart)*.145);
       if(cycle!==moeCycle){moeCycle=cycle;if(t>tokenHoldUntil&&t-pulse>9)selected=(selected+1)%8;}
-      const vertical=hero&&w<900,narrow=vertical&&w<650, batchClock=fract((t-moeClockStart)*.145);
+      const portrait=hero&&w<900,vertical=false,narrow=false, batchClock=fract((t-moeClockStart)*.145);
       const batch=(moeBatch?[selected,(selected+2)%8,(selected+4)%8,(selected+6)%8]:[selected]).map((token,j)=>({token,j,gate:routeToken(token),clock:clamp((batchClock-j*.05)/(1-j*.05),0,.999999),color:[0,1,4,5][j]}));
       const gate=batch[0].gate,active=gate.map(v=>v.expert),clock=batch[0].clock;
       const phase=clock<.38?0:clock<.59?1:clock<.74?2:3;
       const batchActive=[...new Set(batch.flatMap(b=>b.gate.map(v=>v.expert)))];
       const selectedPackets={attention:0,dispatch:0,compute:0,combine:0,output:0};
-      const audit={selectedToken:selected+1,batch:batch.map(b=>({token:b.token+1,color:b.color,experts:b.gate.map(v=>v.expert+1),weights:b.gate.map(v=>v.weight),clock:b.clock})),routes:[],particles:[],expertChains:[],frontRows:[]};
+      const audit={attentionMode,geometrySpace:'canonical-horizontal',attentionTopology:{kind:attentionMode,causal:true,reads:[]},selectedToken:selected+1,batch:batch.map(b=>({token:b.token+1,color:b.color,experts:b.gate.map(v=>v.expert+1),weights:b.gate.map(v=>v.weight),clock:b.clock})),routes:[],particles:[],expertChains:[],frontRows:[]};
       host.__fieldRouting=audit;
       host.dataset.fieldFlowStage=['Attention','Dispatch','Compute','Combine'][phase];
-      host.dataset.fieldArchitecture='sparse-moe';host.dataset.fieldDecoderBlocks='1';host.dataset.fieldAttentionHeads='3';host.dataset.fieldCoreNodes='8';
-      host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldActiveExperts=active.map(i=>i+1).join(',');host.dataset.fieldExpertWeights=gate.map(v=>v.weight.toFixed(6)).join(',');host.dataset.fieldTopK=String(moeTopK);host.dataset.fieldExpertCount=String(moeExpertCount);host.dataset.fieldComposition=vertical?'portrait-flow':hero?'panoramic':'horizontal';
+      host.dataset.fieldArchitecture='sparse-moe';host.dataset.fieldDecoderBlocks='1';host.dataset.fieldAttentionHeads=['mha','mla'].includes(attentionMode)?'3':'0';host.dataset.fieldAttentionMode=attentionMode;host.dataset.fieldCoreNodes='8';
+      host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldActiveExperts=active.map(i=>i+1).join(',');host.dataset.fieldExpertWeights=gate.map(v=>v.weight.toFixed(6)).join(',');host.dataset.fieldTopK=String(moeTopK);host.dataset.fieldExpertCount=String(moeExpertCount);host.dataset.fieldComposition=portrait?'rotated-portrait':hero?'panoramic':'horizontal';
       host.dataset.fieldBatchSize=String(batch.length);host.dataset.fieldBatchActiveExperts=batchActive.map(i=>i+1).join(',');host.dataset.fieldBatchRoutes=JSON.stringify(audit.batch);host.dataset.fieldRouteCount=String(batch.length*moeTopK*2);host.dataset.fieldSeparateTokenOutputs='true';host.dataset.fieldClock=clock.toFixed(4);
-      host.dataset.fieldCausalPositions=Array.from({length:selected+1},(_,i)=>i+1).join(',');host.dataset.fieldMaskedCells='84';host.dataset.fieldMaskAlpha='.14';host.dataset.fieldAllowedAlpha='.52';
+      host.dataset.fieldCausalPositions=Array.from({length:selected+1},(_,i)=>i+1).join(',');host.dataset.fieldMaskedCells=['mha','mla'].includes(attentionMode)?'84':'0';host.dataset.fieldMaskAlpha='.14';host.dataset.fieldAllowedAlpha='.52';
       if(bar){
-        const key=`${selected}/${moeTopK}/${moeBatch}`;
+        const key=`${attentionMode}/${selected}/${moeTopK}/${moeBatch}`;
         if(key!==moeFeedbackKey){moeFeedbackKey=key;bar.querySelector('.moe-select').value=String(selected);bar.querySelectorAll('[data-top-k]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.topK)===moeTopK)));const button=bar.querySelector('.moe-batch');button.setAttribute('aria-pressed',String(moeBatch));button.textContent=moeBatch?'Batch ×4':'Focus ×1';bar.querySelector('.moe-token-feedback').textContent=`Token ${selected+1} →`;bar.querySelector('.moe-weights').textContent=gate.map(v=>`E${v.expert+1}\u00a0${(v.weight*100).toFixed(0)}%`).join('  ·  ');}
         if(phase!==moePhaseKey){moePhaseKey=phase;bar.querySelectorAll('[data-phase]').forEach(el=>el.dataset.active=String(Number(el.dataset.phase)===phase));}
       }
@@ -149,7 +162,7 @@
       const attention=vertical?(narrow?[-.04,-.80,0]:[.10,-2.10,0]):[-2.10,-.08,0],projection=vertical?(narrow?[1.25,.90,0]:[2.05,-1.80,0]):[.02,.04,0];
       const add=vertical?(narrow?[1.25,1.50,0]:[2.05,-.65,0]):[.45,.08,0],router=vertical?(narrow?[0,1.90,0]:[0,.10,0]):[1.04,.08,0];
       const attSize=vertical?(narrow?2.45:2.25):2.60,tokenHeight=vertical?(narrow?.85:1.65):1.80,qkvHeight=vertical?(narrow?.85:1.50):1.65,projectionHeight=vertical?(narrow?.65:1.20):1.55;
-      const headDepth=vertical?.34:.48;
+      const headDepth=.88;
       const sideRail=vertical?(narrow?1.70:2.50):0;
       const rowAt=(center,height,index,dx=0,z=0)=>[center[0]+dx,center[1]+(index/7-.5)*height,z];
       const at=(coords,u)=>{const p=clamp(u,0,1)*(coords.length-1),i=Math.floor(p),a=coords[i],b=coords[Math.min(coords.length-1,i+1)];return[mix(a[0],b[0],fract(p)),mix(a[1],b[1],fract(p)),mix(a[2],b[2],fract(p))];};
@@ -168,40 +181,108 @@
       function tokenPanel(c,sx,sy,color=0){for(let row=0;row<8;row++)for(let col=0;col<5;col++)for(let depth=0;depth<2;depth++)point(c[0]+(col/4-.5)*sx,c[1]+(row/7-.5)*sy,c[2]+(depth-.5)*.06,color,row===selected?.94:batch.some(b=>b.token===row)?.56:.30,row===selected?1.15:.82);}
       tokenPanel(token,.24,tokenHeight);pickWorld=[];
       for(let row=0;row<8;row++){const p=rowAt(token,tokenHeight,row,-.20);pickWorld.push(p);point(...p,row===selected?2:0,row===selected?.98:.48,row===selected?2.7:1.3);}
-      for(let component=0;component<3;component++)tokenPanel([qkv[0],qkv[1],(component-1)*headDepth],.16,qkvHeight,component%2);
-      const heads=[];
-      for(let head=0;head<3;head++){
-        const z=(head-1)*headDepth,c=head%2,x=attention[0]+head*.045,y=attention[1]-head*.04;heads.push({x,y,z,c});
-        for(let row=0;row<8;row++)for(let col=0;col<8;col++){
-          const masked=col>row,chosen=!masked&&row===selected,companion=!masked&&batch.some(b=>b.j>0&&b.token===row);
-          for(let sy=0;sy<3;sy++)for(let sx=0;sx<3;sx++){const dx=(col/7-.5)*attSize+(sx-1)*attSize*.022,dy=(row/7-.5)*attSize+(sy-1)*attSize*.022;point(x+dx,y+dy,z,masked?3:c,masked?.12:chosen?.88:companion?.55:.40,masked?.58:chosen?1.06:.74);}
+      // All mechanisms live in the same canonical horizontal block. A narrow
+      // viewport rotates this entire block; it never rewires component positions.
+      const matrixMode=attentionMode==='mha'||attentionMode==='mla';
+      const projectionComponents=attentionMode==='mla'?1:(attentionMode==='csa'||attentionMode==='hca'?2:3);
+      for(let component=0;component<projectionComponents;component++)tokenPanel([qkv[0],qkv[1],(component-1)*headDepth*.65],.16,qkvHeight,component%2);
+      const heads=[],memory=[],local=[-1.32,1.03,0],query=[-3.18,-.78,0];
+      const matrixSize=attentionMode==='mla'?1.85:2.20;
+      if(matrixMode){
+        for(let head=0;head<3;head++){
+          const z=(head-1)*headDepth,c=[0,1,4][head],x=attention[0]+(head-1)*.30+(attentionMode==='mla'?.36:0),y=attention[1]-(head-1)*.26;heads.push({x,y,z,c});
+          for(let row=0;row<8;row++)for(let col=0;col<8;col++){
+            const masked=col>row,chosen=!masked&&row===selected,companion=!masked&&batch.some(b=>b.j>0&&b.token===row);
+            for(let sy=0;sy<3;sy++)for(let sx=0;sx<3;sx++){const dx=(col/7-.5)*matrixSize+(sx-1)*matrixSize*.022,dy=(row/7-.5)*matrixSize+(sy-1)*matrixSize*.022;point(x+dx,y+dy,z,masked?3:c,masked?.095:chosen?.90:companion?.56:.47,masked?.52:chosen?1.1:.78);}
+          }
+          path([[-.5,-.5],[.5,-.5],[.5,.5],[-.5,.5],[-.5,-.5]].map(v=>[x+v[0]*matrixSize,y+v[1]*matrixSize,z]),c,.40,.75);
+          text('H'+(head+1),x-matrixSize*.5,y-matrixSize*.5-.15,z,c);
         }
-        path([[-.5,-.5],[.5,-.5],[.5,.5],[-.5,.5],[-.5,-.5]].map(v=>[x+v[0]*attSize,y+v[1]*attSize,z]),3,.22,.6);
+        if(attentionMode==='mla'){
+          tokenPanel([-3.40,.15,0],.13,1.65,1);
+          tokenPanel([-3.14,.15,0],.055,1.65,4);
+          text('Latent KV',-3.48,1.32,0,1);text('RoPE K',-3.22,-1.12,0,4);
+        }
+      }else if(attentionMode==='kda'){
+        // A fixed-dimensional recurrent state, not a softmax attention matrix.
+        for(let state=0;state<2;state++){
+          const center=[-2.48+state*.72,-.02,(state-.5)*.85];memory.push(center);
+          for(let i=0;i<13;i++)for(let j=0;j<13;j++)for(let d=0;d<2;d++)point(center[0]+(i/12-.5)*1.2,center[1]+(j/12-.5)*1.3,center[2]+d*.06,state?0:1,state?.65:.30,.88);
+          path([[-.6,-.65],[.6,-.65],[.6,.65],[-.6,.65],[-.6,-.65]].map(v=>[center[0]+v[0],center[1]+v[1],center[2]]),state?0:1,.35,.7);
+        }
+        globe([-2.65,-1.20,0],.11,90,1,.70);
+        path(arc(memory[0],[-2.65,-1.20,0],.10),1,.42,.8);path(arc([-2.65,-1.20,0],memory[1],.12),1,.42,.8);
+        text('S(t−1)',-2.66,.96,-.42,1);text('S(t)',-1.57,.96,.42,0);text('Decay · delta update',-2.48,-1.55,0,1);text('Query read',-.85,-.67);
+      }else{
+        const blockSize=attentionMode==='csa'?2:4,count=8/blockSize;
+        for(let i=0;i<count;i++){
+          const center=[-2.50+(i%2)*.83,-.63+Math.floor(i/2)*.72,0];memory.push(center);
+          const preceding=(i+1)*blockSize-1<selected;
+          for(let j=0;j<7;j++)for(let k=0;k<5;k++)for(let d=0;d<3;d++)point(center[0]+(k/4-.5)*.35,center[1]+(j/6-.5)*.35,center[2]+(d-1)*.08,1,preceding?.62:.16,.85);
+          // DeepSeek-V4 §2.3.1–3: CSA pools overlapping adjacent chunks;
+          // HCA pools disjoint chunks. Only preceding blocks may be read.
+          // Provenance is static: future/unavailable entries never emit packets.
+          const first=attentionMode==='csa'?Math.max(0,(i-1)*blockSize):i*blockSize;
+          for(let source=first;source<(i+1)*blockSize;source++){
+            const hidden=rowAt(token,tokenHeight,source,.12),kv=rowAt(qkv,qkvHeight,source,0,0);
+            path(arc(hidden,kv,.045),1,preceding?.09:.025,.5);
+            path(arc(kv,center,.04),1,preceding?.13:.025,.55);
+          }
+          text('B'+(i+1),center[0],center[1]+.32,0,1);
+        }
+        tokenPanel(local,.38,.20,4);globe(query,.055,70,2,.7);
+        text(attentionMode==='csa'?'Sparse history':'Compressed history',-2.10,-1.35,0,1);
+        text('Local window',-1.30,1.46,0,4);text(attentionMode==='csa'?'Query selection':'Dense read',-3.18,-1.17);
       }
       tokenPanel(projection,.16,projectionHeight,1);
       for(const b of [...batch].reverse()){
         const input=rowAt(token,tokenHeight,b.token,.12),projected=rowAt(projection,projectionHeight,b.token),residual=[add[0],add[1]+(b.token/7-.5)*.12,b.j*.018];
-        const port=[router[0]+(vertical?(b.j-1.5)*.045:0),router[1]+(vertical?0:(b.j-1.5)*.045),b.j*.018];b.residual=residual;b.port=port;
-        audit.frontRows.push({token:b.token+1,input,query:rowAt(qkv,qkvHeight,b.token,0,-headDepth),projected});
-        for(let component=0;component<3;component++){
-          const q=rowAt(qkv,qkvHeight,b.token,0,(component-1)*headDepth);
+        const port=[router[0],router[1]+(b.j-1.5)*.045,b.j*.018];b.residual=residual;b.port=port;
+        audit.frontRows.push({token:b.token+1,input,query:rowAt(qkv,qkvHeight,b.token,0,-headDepth*.65),projected});
+        for(let component=0;component<projectionComponents;component++){
+          const q=rowAt(qkv,qkvHeight,b.token,0,(component-1)*headDepth*.65);
           flow(arc(input,q,.045),b,0,.07,'attention',`T${b.token+1}:projection:${component}`);
-          for(let h=0;h<3;h++){
-            const head=heads[h],entry=[head.x-attSize*.5,head.y+(b.token/7-.5)*attSize,head.z];
-            // Q is the animated query path. K/V remain available context for
-            // all allowed positions of that row, not just the token itself.
-            if(component===0)flow(arc(q,entry,.04),b,.07,.14,'attention',`T${b.token+1}:query:${h}`);
-            else path(arc(q,entry,.035),b.color,b.j===0?.16:.055,.5);
+          if(matrixMode){
+            heads.forEach((h,i)=>{const entry=[h.x-matrixSize*.5,h.y+(b.token/7-.5)*matrixSize,h.z];if(component===0)flow(arc(q,entry,.04),b,.07,.14,'attention',`T${b.token+1}:query:${i}`);else path(arc(q,entry,.03),b.color,b.j===0?.16:.055,.5);});
           }
         }
-        for(let h=0;h<3;h++){
-          const head=heads[h],y=head.y+(b.token/7-.5)*attSize;
-          const entry=[head.x-attSize*.5,y,head.z],lastAllowed=[head.x+(b.token/7-.5)*attSize,y,head.z];
-          flow([entry,lastAllowed],b,.14,.24,'attention',`T${b.token+1}:causal-context:${h}`);
-          flow(arc(lastAllowed,projected,-.10),b,.24,.31,'attention',`T${b.token+1}:head-output:${h}`);
+        if(attentionMode==='mla'){
+          // DeepSeek-V3 §2.1.1: cKV=W_DKV h; the positional key is a separate
+          // h→RoPE branch. The latent does not compress pre-expanded K and V.
+          const cache=rowAt([-3.40,.15,0],1.65,b.token),rope=rowAt([-3.14,.15,0],1.65,b.token);
+          flow(arc(input,cache,.03),b,0,.10,'attention',`T${b.token+1}:latent-kv`);
+          flow(arc(input,rope,-.05),b,0,.10,'attention',`T${b.token+1}:positional-key`);
+          heads.forEach((h,i)=>{
+            const entry=[h.x-matrixSize*.5,h.y+(b.token/7-.5)*matrixSize,h.z];
+            flow(arc(cache,entry,.03),b,.10,.14,'attention',`T${b.token+1}:latent-content:${i}`);
+            flow(arc(rope,entry,-.035),b,.10,.14,'attention',`T${b.token+1}:positional-content:${i}`);
+          });
+        }
+        if(matrixMode){
+          for(let i=0;i<heads.length;i++){const h=heads[i],y=h.y+(b.token/7-.5)*matrixSize,entry=[h.x-matrixSize*.5,y,h.z],last=[h.x+(b.token/7-.5)*matrixSize,y,h.z];flow([entry,last],b,.14,.24,'attention',`T${b.token+1}:causal-context:${i}`);flow(arc(last,projected,-.10),b,.24,.31,'attention',`T${b.token+1}:head-output:${i}`);}
+          audit.attentionTopology.reads.push({token:b.token+1,positions:Array.from({length:b.token+1},(_,i)=>i+1),...(attentionMode==='mla'?{latentSource:'hidden-state',positionalKeyBranch:true}: {})});
+        }else if(attentionMode==='kda'){
+          // Kimi Linear §3, eq. 1: decay/update uses S(t−1), k(t) AND v(t);
+          // q(t) reads S(t). Overlaid token traces each represent their own step.
+          const k=rowAt(qkv,qkvHeight,b.token,0,0),v=rowAt(qkv,qkvHeight,b.token,0,headDepth*.65),q=rowAt(qkv,qkvHeight,b.token,0,-headDepth*.65),gatePoint=[-2.65,-1.20,0],readPoint=[-.85,-.25,0];
+          flow(arc(k,gatePoint,.05),b,.07,.14,'attention',`T${b.token+1}:write`);
+          flow(arc(v,gatePoint,-.05),b,.07,.14,'attention',`T${b.token+1}:value-write`);
+          flow(arc(memory[0],gatePoint,.10),b,.07,.14,'attention',`T${b.token+1}:prior-state`);
+          flow(arc(gatePoint,memory[1],.05),b,.14,.22,'attention',`T${b.token+1}:delta-update`);flow(arc(q,readPoint,.25),b,.07,.22,'attention',`T${b.token+1}:query-read`);flow(arc(memory[1],readPoint,-.05),b,.22,.26,'attention',`T${b.token+1}:state-read`);flow(arc(readPoint,projected,.03),b,.26,.31,'attention',`T${b.token+1}:read-output`);
+          audit.attentionTopology.reads.push({token:b.token+1,stateThrough:b.token+1,priorStateThrough:b.token,writeUses:['key','value'],fixedState:true});
+        }else{
+          const blockSize=attentionMode==='csa'?2:4,eligible=memory.map((_,i)=>i).filter(i=>(i+1)*blockSize-1<b.token),chosen=attentionMode==='csa'?eligible.slice().sort((a,c)=>Math.sin((c+1)*(b.token+1))-Math.sin((a+1)*(b.token+1))).slice(0,2):eligible;
+          const q=rowAt(qkv,qkvHeight,b.token,0,-headDepth*.65),qp=[query[0],query[1]+b.j*.04,query[2]];
+          flow(arc(q,qp,.03),b,.07,.14,'attention',`T${b.token+1}:history-query`);
+          const localKV=rowAt(qkv,qkvHeight,b.token,0,0);
+          flow(arc(localKV,local,-.05),b,.07,.14,'attention',`T${b.token+1}:local-kv`);
+          if(b.token>0)path(arc(rowAt(qkv,qkvHeight,b.token-1,0,0),local,-.025),b.color,b.j===0?.14:.05,.5);
+          for(const i of chosen){flow(arc(qp,memory[i],.05),b,.14,.24,'attention',`T${b.token+1}:history:${i}`);flow(arc(memory[i],projected,.025),b,.24,.31,'attention',`T${b.token+1}:history-output:${i}`);}
+          flow(arc(qp,local,-.20),b,.14,.24,'attention',`T${b.token+1}:local-window`);flow(arc(local,projected,-.05),b,.24,.31,'attention',`T${b.token+1}:local-output`);
+          audit.attentionTopology.reads.push({token:b.token+1,eligibleBlocks:eligible,selectedBlocks:chosen,blockSize,precedingBlocksOnly:true,localPositions:Array.from({length:Math.min(2,b.token+1)},(_,i)=>b.token+1-i),sparse:attentionMode==='csa'});
         }
         flow(arc(projected,residual,0),b,.31,.34,'attention',`T${b.token+1}:attention-add`);
-        flow(arc(residual,port,vertical?-.07:0),b,.34,.38,'attention',`T${b.token+1}:router-input`);
+        flow(arc(residual,port,0),b,.34,.38,'attention',`T${b.token+1}:router-input`);
         point(...residual,b.color,b.j===0?.88:.36,b.j===0?1.9:1.2);
       }
       const attentionSkip=vertical?[[token[0],token[1]-tokenHeight*.53,0],[token[0],(narrow?-3.72:-3.65),0],[sideRail,(narrow?-3.72:-3.65),0],[sideRail,add[1],0],add]:[[token[0],-.95,0],[token[0],-1.80,0],[add[0],-1.80,0],add];path(attentionSkip,0,.16,.65);
@@ -245,21 +326,12 @@
         if(hero&&(w>=180||chosen))text(`E${e.expert+1}`,e.x,e.y+(vertical?.24:.25),e.z,chosen?0:3);
       }
       if(hero){
-        if(vertical){
-          text('Tokens',token[0],narrow?-3.55:-.92);text(w<180?'QKV':'Q / K / V',qkv[0],narrow?-3.55:-.92);
-          text(w<180?'Attention':'Causal attention',attention[0],narrow?-2.36:-3.63);
-          if(w>=180)text(w<350?'3 heads':'3 parallel heads',attention[0]-.15,narrow?.66:-.61,0,1);
-          text(w<180?'Proj.':'Projection',projection[0],narrow?1.38:-.90);
-          text(w<180?'Router':`Router · top ${moeTopK}`,0,narrow?1.65:-.18);
-          text('MoE',0,narrow?2.25:.48,0,1);text(w<300?'Weighted sum':'Weighted combination',0,narrow?4.49:3.10);
-          if(w>=180)text('Residual',sideRail,narrow?1.20:.18,0,3);
-        }else{
-          text('Tokens',-5.15,1.23);text('Q / K / V',-4.20,1.23);
-          text('Causal attention',-2.10,-1.78);text('3 parallel heads',-2.10,1.58,0,1);
-          text('Projection',.02,1.23);text(`Router · top ${moeTopK}`,1.05,-.42);
-          text('MoE',3.05,-1.48,0,1);text('Weighted combination',5.02,-1.05);
-          text('Residual stream',1.0,2.21,0,3);
-        }
+        text('Tokens',-5.15,1.23);text(attentionMode==='mla'?'Query':attentionMode==='csa'||attentionMode==='hca'?'Q / KV':'Q / K / V',-4.20,1.23);
+        text(attentionMode==='kda'?'Recurrent memory':attentionMode.toUpperCase()+' attention',-2.10,-2.0);
+        if(matrixMode)text('Parallel heads',-1.8,1.85,0,1);
+        text(portrait?'Projection':'Output projection',.02,1.23);text('Router',1.05,-.42);
+        text('MoE',3.05,-1.48,0,1);text(portrait?'Combine':'Weighted combination',5.02,-1.05);
+        if(!portrait)text('Residual stream',1.0,2.21,0,3);
       }
       host.dataset.fieldFlowPackets=JSON.stringify(selectedPackets);host.dataset.fieldLabels=labels.map(l=>l.s).join(' | ');host.dataset.fieldPoints=String(points.length);
     }
@@ -423,6 +495,7 @@
         ctx.textAlign='center';if(mode==='transformer'){ctx.lineWidth=3.5;ctx.lineJoin='round';ctx.strokeStyle='rgba(246,245,241,.86)';ctx.strokeText(l.s,best.x,best.y);}ctx.fillStyle=palette[l.c];ctx.fillText(l.s,best.x,best.y);
       }
       if(mode==='transformer')host.dataset.fieldAdjustedLabels=String(adjusted);
+      if(mode==='transformer'){host.__fieldView={portrait:hero&&w<900,labels:placed,points:pickWorld.map(v=>project(...v)),input:project(-5.15,0,0),output:project(5.70,0,0),bounds:{left:g.left,top:g.top,right:g.left+g.width,bottom:g.top+g.height}};}
       ctx.restore();host.dataset.fieldPoints=String(points.length);host.dataset.fieldFrame=String(Math.round(t*30));host.dataset.fieldRenders=String(++renderCount);
     }
     const scene={tick(delta){t+=delta;const e=1-Math.exp(-delta*4);px+=(tx-px)*e;py+=(ty-py)*e;render();},get visible(){return visible;},setVisible(v){visible=v;host.dataset.fieldRunning=String(v&&!hidden&&!document.hidden);wake();},measure};scenes.push(scene);
