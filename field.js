@@ -1,4 +1,4 @@
-/* v21. Original three-dimensional point studies.
+/* v22. Original three-dimensional point studies.
  * The MoE decoder schematic combines causal multi-head attention from Vaswani
  * et al., https://arxiv.org/abs/1706.03762, and sparse FFN routing from Shazeer
  * et al., https://arxiv.org/abs/1701.06538. Selected-logit normalization follows
@@ -21,7 +21,7 @@
   let hidden=false,raf=0,then=0,lastPaint=0;
   function make(canvas,host,mode,hero=false){
     let ctx;try{ctx=canvas.getContext('2d',{alpha:false});}catch(_){return;}if(!ctx)return;
-    canvas.dataset.fieldRenderer='v21';host.dataset.fieldRenderer='v21';
+    canvas.dataset.fieldRenderer='v22';host.dataset.fieldRenderer='v22';
     host.dataset.fieldShape=mode==='transformer'?'causal-moe-transformer':mode;host.dataset.fieldMode=mode;
     const isLanding=host.classList.contains('landing-moon');
     const descriptions={transformer:['Sparse MoE decoder','Select a token · trace attention and experts','Trace token'],training:['Training trajectories','Drag the landscape · compare trajectories','Trace paths'],vision:['Spatial token representation','Touch to perturb · drag to rotate','Send a ripple'],agents:['Agent coordination graph','Drag a node · route a task','Dispatch task'],world:['Action-conditioned futures','Drag to inspect · compare possible futures','Compare paths'],control:['Synchronized control channels','Drag to inspect · follow the event clock','Run sequence'],quantum:['Distributed quantum field','Drag to rotate · shift optical phase','Shift phase']};
@@ -30,25 +30,35 @@
     let w=0,h=0,dpr=1,small=false,visible=false,t=0,px=0,py=0,tx=0,ty=0,pulse=-20,selected=4,step=-1,interactions=0,renderCount=0,tokenHoldUntil=9;
     let moeTopK=4,moeBatch=true,moeFeedbackKey='',moePhaseKey='',moeClockStart=0,moeCycle=0;
     const moeExpertCount=16;
-    let attentionMode='mha';
+    let attentionMode='mha',architectureMode='block',expertMode='routed',cedPhase='decode';
     const attentionModes={
       mha:{name:'Multi-head attention',short:'Parallel causal heads',source:'https://arxiv.org/abs/1706.03762',note:'Three parallel heads within one attention layer, followed by an output projection.'},
+      mqa:{name:'Multi-query attention',short:'One shared KV bank',source:'https://arxiv.org/abs/1911.02150',note:'Independent query heads share one key/value bank. Each head still computes its own causal attention distribution and output.'},
+      gqa:{name:'Grouped-query attention',short:'Grouped KV sharing',source:'https://arxiv.org/abs/2305.13245',note:'Four illustrative query heads share two KV banks in pairs. Queries and attention outputs remain distinct within each group.'},
+      swa:{name:'Sliding-window attention',short:'Banded causal context',source:'https://arxiv.org/abs/2310.06825',note:'Each query reads a recent causal window. Older positions remain visible but inactive. Windowed attention can coexist with grouped KV sharing; these views isolate one mechanism at a time.'},
       mla:{name:'Multi-head latent attention',short:'Low-rank KV memory',source:'https://arxiv.org/abs/2412.19437',note:'Compresses KV features per token while retaining full causal attention. The cache also retains decoupled positional keys; up-projection is shown conceptually.'},
       kda:{name:'Kimi Delta Attention',short:'Gated recurrent memory',source:'https://arxiv.org/abs/2510.26692',note:'Channel-wise decay and a delta-rule update modify a fixed-size state; queries read that state. This is the KDA module, not the complete Kimi Linear hybrid.'},
       csa:{name:'Compressed Sparse Attention',short:'Query-selected compressed history',source:'https://arxiv.org/abs/2606.19348',note:'Compresses completed sequence blocks, selects relevant history for each query, and retains a local token window. History selection is separate from MoE expert routing.'},
       hca:{name:'Heavily Compressed Attention',short:'Dense reads of compressed history',source:'https://arxiv.org/abs/2606.19348',note:'Uses stronger sequence compression and attends to all eligible compressed history, alongside a local token window. There is no sparse history selector.'}
     };
+    const expertModes={
+      routed:{name:'Token top-k',source:'https://arxiv.org/abs/2401.04088',note:'Each token selects its own top-k experts. Gate weights are normalized over those selected experts before combining their outputs.'},
+      switch:{name:'Switch · top-1',source:'https://arxiv.org/abs/2101.03961',note:'Each token enters one expert. Its contribution retains the router probability over all experts, rather than renormalizing that single weight to one. Capacity and overflow are omitted.'},
+      shared:{name:'Shared + routed',source:'https://arxiv.org/abs/2401.06066',note:'Every token also enters an always-active shared FFN. That separate contribution is added to the weighted routed outputs; it is outside the routed top-k budget.'}
+    };
+    const routedK=()=>expertMode==='switch'?1:moeTopK;
     let g={left:0,top:0,width:1,height:1,scale:1,cx:0,cy:0},points=[],paths=[],labels=[],screenPoints=[],pickWorld=[];
     let pane=null,bar=null,status=null,pressed=false,moved=false,start=null,phaseOffset=0,dragNode=-1;
     const ripples=[],nodeOffsets=Array.from({length:7},()=>({x:0,y:0}));
     const stages=['Tokens','Q / K / V','Causal attention','Output projection','Top-k routing','MoE','Weighted combination','Residual output'];
     function routeToken(token){
-      const scores=Array.from({length:moeExpertCount},(_,expert)=>({expert,score:Math.cos((token+1)*(expert+1)*.73)+.35*Math.sin(expert*.83+token)})).sort((a,b)=>b.score-a.score).slice(0,moeTopK);
-      const norm=scores.reduce((sum,v)=>sum+Math.exp(v.score),0);
-      return scores.map(v=>({expert:v.expert,weight:Math.exp(v.score)/norm}));
+      const scores=Array.from({length:moeExpertCount},(_,expert)=>({expert,score:Math.cos((token+1)*(expert+1)*.73)+.35*Math.sin(expert*.83+token)})).sort((a,b)=>b.score-a.score);
+      const chosen=scores.slice(0,routedK());
+      const norm=(expertMode==='switch'?scores:chosen).reduce((sum,v)=>sum+Math.exp(v.score),0);
+      return chosen.map(v=>({expert:v.expert,weight:Math.exp(v.score)/norm}));
     }
     function record(type){interactions++;host.dataset.fieldInteractions=String(interactions);host.dataset.fieldInteractionType=type;}
-    function activate(token,x=0,z=0){if(Number.isInteger(token))selected=clamp(token,0,mode==='agents'?6:7);pulse=t;tokenHoldUntil=t+12;moeClockStart=t;moeCycle=0;phaseOffset+=Math.PI/3;ripples.push({x,z,t});if(ripples.length>5)ripples.shift();record(mode==='transformer'?'attention-flow':'activate');host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldPhase=String(phaseOffset);if(status){const gate=routeToken(selected);status.textContent=mode==='transformer'?`Token ${selected+1} uses the ${attentionMode.toUpperCase()} mechanism over its available prefix. The illustrative router selects ${moeTopK} of ${moeExpertCount} experts: ${gate.map(v=>v.expert+1).join(', ')}. Their normalized weights are ${gate.map(v=>Math.round(v.weight*100)+' percent').join(', ')}. Expert outputs combine separately for each token, then join that token's residual stream.`:`${description[0]} updated.`;}}
+    function activate(token,x=0,z=0){if(Number.isInteger(token))selected=clamp(token,0,mode==='agents'?6:7);pulse=t;tokenHoldUntil=t+12;moeClockStart=t;moeCycle=0;phaseOffset+=Math.PI/3;ripples.push({x,z,t});if(ripples.length>5)ripples.shift();record(mode==='transformer'?'attention-flow':'activate');host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldPhase=String(phaseOffset);if(status){const gate=routeToken(selected);status.textContent=mode==='transformer'?(architectureMode==='ced'?`CED ${cedPhase} trace for token ${selected+1}. Causal encoder, global KV, layer-local windows and decoder.`:`Token ${selected+1}: ${attentionMode.toUpperCase()} and ${expertModes[expertMode].name}. Routed experts ${gate.map(v=>v.expert+1).join(', ')}. ${expertMode==='shared'?'The shared expert also receives this token. ':''}Each token keeps its own weighted output.`):`${description[0]} updated.`;}}
     if(hero){
       host.classList.add('field-interactive','scientific-field');if(mode==='transformer')host.classList.add('transformer-field');
       surface=document.createElement('div');surface.className='scientific-field-stage';
@@ -59,13 +69,34 @@
       surface.append(canvas);
       if(isLanding){const coordinate=host.querySelector('.landing-coordinate');if(coordinate)surface.append(coordinate);}
       pane=document.createElement('div');pane.className='field-interaction transformer-interaction';pane.tabIndex=0;pane.setAttribute('role','group');pane.setAttribute('aria-label',`Explore ${description[0].toLowerCase()}`);
-      const help=document.createElement('span');help.className='field-sr-only';help.id='transformer-help-'+scenes.length;help.textContent=mode==='transformer'?'A conceptual sparse mixture-of-experts decoder block. Three parallel attention heads share a causal mask: faint upper-triangle positions are unavailable. A router chooses two or four of sixteen feed-forward experts independently for each token, with weights normalized over that token’s selected experts. Four-token batch view shows simultaneous routes; each token retains its own weighted output and residual. Heads are not stacked layers. Select a token, switch top-K or focus the view. Drag to change perspective. Arrow keys select tokens; Enter traces; B toggles batch; K changes top-K; R resets. Normalization, capacity limits and token dropping are omitted. Synthetic explanatory routing, not MiniMax architecture.':`${description[0]}. ${description[1]}. Arrow keys select a state, Enter activates it, and R resets the view. This is a conceptual study, not measured experimental data.`;pane.setAttribute('aria-describedby',help.id);
+      const help=document.createElement('span');help.className='field-sr-only';help.id='transformer-help-'+scenes.length;help.textContent=mode==='transformer'?'A conceptual sparse mixture-of-experts decoder block. Parallel attention heads share a causal mask: faint upper-triangle positions are unavailable. A router chooses two or four of sixteen feed-forward experts independently for each token, with weights normalized over that token’s selected experts. Four-token batch view shows simultaneous routes; each token retains its own weighted output and residual. Heads are not stacked layers. Select a token, switch top-K or focus the view. Drag to change perspective. Arrow keys select tokens; Enter traces; B toggles batch; K changes top-K; R resets. Normalization, capacity limits and token dropping are omitted. Synthetic explanatory routing, not MiniMax architecture.':`${description[0]}. ${description[1]}. Arrow keys select a state, Enter activates it, and R resets the view. This is a conceptual study, not measured experimental data.`;pane.setAttribute('aria-describedby',help.id);
       bar=document.createElement('div');bar.className='field-playbar transformer-playbar';bar.innerHTML=`<span class="field-play-hint">${description[1]}</span><button class="field-play-action" type="button">${description[2]}</button><button class="field-play-reset" type="button">Reset</button>`;
       if(mode==='transformer'){
-        bar.classList.add('moe-playbar');bar.innerHTML=`<div class="attention-presets" role="group" aria-label="Attention mechanism">${Object.entries(attentionModes).map(([key,value])=>`<button type="button" data-attention-mode="${key}" aria-pressed="${key===attentionMode}" title="${value.name}">${key.toUpperCase()}</button>`).join('')}</div><div class="moe-controls"><label class="moe-select-wrap"><span>Token</span><select class="moe-select" aria-label="Select token">${Array.from({length:8},(_,i)=>`<option value="${i}"${i===selected?' selected':''}>${i+1}</option>`).join('')}</select></label><div class="moe-segment" role="group" aria-label="MoE experts per token"><span>MoE</span><button type="button" data-top-k="2" aria-pressed="false">Top 2</button><button type="button" data-top-k="4" aria-pressed="true">Top 4</button></div><button class="field-play-action" type="button">Trace ↗</button><details class="moe-details"><summary aria-label="Diagram details and more controls">About / controls</summary><div class="moe-details-body"><p><strong class="attention-name">Multi-head attention</strong><span class="attention-note"></span> <a class="attention-source" target="_blank" rel="noopener noreferrer">Paper ↗</a></p><p class="moe-boundary">Mechanism study · illustrative dimensions and routing, not a vendor model configuration.</p><div class="moe-advanced"><button class="moe-batch" type="button" aria-pressed="true" aria-label="Show four tokens together">Batch ×4</button><button class="field-play-reset" type="button">Reset view</button></div><div class="moe-feedback"><strong class="moe-token-feedback">Token 5</strong><span class="moe-weights"></span></div></div></details></div>`;
-        function updateAttention(){const item=attentionModes[attentionMode];bar.querySelectorAll('[data-attention-mode]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.attentionMode===attentionMode)));bar.querySelector('.attention-name').textContent=item.name;bar.querySelector('.attention-note').textContent=item.note;const source=bar.querySelector('.attention-source');source.href=item.source;source.setAttribute('aria-label',item.name+' technical report');help.textContent='Interactive mechanism study. '+item.note+' Each token is routed independently to two or four MoE experts. Illustrative routing, not MiniMax architecture. Drag to rotate. Arrow keys select tokens, Enter traces, B toggles batch, K changes MoE top-k, R resets.';}
+        bar.classList.add('moe-playbar');bar.innerHTML=`<div class="architecture-controls">
+          <label class="architecture-control"><span>Structure</span><select class="architecture-select" aria-label="Model structure"><option value="block">Attention + MoE</option><option value="ced">CED / CSA2</option></select></label>
+          <label class="architecture-control"><span>Attention</span><select class="attention-select" aria-label="Attention mechanism">${Object.entries(attentionModes).map(([key,value])=>`<option value="${key}" title="${value.name}">${key.toUpperCase()}</option>`).join('')}<option value="csa2" hidden>CSA2</option></select></label>
+          <label class="architecture-control"><span>Experts</span><select class="expert-select" aria-label="Expert routing">${Object.entries(expertModes).map(([key,value])=>`<option value="${key}">${value.name}</option>`).join('')}</select></label>
+          <label class="architecture-control ced-phase-wrap" hidden><span>Phase</span><select class="ced-phase" aria-label="CED execution phase"><option value="decode">Decode</option><option value="prefill">Prefill</option></select></label>
+          </div><div class="moe-controls"><label class="moe-select-wrap"><span>Token</span><select class="moe-select" aria-label="Select token">${Array.from({length:8},(_,i)=>`<option value="${i}"${i===selected?' selected':''}>${i+1}</option>`).join('')}</select></label><button class="field-play-action" type="button">Trace</button><details class="moe-details"><summary aria-label="Diagram details and more controls">About / controls</summary><div class="moe-details-body"><p><strong class="attention-name"></strong><span class="attention-note"></span> <a class="attention-source" target="_blank" rel="noopener noreferrer">Paper ↗</a></p><p class="expert-description"><strong class="expert-name"></strong><span class="expert-note"></span> <a class="expert-source" target="_blank" rel="noopener noreferrer">Paper ↗</a></p><p class="moe-boundary">Mechanism comparison · schematic dimensions and synthetic routing, not a vendor model configuration. Drag to rotate; select a token to follow its own paths.</p><div class="moe-advanced"><div class="moe-segment" role="group" aria-label="Routed experts per token"><button type="button" data-top-k="2" aria-pressed="false">Top 2</button><button type="button" data-top-k="4" aria-pressed="true">Top 4</button></div><button class="moe-batch" type="button" aria-pressed="true" aria-label="Show four tokens together">Batch ×4</button><button class="field-play-reset" type="button">Reset view</button></div><div class="moe-feedback"><strong class="moe-token-feedback">Token 5</strong><span class="moe-weights"></span></div></div></details></div>`;
+        function updateAttention(){
+          const ced=architectureMode==='ced',item=ced?{name:'Causal Encoder–Decoder · CSA2',source:'https://arxiv.org/html/2609.19969v1',note:'A causal encoder supplies decoder global KV. Full, Reindex and Reuse layers share different cache and index components; every decoder layer keeps its own query and local window. Prefill includes bounded local-window replay; decode traverses both stacks.'}:attentionModes[attentionMode];
+          bar.dataset.architecture=architectureMode;
+          bar.querySelector('.attention-select').value=ced?'csa2':attentionMode;bar.querySelector('.attention-select').disabled=ced;
+          bar.querySelector('.expert-select').value=ced?'shared':expertMode;bar.querySelector('.expert-select').disabled=ced;
+          bar.querySelector('.ced-phase-wrap').hidden=!ced;
+          bar.querySelector('.attention-name').textContent=item.name;bar.querySelector('.attention-note').textContent=item.note;
+          const source=bar.querySelector('.attention-source');source.href=item.source;source.setAttribute('aria-label',item.name+' technical report');
+          const expert=expertModes[ced?'shared':expertMode];bar.querySelector('.expert-name').textContent=expert.name;bar.querySelector('.expert-note').textContent=expert.note;bar.querySelector('.expert-source').href=expert.source;
+          bar.querySelector('.expert-description').hidden=ced;bar.querySelector('.moe-segment').hidden=ced;
+          bar.querySelectorAll('[data-top-k]').forEach(b=>b.disabled=ced||expertMode==='switch');bar.querySelector('.moe-batch').hidden=ced;bar.querySelector('.moe-feedback').hidden=ced;
+          help.textContent='Architecture explorer. '+item.note+' '+(ced?'':expert.note)+' Illustrative routing, not MiniMax architecture. Drag to rotate; arrow keys select tokens, Enter traces, R resets.';
+          if(status)queueMeasure();
+        }
         updateAttention();
-        bar.querySelectorAll('[data-attention-mode]').forEach(button=>button.addEventListener('click',()=>{attentionMode=button.dataset.attentionMode;moeFeedbackKey='';updateAttention();activate();record('attention-mode-change');}));
+        bar.querySelector('.architecture-select').addEventListener('change',e=>{architectureMode=e.target.value;moeFeedbackKey='';updateAttention();activate();record('architecture-mode-change');});
+        bar.querySelector('.attention-select').addEventListener('change',e=>{if(e.target.value==='csa2')return;attentionMode=e.target.value;moeFeedbackKey='';updateAttention();activate();record('attention-mode-change');});
+        bar.querySelector('.expert-select').addEventListener('change',e=>{expertMode=e.target.value;moeFeedbackKey='';updateAttention();activate();record('expert-mode-change');});
+        bar.querySelector('.ced-phase').addEventListener('change',e=>{cedPhase=e.target.value;activate();record('execution-phase-change');});
         bar.querySelector('.moe-details').addEventListener('toggle',()=>queueMeasure());
         bar.querySelector('.moe-select').addEventListener('change',e=>activate(Number(e.target.value)));
         bar.querySelectorAll('[data-top-k]').forEach(button=>button.addEventListener('click',()=>{moeTopK=Number(button.dataset.topK);moeFeedbackKey='';activate();record('top-k-change');}));
@@ -89,7 +120,7 @@
       card.addEventListener('pointerleave',()=>{tx=ty=0;},{passive:true});
     }
     function measure(){
-      if(hero){const layout=surface.parentElement,ls=getComputedStyle(layout),available=layout.clientWidth-(parseFloat(ls.paddingLeft)||0)-(parseFloat(ls.paddingRight)||0),stacked=isLanding||available<1100;host.dataset.fieldLayout=stacked?'stacked':'split';if(isLanding&&mode==='transformer'){host.dataset.fieldPresentation=available>=900?'panoramic':'portrait';host.style.setProperty('--moe-stage-height',`${(available>=900?clamp(available*.43,570,690):clamp(available*1.60+160,700,980))+(bar?.querySelector('.moe-details[open] .moe-details-body')?.offsetHeight||0)}px`);}const localWidth=host.clientWidth;host.style.setProperty('--field-title-size',`${localWidth<620?clamp(localWidth*.108,36,62):clamp(localWidth*.078,48,76)}px`);}
+      if(hero){const layout=surface.parentElement,ls=getComputedStyle(layout),available=layout.clientWidth-(parseFloat(ls.paddingLeft)||0)-(parseFloat(ls.paddingRight)||0),stacked=isLanding||available<1100;host.dataset.fieldLayout=stacked?'stacked':'split';if(isLanding&&mode==='transformer'){host.dataset.fieldPresentation=available>=900?'panoramic':'portrait';host.style.setProperty('--moe-stage-height',`${(available>=900?clamp(available*.43,570,690):clamp(available*1.60+160,700,980))+Math.max(0,(bar?.offsetHeight||90)-90)}px`);}const localWidth=host.clientWidth;host.style.setProperty('--field-title-size',`${localWidth<620?clamp(localWidth*.108,36,62):clamp(localWidth*.078,48,76)}px`);}
       const r=surface.getBoundingClientRect(),style=getComputedStyle(surface),borderX=(parseFloat(style.borderLeftWidth)||0)+(parseFloat(style.borderRightWidth)||0),borderY=(parseFloat(style.borderTopWidth)||0)+(parseFloat(style.borderBottomWidth)||0);
       // Fractional CSS sizes matter under browser / embedded-view CSS zoom;
       // integer clientHeight can undersize a tall backing surface in WebKit.
@@ -136,6 +167,7 @@
     }
     function arc(a,b,lift=.12,depth=0){const out=[];for(let i=0;i<=32;i++){const u=i/32;out.push([mix(a[0],b[0],u),mix(a[1],b[1],u)-Math.sin(u*Math.PI)*lift,mix(a[2],b[2],u)+Math.sin(u*Math.PI)*depth]);}return out;}
     function transformer(){
+      if(architectureMode==='ced'&&hero){cedTransformer();return;}
       const cycle=Math.floor((t-moeClockStart)*.145);
       if(cycle!==moeCycle){moeCycle=cycle;if(t>tokenHoldUntil&&t-pulse>9)selected=(selected+1)%8;}
       const portrait=hero&&w<900,vertical=false,narrow=false, batchClock=fract((t-moeClockStart)*.145);
@@ -144,16 +176,16 @@
       const phase=clock<.38?0:clock<.59?1:clock<.74?2:3;
       const batchActive=[...new Set(batch.flatMap(b=>b.gate.map(v=>v.expert)))];
       const selectedPackets={attention:0,dispatch:0,compute:0,combine:0,output:0};
-      const audit={attentionMode,geometrySpace:'canonical-horizontal',attentionTopology:{kind:attentionMode,causal:true,reads:[]},selectedToken:selected+1,batch:batch.map(b=>({token:b.token+1,color:b.color,experts:b.gate.map(v=>v.expert+1),weights:b.gate.map(v=>v.weight),clock:b.clock})),routes:[],particles:[],expertChains:[],frontRows:[]};
+      const audit={architectureMode,expertMode,sharedContributions:[],gateNormalization:expertMode==='switch'?'all-experts':'selected-experts',attentionMode,geometrySpace:'canonical-horizontal',attentionTopology:{kind:attentionMode,causal:true,reads:[]},selectedToken:selected+1,batch:batch.map(b=>({token:b.token+1,color:b.color,experts:b.gate.map(v=>v.expert+1),weights:b.gate.map(v=>v.weight),clock:b.clock})),routes:[],particles:[],expertChains:[],frontRows:[]};
       host.__fieldRouting=audit;
       host.dataset.fieldFlowStage=['Attention','Dispatch','Compute','Combine'][phase];
-      host.dataset.fieldArchitecture='sparse-moe';host.dataset.fieldDecoderBlocks='1';host.dataset.fieldAttentionHeads=['mha','mla'].includes(attentionMode)?'3':'0';host.dataset.fieldAttentionMode=attentionMode;host.dataset.fieldCoreNodes='8';
-      host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldActiveExperts=active.map(i=>i+1).join(',');host.dataset.fieldExpertWeights=gate.map(v=>v.weight.toFixed(6)).join(',');host.dataset.fieldTopK=String(moeTopK);host.dataset.fieldExpertCount=String(moeExpertCount);host.dataset.fieldComposition=portrait?'rotated-portrait':hero?'panoramic':'horizontal';
-      host.dataset.fieldBatchSize=String(batch.length);host.dataset.fieldBatchActiveExperts=batchActive.map(i=>i+1).join(',');host.dataset.fieldBatchRoutes=JSON.stringify(audit.batch);host.dataset.fieldRouteCount=String(batch.length*moeTopK*2);host.dataset.fieldSeparateTokenOutputs='true';host.dataset.fieldClock=clock.toFixed(4);
+      host.dataset.fieldArchitecture='sparse-moe';host.dataset.fieldArchitectureMode='block';host.dataset.fieldExpertMode=expertMode;host.dataset.fieldDecoderBlocks='1';host.dataset.fieldAttentionHeads=['mqa','gqa'].includes(attentionMode)?'4':['mha','mla','swa'].includes(attentionMode)?'3':'0';host.dataset.fieldAttentionMode=attentionMode;host.dataset.fieldCoreNodes='8';
+      host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldActiveExperts=active.map(i=>i+1).join(',');host.dataset.fieldExpertWeights=gate.map(v=>v.weight.toFixed(6)).join(',');host.dataset.fieldTopK=String(routedK());host.dataset.fieldExpertCount=String(moeExpertCount);host.dataset.fieldComposition=portrait?'rotated-portrait':hero?'panoramic':'horizontal';
+      host.dataset.fieldBatchSize=String(batch.length);host.dataset.fieldBatchActiveExperts=batchActive.map(i=>i+1).join(',');host.dataset.fieldBatchRoutes=JSON.stringify(audit.batch);host.dataset.fieldRouteCount=String(batch.length*routedK()*2);host.dataset.fieldSeparateTokenOutputs='true';host.dataset.fieldClock=clock.toFixed(4);
       host.dataset.fieldCausalPositions=Array.from({length:selected+1},(_,i)=>i+1).join(',');host.dataset.fieldMaskedCells=['mha','mla'].includes(attentionMode)?'84':'0';host.dataset.fieldMaskAlpha='.14';host.dataset.fieldAllowedAlpha='.52';
       if(bar){
-        const key=`${attentionMode}/${selected}/${moeTopK}/${moeBatch}`;
-        if(key!==moeFeedbackKey){moeFeedbackKey=key;bar.querySelector('.moe-select').value=String(selected);bar.querySelectorAll('[data-top-k]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.topK)===moeTopK)));const button=bar.querySelector('.moe-batch');button.setAttribute('aria-pressed',String(moeBatch));button.textContent=moeBatch?'Batch ×4':'Focus ×1';bar.querySelector('.moe-token-feedback').textContent=`Token ${selected+1} →`;bar.querySelector('.moe-weights').textContent=gate.map(v=>`E${v.expert+1}\u00a0${(v.weight*100).toFixed(0)}%`).join('  ·  ');}
+        const key=`${attentionMode}/${expertMode}/${selected}/${moeTopK}/${moeBatch}`;
+        if(key!==moeFeedbackKey){moeFeedbackKey=key;bar.querySelector('.moe-select').value=String(selected);bar.querySelectorAll('[data-top-k]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.topK)===routedK())));const button=bar.querySelector('.moe-batch');button.setAttribute('aria-pressed',String(moeBatch));button.textContent=moeBatch?'Batch ×4':'Focus ×1';bar.querySelector('.moe-token-feedback').textContent=`Token ${selected+1} →`;bar.querySelector('.moe-weights').textContent=gate.map(v=>`E${v.expert+1}\u00a0${(v.weight*100).toFixed(0)}%`).join('  ·  ');}
         if(phase!==moePhaseKey){moePhaseKey=phase;bar.querySelectorAll('[data-phase]').forEach(el=>el.dataset.active=String(Number(el.dataset.phase)===phase));}
       }
       // The desktop decoder spans the full page. On a phone, its input,
@@ -183,20 +215,25 @@
       for(let row=0;row<8;row++){const p=rowAt(token,tokenHeight,row,-.20);pickWorld.push(p);point(...p,row===selected?2:0,row===selected?.98:.48,row===selected?2.7:1.3);}
       // All mechanisms live in the same canonical horizontal block. A narrow
       // viewport rotates this entire block; it never rewires component positions.
-      const matrixMode=attentionMode==='mha'||attentionMode==='mla';
-      const projectionComponents=attentionMode==='mla'?1:(attentionMode==='csa'||attentionMode==='hca'?2:3);
+      const matrixMode=['mha','mqa','gqa','swa','mla'].includes(attentionMode),sharedKV=['mqa','gqa'].includes(attentionMode),headCount=sharedKV?4:3,kvCount=attentionMode==='mqa'?1:attentionMode==='gqa'?2:headCount;
+      audit.attentionTopology.queryHeads=matrixMode?headCount:0;audit.attentionTopology.kvHeads=matrixMode?kvCount:0;audit.attentionTopology.window=attentionMode==='swa'?3:null;
+      const kvBanks=[];
+      const projectionComponents=(attentionMode==='mla'||sharedKV)?1:(attentionMode==='csa'||attentionMode==='hca'?2:3);
       for(let component=0;component<projectionComponents;component++)tokenPanel([qkv[0],qkv[1],(component-1)*headDepth*.65],.16,qkvHeight,component%2);
       const heads=[],memory=[],local=[-1.32,1.03,0],query=[-3.18,-.78,0];
-      const matrixSize=attentionMode==='mla'?1.85:2.20;
+      const matrixSize=attentionMode==='mla'?1.85:sharedKV?1.94:2.20;
       if(matrixMode){
-        for(let head=0;head<3;head++){
-          const z=(head-1)*headDepth,c=[0,1,4][head],x=attention[0]+(head-1)*.30+(attentionMode==='mla'?.36:0),y=attention[1]-(head-1)*.26;heads.push({x,y,z,c});
+        for(let head=0;head<headCount;head++){
+          const offset=head-(headCount-1)/2,z=offset*(sharedKV?.64:headDepth),c=sharedKV?(Math.floor(head/(headCount/kvCount))?1:0):[0,1,4][head],x=attention[0]+offset*.30+(attentionMode==='mla'?.36:sharedKV?.23:0),y=attention[1]-offset*.26;heads.push({x,y,z,c});
           for(let row=0;row<8;row++)for(let col=0;col<8;col++){
-            const masked=col>row,chosen=!masked&&row===selected,companion=!masked&&batch.some(b=>b.j>0&&b.token===row);
+            const masked=col>row||(attentionMode==='swa'&&col<row-2),chosen=!masked&&row===selected,companion=!masked&&batch.some(b=>b.j>0&&b.token===row);
             for(let sy=0;sy<3;sy++)for(let sx=0;sx<3;sx++){const dx=(col/7-.5)*matrixSize+(sx-1)*matrixSize*.022,dy=(row/7-.5)*matrixSize+(sy-1)*matrixSize*.022;point(x+dx,y+dy,z,masked?3:c,masked?.095:chosen?.90:companion?.56:.47,masked?.52:chosen?1.1:.78);}
           }
           path([[-.5,-.5],[.5,-.5],[.5,.5],[-.5,.5],[-.5,-.5]].map(v=>[x+v[0]*matrixSize,y+v[1]*matrixSize,z]),c,.40,.75);
           text('H'+(head+1),x-matrixSize*.5,y-matrixSize*.5-.15,z,c);
+        }
+        if(sharedKV){
+          for(let k=0;k<kvCount;k++){const bank=[-3.36,(k-(kvCount-1)/2)*1.03,.10];kvBanks.push(bank);tokenPanel(bank,.12,.73,k);text(kvCount===1?'Shared KV':'KV '+(k+1),bank[0],bank[1]+.58,bank[2],k);}
         }
         if(attentionMode==='mla'){
           tokenPanel([-3.40,.15,0],.13,1.65,1);
@@ -243,8 +280,11 @@
           const q=rowAt(qkv,qkvHeight,b.token,0,(component-1)*headDepth*.65);
           flow(arc(input,q,.045),b,0,.07,'attention',`T${b.token+1}:projection:${component}`);
           if(matrixMode){
-            heads.forEach((h,i)=>{const entry=[h.x-matrixSize*.5,h.y+(b.token/7-.5)*matrixSize,h.z];if(component===0)flow(arc(q,entry,.04),b,.07,.14,'attention',`T${b.token+1}:query:${i}`);else path(arc(q,entry,.03),b.color,b.j===0?.16:.055,.5);});
+            heads.forEach((h,i)=>{const entry=[h.x+((attentionMode==='swa'?Math.max(0,b.token-2):0)/7-.5)*matrixSize,h.y+(b.token/7-.5)*matrixSize,h.z];if(component===0)flow(arc(q,entry,.04),b,.07,.14,'attention',`T${b.token+1}:query:${i}`);else path(arc(q,entry,.03),b.color,b.j===0?.16:.055,.5);});
           }
+        }
+        if(sharedKV){
+          for(let k=0;k<kvCount;k++){const cache=rowAt(kvBanks[k],.73,b.token);flow(arc(input,cache,.02),b,0,.10,'attention',`T${b.token+1}:kv-bank:${k}`);heads.forEach((h,i)=>{if(Math.floor(i/(headCount/kvCount))!==k)return;const entry=[h.x+((attentionMode==='swa'?Math.max(0,b.token-2):0)/7-.5)*matrixSize,h.y+(b.token/7-.5)*matrixSize,h.z];flow(arc(cache,entry,.02),b,.10,.14,'attention',`T${b.token+1}:shared-kv:${i}`);});}
         }
         if(attentionMode==='mla'){
           // DeepSeek-V3 §2.1.1: cKV=W_DKV h; the positional key is a separate
@@ -253,14 +293,14 @@
           flow(arc(input,cache,.03),b,0,.10,'attention',`T${b.token+1}:latent-kv`);
           flow(arc(input,rope,-.05),b,0,.10,'attention',`T${b.token+1}:positional-key`);
           heads.forEach((h,i)=>{
-            const entry=[h.x-matrixSize*.5,h.y+(b.token/7-.5)*matrixSize,h.z];
+            const entry=[h.x+((attentionMode==='swa'?Math.max(0,b.token-2):0)/7-.5)*matrixSize,h.y+(b.token/7-.5)*matrixSize,h.z];
             flow(arc(cache,entry,.03),b,.10,.14,'attention',`T${b.token+1}:latent-content:${i}`);
             flow(arc(rope,entry,-.035),b,.10,.14,'attention',`T${b.token+1}:positional-content:${i}`);
           });
         }
         if(matrixMode){
-          for(let i=0;i<heads.length;i++){const h=heads[i],y=h.y+(b.token/7-.5)*matrixSize,entry=[h.x-matrixSize*.5,y,h.z],last=[h.x+(b.token/7-.5)*matrixSize,y,h.z];flow([entry,last],b,.14,.24,'attention',`T${b.token+1}:causal-context:${i}`);flow(arc(last,projected,-.10),b,.24,.31,'attention',`T${b.token+1}:head-output:${i}`);}
-          audit.attentionTopology.reads.push({token:b.token+1,positions:Array.from({length:b.token+1},(_,i)=>i+1),...(attentionMode==='mla'?{latentSource:'hidden-state',positionalKeyBranch:true}: {})});
+          for(let i=0;i<heads.length;i++){const h=heads[i],y=h.y+(b.token/7-.5)*matrixSize,entry=[h.x+((attentionMode==='swa'?Math.max(0,b.token-2):0)/7-.5)*matrixSize,y,h.z],last=[h.x+(b.token/7-.5)*matrixSize,y,h.z];flow([entry,last],b,.14,.24,'attention',`T${b.token+1}:causal-context:${i}`);flow(arc(last,projected,-.10),b,.24,.31,'attention',`T${b.token+1}:head-output:${i}`);}
+          audit.attentionTopology.reads.push({token:b.token+1,positions:Array.from({length:attentionMode==='swa'?Math.min(3,b.token+1):b.token+1},(_,i)=>(attentionMode==='swa'?Math.max(0,b.token-2):0)+i+1),queryHeads:headCount,kvHeads:kvCount,headToKV:Array.from({length:headCount},(_,i)=>Math.floor(i/(headCount/kvCount))),...(attentionMode==='mla'?{latentSource:'hidden-state',positionalKeyBranch:true}: {})});
         }else if(attentionMode==='kda'){
           // Kimi Linear §3, eq. 1: decay/update uses S(t−1), k(t) AND v(t);
           // q(t) reads S(t). Overlaid token traces each represent their own step.
@@ -309,6 +349,12 @@
           flow(routeOut,b,.74,.94,'combine',id+':combine',e.expert+1,v.weight);
           audit.expertChains.push({token:b.token+1,expert:e.expert+1,dispatch:routeIn,compute:internal,combine:routeOut,output:b.combine});
         }
+        if(expertMode==='shared'){
+          const entry=[2.68,-1.93,0],middle=[3.03,-1.93,0],exit=[3.38,-1.93,0];
+          const incoming=arc(b.residual,entry,.09,b.j*.012),internal=[entry,middle,exit],outgoing=arc(exit,b.combine,-.10,b.j*.012),id=`T${b.token+1}:shared`;
+          flow(incoming,b,.38,.59,'dispatch',id+':dispatch','shared',.3);flow(internal,b,.59,.74,'compute',id+':compute','shared',.3);flow(outgoing,b,.74,.94,'combine',id+':combine','shared',.3);
+          audit.sharedContributions.push({token:b.token+1,alwaysActive:true,outsideTopK:true,coefficient:1,dispatch:incoming,compute:internal,combine:outgoing,output:b.combine});
+        }
         ring(b.combine,b.j===0?.062:.043,b.j===0?.062:.043,b.color,b.j===0?.68:.38,Math.PI/2);
         flow(arc(b.combine,b.finalAdd,0),b,.94,.97,'output',`T${b.token+1}:combine-output`);
         flow([b.finalAdd,b.output],b,.97,1,'output',`T${b.token+1}:output`);
@@ -325,16 +371,251 @@
         }
         if(hero&&(w>=180||chosen))text(`E${e.expert+1}`,e.x,e.y+(vertical?.24:.25),e.z,chosen?0:3);
       }
+      if(expertMode==='shared'){
+        for(let layer=0;layer<3;layer++)for(let row=0;row<13;row++)for(let depth=0;depth<4;depth++)point(2.76+layer*.27,-1.93+(row/12-.5)*(layer===1?.42:.24),(depth-1.5)*.035,1,.65,.85);
+        text('Shared FFN',3.03,-2.32,0,1);
+      }
       if(hero){
-        text('Tokens',-5.15,1.23);text(attentionMode==='mla'?'Query':attentionMode==='csa'||attentionMode==='hca'?'Q / KV':'Q / K / V',-4.20,1.23);
+        text('Tokens',-5.15,1.23);text(attentionMode==='mla'||sharedKV?'Query':attentionMode==='csa'||attentionMode==='hca'?'Q / KV':'Q / K / V',-4.20,1.23);
         text(attentionMode==='kda'?'Recurrent memory':attentionMode.toUpperCase()+' attention',-2.10,-2.0);
-        if(matrixMode)text('Parallel heads',-1.8,1.85,0,1);
+        if(matrixMode)text(attentionMode==='swa'?'Recent causal window':'Parallel heads',-1.8,1.85,0,1);
         text(portrait?'Projection':'Output projection',.02,1.23);text('Router',1.05,-.42);
-        text('MoE',3.05,-1.48,0,1);text(portrait?'Combine':'Weighted combination',5.02,-1.05);
+        text('MoE',3.05,expertMode==='shared'?-2.75:-1.48,0,1);text(portrait?'Combine':'Weighted combination',5.02,-1.05);
         if(!portrait)text('Residual stream',1.0,2.21,0,3);
       }
       host.dataset.fieldFlowPackets=JSON.stringify(selectedPackets);host.dataset.fieldLabels=labels.map(l=>l.s).join(' | ');host.dataset.fieldPoints=String(points.length);
     }
+
+/* Splice inside make(), before transformer(). Depends on cedPhase ('prefill' or
+ * 'decode'), selected, hero, w, t, moeClockStart, host, pickWorld, point/path/text.
+ * All geometry is canonical horizontal. Existing project() rotates it intact.
+ * Schematic layer/expert counts; this is not a checkpoint reconstruction.
+ */
+function cedTransformer() {
+  const phase = cedPhase === 'prefill' ? 'prefill' : 'decode';
+  const token = Math.max(0, Math.min(7, selected));
+  const clock = ((t - moeClockStart) * .105 % 1 + 1) % 1;
+  const prefix = Array.from({length: token + 1}, (_, i) => i + 1);
+  const localPositions = prefix.slice(-2);
+  const yRow = n => (n / 7 - .5) * 1.52;
+  const input = [-5.15, yRow(token), 0];
+  const encoded = [-2.35, yRow(token), 0];
+  const globalKV = [-1.22, -1.22, 0];
+  const decoderX = [.18, 1.92, 3.66];
+  const output = [5.70, yRow(token) * .35, 0];
+  const modes = ['Full', 'Reindex', 'Reuse'];
+  const packetCounts = {attention: 0, dispatch: 0, compute: 0, combine: 0, output: 0};
+  const audit = {
+    architectureMode: 'ced', attentionMode: 'csa2', expertMode: 'shared',
+    geometrySpace: 'canonical-horizontal', selectedToken: token + 1, phase, cedPhase: phase,
+    batch: [{token: token + 1, color: 0, experts: [], weights: [], clock}],
+    routes: [], particles: [], expertChains: [], frontRows: [{token: token + 1, input, projected: encoded}],
+    attentionTopology: {
+      kind: 'csa2', causal: true, stack: 'causal-encoder-decoder',
+      globalKVSource: 'final-encoder-hidden-state',
+      localKVSource: 'current-layer-hidden-state',
+      prefillBoundedReplay: true, schematicWindowSize: 2,
+      promptPositions: prefix, replayPositions: localPositions,
+      bypassedDecoderPositions: phase === 'prefill' ? prefix.slice(0, -2) : [],
+      traversesBothStacks: true, reads: [], layers: []
+    },
+    ced: {
+      phase, causalEncoder: true, nextTokenFeedback: false,
+      schematicLayerCount: 3, globalKVSource: 'final-encoder-hidden-state',
+      prefillPath: 'encoder → global cache; final-window decoder replay',
+      decodePath: 'encoder → decoder → next token',
+      decoderReplayPositions: phase === 'prefill' ? localPositions : [],
+      layerModes: modes
+    }
+  };
+  host.__fieldRouting = audit;
+  if(bar)bar.querySelector('.moe-select').value=String(token);
+
+  const blend = (a, b, u) => a + (b - a) * u;
+  const sample = (coords, u) => {
+    const k = Math.max(0, Math.min(1, u)) * (coords.length - 1);
+    const i = Math.floor(k), a = coords[i], b = coords[Math.min(i + 1, coords.length - 1)];
+    return a.map((v, j) => blend(v, b[j], k - i));
+  };
+  const curve = (a, b, lift = 0, depth = 0) => Array.from({length: 25}, (_, i) => {
+    const u = i / 24, s = Math.sin(Math.PI * u);
+    return [blend(a[0], b[0], u), blend(a[1], b[1], u) - s * lift, blend(a[2], b[2], u) + s * depth];
+  });
+  function wire(id, coords, start, end, stage = 'attention', color = 0, meta = {}) {
+    path(coords, color, meta.muted ? .23 : .55, meta.muted ? .65 : .95);
+    const route = {id: `CED:T${token + 1}:${id}`, token: token + 1, expert: null, stage, color, start, end, coords, ...meta};
+    audit.routes.push(route);
+    if (clock >= start && clock < end) {
+      packetCounts[stage] = (packetCounts[stage] || 0) + 1;
+      const u = (clock - start) / (end - start);
+      for (let tail = 0; tail < 4; tail++) {
+        const at = u - tail * .035;
+        if (at < 0) continue;
+        const p = sample(coords, at);
+        point(...p, color, 1 - tail * .19, tail ? 1.0 : 2.3);
+        if (!tail) audit.particles.push({route: route.id, token: route.token, expert: route.expert, stage, color, position: p});
+      }
+    }
+    return route;
+  }
+  function panel(center, width, height, color = 0, rows = 8, columns = 5, alpha = .50) {
+    for (let row = 0; row < rows; row++) for (let col = 0; col < columns; col++) for (let d = 0; d < 2; d++) {
+      const y = center[1] + (row / Math.max(1, rows - 1) - .5) * height;
+      point(center[0] + (col / Math.max(1, columns - 1) - .5) * width, y, center[2] + (d - .5) * .07, color, alpha, .84);
+    }
+  }
+  function orb(center, radius, color = 0, alpha = .62) {
+    for (let i = 0; i < 66; i++) {
+      const y = 1 - 2 * (i + .5) / 66, a = i * 2.399963, r = Math.sqrt(1 - y * y);
+      point(center[0] + Math.cos(a) * r * radius, center[1] + y * radius, center[2] + Math.sin(a) * r * radius, color, alpha, .83);
+    }
+  }
+
+  // The eight positions share one causal prefix. Only the selected position is
+  // animated; subdued marks outside the prefix are never used as KV content.
+  pickWorld = [];
+  for (let i = 0; i < 8; i++) {
+    const p = [-5.15, yRow(i), 0];
+    pickWorld.push([-5.35, p[1], 0]);
+    panel(p, .24, .055, i === token ? 2 : 0, 2, 5, i > token ? .12 : i === token ? .95 : .42);
+    point(-5.35, p[1], 0, i === token ? 2 : 0, i === token ? .95 : .36, i === token ? 2.7 : 1.3);
+  }
+  text('Tokens', -5.15, 1.13);
+
+  // Three planes denote successive encoder layers, not attention heads.
+  const encoder = [-4.42, -3.72, -3.02].map((x, i) => ({x, z: (i - 1) * .20}));
+  encoder.forEach((layer, i) => {
+    for (let row = 0; row < 8; row++) for (let column = 0; column < 7; column++) for (let d = 0; d < 2; d++) {
+      const causal = column <= Math.floor(row * 6 / 7), available = row <= token;
+      point(layer.x + (column / 6 - .5) * .36, yRow(row), layer.z + d * .055,
+        i % 2, !causal ? .08 : !available ? .13 : row === token ? .77 : .40, .88);
+    }
+    const start = i === 0 ? input : [encoder[i - 1].x, yRow(token), encoder[i - 1].z];
+    const end = [layer.x, yRow(token), layer.z];
+    wire(`encoder:${i + 1}`, curve(start, end, .025), i * .09, (i + 1) * .09, 'attention', 0, {encoderLayer: i + 1});
+  });
+  text('Causal encoder', -3.72, -1.26, 0, 0);
+  panel([-2.35, 0, 0], .16, 1.52, 1, 8, 4, .62);
+  wire('encoder-output', curve([encoder[2].x, yRow(token), encoder[2].z], encoded), .27, .33);
+  text('Encoded state', -2.35, 1.13, 0, 1);
+
+  // Global caches are projected from final encoder states. The upper bus is a
+  // shared cache provenance path, not an autoregressive recurrent connection.
+  panel(globalKV, .54, .42, 1, 6, 8, .65);
+  wire('global-kv-projection', curve(encoded, globalKV, .15), .33, .42, 'attention', 1, {cacheSource: 'final-encoder-hidden-state'});
+  if (phase === 'prefill') {
+    // Older prompt positions populate global memory without traversing decoder
+    // blocks. Only the final local window is replayed through that half.
+    for (const position of prefix.slice(0, -2)) {
+      const n = position - 1;
+      const coords = [[-5.15, yRow(n), 0], ...encoder.map(e => [e.x, yRow(n), e.z]), [-2.35, yRow(n), 0], globalKV];
+      wire(`prompt:${position}:cache-only`, coords, 0, .42, 'attention', 1,
+        {token: position, cacheOnly: true, bypassesDecoder: true, muted: true});
+      audit.batch.push({token: position, color: 1, experts: [], weights: [], clock});
+    }
+  }
+  text('Global KV', -1.22, -1.77, 0, 1);
+  const cacheRail = [globalKV, [-.72, -1.22, 0], [3.66, -1.22, 0]];
+  path(cacheRail, 1, .30, .80);
+
+  text('CSA2 decoder', 1.92, -2.02, 0, 0);
+  let priorOutput = encoded;
+  let previousIndices = null;
+  const globalEntries = prefix.slice(0, Math.max(0, prefix.length - 2));
+  const chosenFull = globalEntries.filter((_, i) => i % 2 === 0).slice(-2);
+  const chosenReindex = globalEntries.filter((_, i) => i % 2 === 1).slice(-2);
+  // Empty histories at the first positions are intentional: those tokens use
+  // their local causal window, not nonexistent or future global entries.
+  const selections = [chosenFull, chosenReindex, chosenReindex];
+  const layerOutputs = [];
+  decoderX.forEach((x, layer) => {
+    const startTime = .42 + layer * .16, layerMode = modes[layer];
+    const y = yRow(token) * .35;
+    const entry = [x - .47, y, 0], q = [x - .25, y - .12, 0];
+    const attention = [x, y, 0], local = [x - .12, 1.12, .02];
+    const index = [x - .05, -.73, 0], cachePort = [x, -1.22, 0];
+    const combine = [x + .62, y, 0];
+    const layerOut = [x + .83, y, 0];
+    const routeMeta = {decoderLayer: layer + 1, layerMode, boundedReplay: phase === 'prefill', localPositions};
+    const shared = [x + .29, y + .24, .02];
+    const routed = [x + .29, y - .24, .02];
+    panel([x, 0, 0], .20, 1.0, layer % 2, 11, 5, .47);
+    panel(local, .35, .16, 4, 3, 7, .66);
+    orb(q, .037, 0, .70);
+    orb(index, .055, layer === 2 ? 1 : 0, .62);
+    // Distinct shared/routed FFN branches inside each schematic decoder layer.
+    panel(shared, .13, .13, 4, 3, 3, .65);
+    panel(routed, .13, .13, 1, 3, 3, .65);
+    point(...combine, 2, .82, 1.7);
+    text(layerMode, x, -1.62, 0, layer === 2 ? 1 : 0);
+    text('Q', x - .48, -.47, 0, 0);
+    text('Local', x -.12, 1.50, 0, 4);
+
+    wire(`layer:${layer + 1}:input`, curve(priorOutput, entry, .015), startTime, startTime + .025, 'attention', 0, routeMeta);
+    wire(`layer:${layer + 1}:query`, curve(entry, q), startTime + .025, startTime + .045, 'attention', 0, {...routeMeta, freshQuery: true});
+    wire(`layer:${layer + 1}:local-kv`, curve(entry, local, -.10), startTime + .025, startTime + .055, 'attention', 4, {...routeMeta, kvSource: 'current-layer-hidden-state'});
+    wire(`layer:${layer + 1}:local-read`, curve(local, attention, -.07), startTime + .055, startTime + .080, 'attention', 4, routeMeta);
+    wire(`layer:${layer + 1}:query-read`, curve(q, attention), startTime + .045, startTime + .080, 'attention', 0, routeMeta);
+    if (layer === 0) {
+      wire('full:cache', [globalKV, [-.72, -1.22, 0], cachePort], .42, startTime + .045, 'attention', 1, {globalKV: 'fresh', source: 'final-encoder-hidden-state'});
+    } else {
+      wire(`layer:${layer + 1}:cache-reuse`, [globalKV, [-.72, -1.22, 0], cachePort], startTime, startTime + .045, 'attention', 1, {globalKV: 'reused', sourceLayer: 1, decoderLayer: layer + 1});
+    }
+    if (layer < 2) {
+      wire(`layer:${layer + 1}:index-query`, curve(q, index, .03), startTime + .045, startTime + .065, 'attention', 0, {...routeMeta, indexSelection: 'fresh'});
+      path(curve(cachePort, index), 1, .32, .70);
+    } else {
+      wire('reuse:indices', [previousIndices, [previousIndices[0], -.91, 0], [index[0], -.91, 0], index], startTime + .025, startTime + .065, 'attention', 1, {...routeMeta, indexSelection: 'reused', sourceLayer: 2});
+    }
+    if (selections[layer].length) {
+      wire(`layer:${layer + 1}:global-read`, [cachePort, index, attention], startTime + .065, startTime + .080, 'attention', 1, {...routeMeta, selectedPositions: selections[layer]});
+    } else {
+      path([cachePort, index, attention], 3, .10, .55);
+    }
+    // Shared experts are deterministic parallel computation, never candidates
+    // in the token's routed Top-k set. Both contribute before the residual add.
+    wire(`layer:${layer + 1}:shared`, curve(attention, shared, -.025), startTime + .080, startTime + .105, 'compute', 4, {...routeMeta, expert: 'shared', alwaysOn: true});
+    wire(`layer:${layer + 1}:routed`, curve(attention, routed, .025), startTime + .080, startTime + .105, 'compute', 1, {...routeMeta, expert: 'routed-subset'});
+    wire(`layer:${layer + 1}:shared-combine`, curve(shared, combine, -.02), startTime + .105, startTime + .13, 'combine', 4, {...routeMeta, expert: 'shared'});
+    wire(`layer:${layer + 1}:routed-combine`, curve(routed, combine, .02), startTime + .105, startTime + .13, 'combine', 1, {...routeMeta, expert: 'routed-subset'});
+    wire(`layer:${layer + 1}:output`, [combine, layerOut], startTime + .13, startTime + .16, 'output', 0, routeMeta);
+    path([entry, [entry[0], .68, -.08], [combine[0], .68, -.08], combine], 0, .18, .60);
+    const layerAudit = {
+      layer: layer + 1, mode: layerMode, freshQuery: true, ownLocalKV: true,
+      localKVSource: 'current-layer-hidden-state', localPositions,
+      globalKV: layer ? 'reused' : 'fresh', globalKVSourceLayer: 1,
+      globalKVProjectionSource: 'final-encoder-hidden-state',
+      indices: layer === 2 ? 'reused' : 'fresh', indexSourceLayer: layer === 2 ? 2 : layer + 1,
+      selectedPositions: selections[layer], candidatePool: globalEntries,
+      sharedExpertAlwaysOn: true, routedSubsetShownSchematically: true,
+      input: entry, query: q, attention, local, output: layerOut
+    };
+    audit.attentionTopology.layers.push(layerAudit);
+    audit.attentionTopology.reads.push({token: token + 1, layer: layer + 1, positions: [...new Set([...selections[layer], ...localPositions])], localPositions, selectedPositions: selections[layer], causal: true});
+    layerOutputs.push(layerOut);
+    priorOutput = layerOut;
+    previousIndices = index;
+  });
+  wire('final-output', curve(layerOutputs[2], output), .90, 1, 'output', 0, {phase});
+  orb(output, .06, 0, .85);
+  text(phase === 'prefill' ? 'Prompt cached' : 'Next token', 5.30, 1.13, 0, 0);
+  text(phase === 'prefill' ? 'Final-window replay' : 'Layer-local SWA', 1.92, 1.91, 0, 4);
+  // One quiet shared/routed key for all three layers, rather than six labels.
+  text('MoE', 4.33, .98, 0, 1);
+
+  Object.assign(host.dataset, {
+    fieldArchitecture: 'ced', fieldArchitectureMode: 'ced', fieldAttentionMode: 'csa2',
+    fieldExpertMode: 'shared', fieldCEDPhase: phase, fieldDecoderBlocks: '3',
+    fieldAttentionHeads: '0', fieldCoreNodes: '8', fieldSelectedToken: String(token + 1),
+    fieldComposition: hero && w < 900 ? 'rotated-portrait' : hero ? 'panoramic' : 'horizontal',
+    fieldBatchSize: String(audit.batch.length), fieldBatchRoutes: JSON.stringify(audit.batch),
+    fieldSeparateTokenOutputs: 'true', fieldClock: clock.toFixed(4),
+    fieldCausalPositions: prefix.join(','), fieldRouteCount: String(audit.routes.length),
+    fieldActiveExperts: 'shared + routed subset', fieldExpertWeights: '',
+    fieldFlowStage: clock < .33 ? 'Encoder' : clock < .42 ? 'Global KV' : phase === 'prefill' ? 'Bounded replay' : 'Decoder',
+    fieldFlowPackets: JSON.stringify(packetCounts)
+  });
+}
 
     function globe(c,r,count,color=0,alpha=.6){
       for(let i=0;i<count;i++){const y=1-2*(i+.5)/count,a=i*2.399963,rr=Math.sqrt(1-y*y);point(c[0]+Math.cos(a)*rr*r,c[1]+y*r,c[2]+Math.sin(a)*rr*r,color,alpha*(.8+.2*rr),.88);}

@@ -1,0 +1,27 @@
+/* Three independent architectural choices; the illustration is always open. */
+.research-field.landing-moon.transformer-field .moe-playbar{gap:10px 22px;align-items:end;padding-top:14px}
+.transformer-field .architecture-controls{display:flex;gap:12px;align-items:end;flex:1 1 570px;min-width:0}
+.transformer-field .architecture-control{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1 1 120px;font:500 10px 'Space Grotesk',sans-serif;letter-spacing:.045em;color:#6d7e95}
+.transformer-field .architecture-control:first-child{flex-basis:175px}
+.transformer-field .architecture-control select{appearance:auto;width:100%;min-width:0;min-height:43px;padding:7px 24px 7px 10px;border:1px solid #c5cfdf;border-radius:5px;background:#f5f6f8;color:#31557d;font:500 12px 'Space Grotesk',sans-serif;letter-spacing:0;cursor:pointer}
+.transformer-field .architecture-control select:disabled{color:#77869a;cursor:default;background:#eceff3}
+.transformer-field .architecture-control select:focus-visible{outline:2px solid #6689b0;outline-offset:3px}
+.transformer-field [hidden]{display:none!important}
+.research-field.landing-moon.transformer-field .moe-controls{flex:0 1 auto;gap:8px 15px}
+.research-field.landing-moon.transformer-field .moe-details-body{grid-template-columns:minmax(0,1fr) minmax(220px,.65fr);max-width:1100px}
+.research-field.landing-moon.transformer-field .moe-details-body>.expert-description{grid-column:2;grid-row:1}
+.research-field.landing-moon.transformer-field .moe-details-body>.moe-boundary{grid-column:1/-1;grid-row:2;font-size:10px}
+.research-field.landing-moon.transformer-field .moe-details-body>.moe-advanced{grid-column:1/-1;grid-row:3;display:flex;flex-wrap:wrap;justify-content:flex-start;gap:6px 18px}
+.research-field.landing-moon.transformer-field .moe-details-body>.moe-feedback{grid-column:1/-1;grid-row:4}
+.transformer-field .expert-name{display:block;color:#365477;font-weight:500;margin-bottom:4px}
+.transformer-field .expert-source{color:#496f9b;text-decoration:none;white-space:nowrap}
+.transformer-field .moe-segment button:disabled{opacity:.4;cursor:default}
+.research-field.landing-moon[data-field-presentation="portrait"] .architecture-controls{flex:1 1 100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:9px 12px}
+.research-field.landing-moon[data-field-presentation="portrait"] .architecture-control:first-child{grid-column:1/-1}
+.research-field.landing-moon[data-field-presentation="portrait"] .moe-controls{flex-basis:100%;justify-content:space-between}
+.research-field.landing-moon[data-field-presentation="portrait"] .moe-details-body{display:block}
+.research-field.landing-moon[data-field-presentation="portrait"] .moe-playbar[data-architecture="ced"] .architecture-controls{grid-template-columns:1fr 1fr}
+.research-field.landing-moon[data-field-presentation="portrait"] .moe-playbar[data-architecture="ced"] .architecture-control:first-child{grid-column:1}
+.research-field.landing-moon[data-field-presentation="portrait"] .moe-playbar[data-architecture="ced"] .ced-phase-wrap{grid-column:2;grid-row:1}
+@media(max-width:359px){.transformer-field .architecture-control select{font-size:11px;padding-left:7px;padding-right:16px}.transformer-field .architecture-controls{column-gap:8px!important}.transformer-field .moe-details>summary{font-size:10px}}
+@media print{.architecture-controls{display:none!important}}
