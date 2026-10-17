@@ -1,4 +1,4 @@
-/* v14. Original three-dimensional point studies. Transformer geometry follows the
+/* v16. Original three-dimensional point studies. Transformer geometry follows the
  * token / QKV / causal multi-head attention / projection / residual / FFN structure
  * of Vaswani et al., https://arxiv.org/abs/1706.03762. This is a conceptual decoder
  * block, not a claim about a particular model, measured attention, or experiment.
@@ -15,10 +15,10 @@
   let hidden=false,raf=0,then=0,lastPaint=0;
   function make(canvas,host,mode,hero=false){
     let ctx;try{ctx=canvas.getContext('2d',{alpha:false});}catch(_){return;}if(!ctx)return;
-    canvas.dataset.fieldRenderer='v14';host.dataset.fieldRenderer='v14';
+    canvas.dataset.fieldRenderer='v16';host.dataset.fieldRenderer='v16';
     host.dataset.fieldShape=mode==='transformer'?'causal-transformer':mode;host.dataset.fieldMode=mode;
     const isLanding=host.classList.contains('landing-moon');
-    const descriptions={transformer:['Transformer block','Select a token · follow its attention','Trace token'],training:['Training trajectories','Drag the landscape · compare trajectories','Trace paths'],vision:['Spatial token representation','Touch to perturb · drag to rotate','Send a ripple'],agents:['Agent coordination graph','Drag a node · route a task','Dispatch task'],quantum:['Distributed quantum field','Drag to rotate · shift optical phase','Shift phase']};
+    const descriptions={transformer:['Transformer block','Select a token · follow its attention','Trace token'],training:['Training trajectories','Drag the landscape · compare trajectories','Trace paths'],vision:['Spatial token representation','Touch to perturb · drag to rotate','Send a ripple'],agents:['Agent coordination graph','Drag a node · route a task','Dispatch task'],world:['Action-conditioned futures','Drag to inspect · compare possible futures','Compare paths'],control:['Synchronized control channels','Drag to inspect · follow the event clock','Run sequence'],quantum:['Distributed quantum field','Drag to rotate · shift optical phase','Shift phase']};
     const description=descriptions[mode]||descriptions.transformer;
     let surface=host;
     let w=0,h=0,dpr=1,small=false,visible=false,t=0,px=0,py=0,tx=0,ty=0,pulse=-20,selected=4,step=-1,interactions=0,renderCount=0;
@@ -69,7 +69,7 @@
         g={left:6,top:16,width:w-12,height:h-(small?96:82)};
         pane.style.cssText=`left:${g.left}px;top:${g.top}px;width:${g.width}px;height:${g.height}px`;
         bar.style.cssText=`left:${g.left+8}px;width:${g.width-16}px;bottom:7px`;
-      }else g={left:12,top:10,width:w-24,height:h-20};
+      }else g={left:10,top:8,width:w-20,height:h-16};
       const spanY={transformer:2.42,training:1.75,vision:2.02,agents:1.9,world:2.8,control:1.64,quantum:1.65}[mode]||2.42;
       g.scale=Math.min(g.width/(mode==='transformer'?3.65:3.25),g.height/spanY);g.cx=g.left+g.width*.5;g.cy=g.top+g.height*(mode==='world'?.54:mode==='training'?.46:.50);
       g.baseScale=g.scale;g.baseCx=g.cx;g.baseCy=g.cy;
@@ -77,7 +77,7 @@
       visible=r.bottom>0&&r.top<innerHeight;host.dataset.fieldReady='true';render();wake();
     }
     function project(x,y,z){
-      const yaw=(mode==='transformer'?-.26:mode==='control'?-.22:-.26)+px,tilt=(mode==='transformer'?.31:mode==='agents'?.34:.56)+py;
+      const yaw=(mode==='control'?-.22:-.26)+px,tilt=(mode==='transformer'?.31:mode==='agents'?.34:mode==='training'&&!hero?.40:.56)+py;
       const X=x*Math.cos(yaw)+z*Math.sin(yaw),Z=z*Math.cos(yaw)-x*Math.sin(yaw),Y=y*Math.cos(tilt)-Z*Math.sin(tilt),D=y*Math.sin(tilt)+Z*Math.cos(tilt),pers=1/(1+D*.13);
       return{x:g.cx+X*g.scale*pers,y:g.cy+Y*g.scale*pers,d:D,s:pers};
     }
@@ -156,10 +156,12 @@
       const loss=(x,z)=>.27*Math.sin(x*2.5+z)+.21*Math.cos(z*2.7)-.43*Math.exp(-((x-.42)**2+(z+.08)**2)*3)+.15*x*x;
       for(let j=0;j<=m;j++)for(let i=0;i<=n;i++){const x=(i/n-.5)*3.10,z=(j/m-.5)*2.10,y=loss(x,z);point(x,y,z,j%5?0:1,.32+(j/m)*.27,.84);}
       for(let j=0;j<8;j++){const z=(j/7-.5)*2.1,coords=[];for(let i=0;i<70;i++){const x=(i/69-.5)*3.1;coords.push([x,loss(x,z),z]);}path(coords,j%2,.17,.65);}
-      // A faint base plane makes height and descent legible in perspective.
-      for(let j=0;j<12;j++)for(let i=0;i<26;i++)point((i/25-.5)*3.1,.91,(j/11-.5)*2.1,3,.20,.62);
+      // A sparse reference plane clarifies depth without turning compact cards
+      // into a dense, low-contrast cloud or shrinking the primary surface.
+      if(hero||h>210)for(let j=0;j<8;j++)for(let i=0;i<21;i++)point((i/20-.5)*3.1,.78,(j/7-.5)*1.75,3,.15,.56);
       for(let k=0;k<3;k++){const coords=[];for(let i=0;i<=100;i++){const u=i/100,x=-1.48+u*1.95,z=(k-1)*.74*(1-u)+.16*Math.sin(u*9+k)*(1-u);coords.push([x,loss(x,z)-.025,z]);}trace(coords,k%2,k*.23+phaseOffset*.1);globe(coords[0],.045,32,k%2,.75);}
       const minimum=[.47,loss(.47,0),0];globe(minimum,.055,56,2,.88);ring([.47,loss(.47,0)-.008,0],.16,.12,1,.5);
+      for(let n=1;n<=3;n++){const contour=[];for(let i=0;i<=84;i++){const a=i*TAU/84,x=.47+Math.cos(a)*(.14+n*.095),z=Math.sin(a)*(.09+n*.065);contour.push([x,loss(x,z)-.011,z]);}path(contour,n%2,n===1?.31:.16,.65);}
       text('OPTIMIZATION LANDSCAPE',-.10,-.93,0,0);text('TRAJECTORY COMPARISON',.10,1.12,0,1);
     }
     function vision(){
@@ -186,7 +188,8 @@
       // context plane: a hierarchy with explicit paths, not an all-to-all graph.
       const hubs=[[0,-.08,0]];for(let j=0;j<6;j++){const a=j*TAU/6;hubs.push([1.05*Math.cos(a),.67*Math.sin(a),.38*Math.sin(a*2)]);}
       hubs.forEach((c,j)=>{c[0]+=nodeOffsets[j].x;c[1]+=nodeOffsets[j].y;});pickWorld=hubs;
-      hubs.forEach((c,j)=>{globe(c,j?.135:.24,j?116:270,j%2,j?.64:.78);if(j){trace(arc(hubs[0],c,.10,(j%2?1:-1)*.22),j%2,j*.13+phaseOffset*.06);for(let k=0;k<3;k++){const a=(j-1)*TAU/6+(k-1)*.25,q=[c[0]+Math.cos(a)*.29,c[1]+Math.sin(a)*.22,c[2]+.09*(k-1)];globe(q,.035,25,j%2,.52);path([c,q],j%2,.22,.6);}}});
+      const active=1+Math.floor(t*.36+phaseOffset)%6;
+      hubs.forEach((c,j)=>{globe(c,j?.135:.24,j?116:270,j%2,j?.64:.78);if(j){trace(arc(hubs[0],c,.10,(j%2?1:-1)*.22),j%2,j*.13+phaseOffset*.06);if(j===active)ring(c,.19,.16,2,.52,.25);for(let k=0;k<3;k++){const a=(j-1)*TAU/6+(k-1)*.25,q=[c[0]+Math.cos(a)*.29,c[1]+Math.sin(a)*.22,c[2]+.09*(k-1)];globe(q,.035,25,j%2,.52);path([c,q],j%2,.22,.6);}}});
       for(let j=1;j<hubs.length;j++)path(arc(hubs[j],hubs[j===6?1:j+1],.08,.1),0,.14,.6);
       ring([0,.03,.23],.65,.43,1,.22,.5);
       for(let j=0;j<8;j++)for(let i=0;i<20;i++)point((i/19-.5)*1.45,.95,(j/7-.5)*.48,3,.28,.7);
@@ -196,14 +199,14 @@
     function world(){
       // A common latent history branches under different candidate actions;
       // uncertainty expands with prediction horizon. No deterministic forecast.
-      const branchCount=7;
+      const branchCount=5,chosen=Math.floor(t*.22+phaseOffset)%branchCount;
       for(let frame=0;frame<3;frame++){
         const x=-1.5+frame*.18;for(let j=0;j<13;j++)for(let k=0;k<7;k++)point(x,(j/12-.5)*.52,(k/6-.5)*.44,frame%2,.35+frame*.13,.78);
       }
       for(let branch=0;branch<branchCount;branch++){
-        const angle=(branch-3)*.28,coords=[];
-        for(let i=0;i<=85;i++){const u=i/85,x=-1.04+u*2.50,y=Math.sin(angle)*u*u*1.34+.04*Math.sin(u*5+t*.18+branch)*u,z=(branch-3)*.16*u+Math.sin(u*Math.PI)*.20*Math.cos(branch);coords.push([x,y,z]);for(let n=0;n<5;n++){const a=n*TAU/5+u*5+t*.10;point(x,y+Math.sin(a)*(.02+.055*u),z+Math.cos(a)*(.02+.055*u),branch%2,.28+.28*u,.76);}}
-        trace(coords,branch%2,branch*.11);globe(coords[85],.055,56,branch%2,.68);
+        const angle=(branch-2)*.36,coords=[],active=branch===chosen,color=active?2:branch%2;
+        for(let i=0;i<=85;i++){const u=i/85,x=-1.04+u*2.50,y=Math.sin(angle)*u*u*1.34+.035*Math.sin(u*5+t*.18+branch)*u,z=(branch-2)*.22*u+Math.sin(u*Math.PI)*.20*Math.cos(branch);coords.push([x,y,z]);for(let n=0;n<4;n++){const a=n*TAU/4+u*5+t*.10;point(x,y+Math.sin(a)*(.02+.065*u),z+Math.cos(a)*(.02+.065*u),color,(active?.40:.22)+.23*u,active?.88:.74);}}
+        trace(coords,color,branch*.11);globe(coords[85],active?.065:.045,active?72:40,color,active?.85:.56);
       }
       for(const x of [-.40,.30,1.0]){const u=(x+1.04)/2.5;ring([x,0,0],.025,.30+u*.55,3,.22,Math.PI/2);}
       text('LATENT HISTORY',-1.23,.91,0,0);text('ACTION-CONDITIONED FUTURES',.60,-1.15,0,1);
@@ -211,14 +214,17 @@
     function control(){
       // Stacked RF / digital channels share an event timeline; pulses terminate
       // at a multi-channel output lattice, representing an executable sequence.
+      const event=fract(t*.105+phaseOffset*.08);
+      const wave=(u,lane)=>lane%2===0?Math.sin(u*6*TAU)*Math.exp(-(((u-.54)*3.8)**2))*.10:((u>.2&&u<.34)||(u>.57&&u<.78)?-.12:.025);
       for(let lane=0;lane<6;lane++){
         const y=(lane-2.5)*.245,z=(lane-2.5)*.10,coords=[];
-        for(let i=0;i<=150;i++){const u=i/150,x=-1.43+u*2.48,v=lane%2===0?Math.sin((u*6-t*.10)*TAU)*Math.exp(-(((u-.54)*3.8)**2))*.10:((u>.2&&u<.34)||(u>.57&&u<.78)?-.12:.025);coords.push([x,y+v,z]);point(x,y+v,z,lane%2,.65,.9);}
-        path(coords,lane%2,.26,.6);const u=fract(t*.10+lane*.13);point(-1.43+u*2.48,y,z,lane%2,.95,2.0);
+        for(let i=0;i<=150;i++){const u=i/150,x=-1.43+u*2.48,v=wave(u,lane);coords.push([x,y+v,z]);point(x,y+v,z,lane%2,.65,.9);}
+        path(coords,lane%2,.26,.6);point(-1.43+event*2.48,y+wave(event,lane),z,lane%2,.98,1.8);
         path([[-1.43,y,z],[1.05,y,z]],3,.16,.55);
       }
       for(let layer=0;layer<3;layer++)for(let j=0;j<10;j++)for(let i=0;i<4;i++)point(1.28+(i/3-.5)*.17,(j/9-.5)*1.43,layer*.13,layer%2,.48,.9);
       for(const x of [-.9,-.05,.64]){const coords=[];for(let j=0;j<22;j++)coords.push([x,(j/21-.5)*1.60,(j/21-.5)*.60]);path(coords,2,.25,.7);}
+      path([[-1.43+event*2.48,-.86,-.34],[-1.43+event*2.48,.86,.34]],2,.40,.95);
       for(let j=0;j<6;j++)trace([[1.05,(j-2.5)*.245,(j-2.5)*.10],[1.28,(j-2.5)*.245,0]],j%2,j*.11);
       text('SYNCHRONIZED CONTROL',-.25,-1.08,0,0);text('EXECUTABLE WAVEFORMS',-.30,1.11,0,1);
     }
@@ -234,8 +240,11 @@
         for(let n=0;n<80;n++){const u=n/79;point(cx,.08+u*.47,0,c,.34,.68);}
       }
       for(let k=0;k<2;k++){const coords=[];for(let i=0;i<=160;i++){const u=i/160,a=u*TAU*1.6+t*.40+k*Math.PI+phaseOffset;coords.push([-1.08+u*2.16,.17*Math.sin(a)*Math.sin(u*Math.PI),.17*Math.cos(a)*Math.sin(u*Math.PI)]);if(i%2===0)point(...coords[i],k,.58,.84);}trace(coords,k,k*.5);}
-      const herald=[0,-.62,0];globe(herald,.10,150,2,.69);for(const side of[-1,1])trace(arc([side*1.08,0,0],herald,.18,side*.28),side<0?0:1,side*.15);
-      text('REMOTE MATTER NODES',0,1.12,0,0);text('HERALDED OPTICAL LINK',0,-1.00,0,1);
+      const herald=[0,-.62,0],arrival=fract(t*.20+phaseOffset*.08);
+      globe(herald,.09,140,2,.69);
+      for(const side of[-1,1]){const route=arc([side*1.08,0,0],herald,.18,side*.28);path(route,side<0?0:1,.29,.75);const q=arrival*(route.length-1),a=route[Math.floor(q)],b=route[Math.min(route.length-1,Math.floor(q)+1)];globe([mix(a[0],b[0],fract(q)),mix(a[1],b[1],fract(q)),mix(a[2],b[2],fract(q))],.024,14,side<0?0:1,.94);}
+      if(arrival>.82)ring(herald,.11+(arrival-.82)*.55,.10+(arrival-.82)*.48,2,(1-arrival)*3,.50);
+      text('ALICE',-1.08,1.03,0,0);text('BOB',1.08,1.03,0,1);text('HERALDED OPTICAL LINK',0,-1.00,0,1);
     }
     const draw={transformer,training,vision,agents,world,control,quantum};
     function render(){
@@ -249,8 +258,10 @@
         for(const v of points){const q=project(v.x,v.y,v.z);loX=Math.min(loX,q.x);hiX=Math.max(hiX,q.x);loY=Math.min(loY,q.y);hiY=Math.max(hiY,q.y);}
         for(const p of paths)for(const v of p.coords){const q=project(...v);loX=Math.min(loX,q.x);hiX=Math.max(hiX,q.x);loY=Math.min(loY,q.y);hiY=Math.max(hiY,q.y);}
         for(const v of labels){const q=project(v.x,v.y,v.z);const half=v.s.length*(small?2.7:3.0);loX=Math.min(loX,q.x-half);hiX=Math.max(hiX,q.x+half);loY=Math.min(loY,q.y-12);hiY=Math.max(hiY,q.y+5);}
-        const factor=Math.min(1.6,(g.width-18)/Math.max(1,hiX-loX),(g.height-20)/Math.max(1,hiY-loY));
+        const inset=hero?18:8;
+        const factor=Math.min(2.1,(g.width-inset)/Math.max(1,hiX-loX),(g.height-inset)/Math.max(1,hiY-loY));
         g.scale*=factor;g.cx=g.left+g.width*.5-((loX+hiX)*.5-g.baseCx)*factor;g.cy=g.top+g.height*.5-((loY+hiY)*.5-g.baseCy)*factor;
+        host.dataset.fieldArtWidth=String(Math.round((hiX-loX)*factor));host.dataset.fieldArtHeight=String(Math.round((hiY-loY)*factor));
       }
       screenPoints=pickWorld.map(v=>project(...v));
       ctx.save();ctx.beginPath();ctx.rect(g.left,g.top,g.width,g.height);ctx.clip();
@@ -259,7 +270,7 @@
       // thousands of individual fills with a small set of shared paint calls.
       // Geometry and particle count stay intact on slower mobile renderers.
       const batches=new Map();
-      for(const v of points){const p=project(v.x,v.y,v.z),depth=Math.round(p.d*4),a=Math.round(clamp(v.a*(1-p.d*.13),.1,1)*12)/12,r=Math.max(.5,Math.round(v.r*(hero?(small?.95:1.1):.90)*p.s*4)/4),key=`${depth}/${v.c}/${a}/${r}`;let b=batches.get(key);if(!b){b={depth,c:v.c,a,r,xy:[]};batches.set(key,b);}b.xy.push(p.x,p.y);}
+      for(const v of points){const p=project(v.x,v.y,v.z),depth=Math.round(p.d*4),a=Math.round(clamp(v.a*(1-p.d*.13),.1,1)*12)/12,r=Math.max(.5,Math.round(v.r*(hero?(small?.95:1.1):h<180?.82:.97)*p.s*4)/4),key=`${depth}/${v.c}/${a}/${r}`;let b=batches.get(key);if(!b){b={depth,c:v.c,a,r,xy:[]};batches.set(key,b);}b.xy.push(p.x,p.y);}
       for(const b of [...batches.values()].sort((a,b)=>b.depth-a.depth)){ctx.globalAlpha=b.a;ctx.fillStyle=palette[b.c];ctx.beginPath();for(let i=0;i<b.xy.length;i+=2){ctx.moveTo(b.xy[i]+b.r,b.xy[i+1]);ctx.arc(b.xy[i],b.xy[i+1],b.r,0,TAU);}ctx.fill();}
       ctx.globalAlpha=1;
       for(const l of labels){const p=project(l.x,l.y,l.z);ctx.font=`500 ${small?9:10}px "Space Grotesk",sans-serif`;ctx.textAlign='center';ctx.fillStyle=palette[l.c];ctx.fillText(l.s,p.x,p.y);}

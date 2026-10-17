@@ -1,0 +1,61 @@
+/* Case studies: a reading column, a distinct point study, and contextual evidence. */
+[data-case-study] .project-hero{container-type:inline-size;container-name:case-opening}
+.case-heading-grid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);gap:clamp(32px,4vw,70px);align-items:center;margin:28px 0 32px}
+.case-heading-copy,.case-study-visual{min-width:0}
+.case-heading-grid .case-heading-copy h1{font-size:clamp(38px,3.75vw,60px);line-height:1.13;letter-spacing:-.045em;margin:0 0 26px;max-width:18ch;text-wrap:balance}
+.case-heading-grid .project-summary{font-size:16px;line-height:1.85;max-width:64ch;margin:0;color:#526178}
+.case-study-visual{align-self:center;isolation:isolate}
+.case-study-visual-caption{display:block;max-width:42ch;margin:10px auto 0;text-align:center;font-size:11px;line-height:1.65;color:#526b8e}
+.case-study-visual-caption span{display:block;margin-top:4px;font-size:10px;color:#748096}
+[data-case-study] .project-meta{grid-template-columns:1.1fr .7fr 1.2fr;gap:36px;padding-block:26px;margin-top:28px;border-bottom:1px solid #d9dfe7}
+[data-case-study] .project-meta label{text-transform:none;letter-spacing:0;font-size:12px;color:#425e82;font-weight:550}
+[data-case-study] .project-meta>div>span{font-size:13px;line-height:1.8}
+[data-case-study] .project-cover{margin-top:20px}
+[data-case-study] .project-cover+.source-credit{max-width:85ch;font-size:13px;line-height:1.8;margin:-38px 0 45px;color:#526178}
+[data-case-study] .project-links{gap:10px}
+[data-case-study] .project-layout{gap:clamp(34px,5vw,80px)}
+[data-case-study] .prose-section{scroll-margin-top:110px}
+[data-case-study] .prose-section h2{max-width:28ch;text-wrap:balance}
+[data-case-study] .prose-section>p,[data-case-study] .prose-section>ul{max-width:76ch}
+[data-case-study] .figure{margin-top:32px;margin-bottom:12px}
+[data-case-study] .figure button{padding:clamp(10px,1.5vw,24px);border:1px solid #dce2e9;border-radius:12px;background:#fff;box-shadow:0 10px 30px #31466605}
+[data-case-study] .figure figcaption{font-size:13px;line-height:1.8;color:#526178;max-width:85ch;padding:17px 2px 0}
+.figure-caption-title{display:block;color:#273c59;font-size:15px;font-weight:550;line-height:1.5;margin-bottom:7px}
+.figure-evidence-type{display:block;font-size:10px;line-height:1.5;color:#647c9b;margin-bottom:7px;letter-spacing:.025em}
+.figure-caption-text{display:block}
+[data-case-study] .gallery{gap:36px}
+[data-case-study] .next-project{margin-top:65px}
+.home-overview .overview-introduction{padding-top:80px}
+.home-overview .overview-intro-copy>p{max-width:57ch}
+/* Available column width also changes under browser zoom, independently of
+   viewport media queries. Stack before scientific terms would split mid-word. */
+@container case-opening (max-width:850px){
+ .case-heading-grid{grid-template-columns:minmax(0,1fr)}
+ .case-heading-grid .case-heading-copy h1{font-size:clamp(34px,6cqw,48px);max-width:24ch}
+ .case-study-visual{max-width:620px;width:100%;justify-self:center}
+}
+@media(max-width:1000px){
+ .case-heading-grid{gap:28px;grid-template-columns:minmax(0,1fr) minmax(0,.8fr)}
+ .case-heading-grid .case-heading-copy h1{font-size:clamp(34px,4.5vw,46px)}
+ .case-heading-grid .project-summary{font-size:15px}
+ [data-case-study] .project-meta{gap:26px}
+}
+@media(max-width:760px){
+ .case-heading-grid{grid-template-columns:minmax(0,1fr);gap:22px;margin:23px 0 27px}
+ .case-heading-grid .case-heading-copy h1{font-size:clamp(34px,7.5vw,48px);max-width:21ch;line-height:1.14;margin-bottom:22px}
+ .case-heading-grid .project-summary{font-size:15px;line-height:1.8;max-width:none}
+ .case-study-visual-caption{font-size:11px;max-width:34ch;margin-top:7px}
+ [data-case-study] .project-meta{grid-template-columns:minmax(0,1fr);gap:20px;padding-block:23px;margin-top:26px}
+ [data-case-study] .project-meta>div:last-child{grid-column:auto}
+ [data-case-study] .project-meta>div>span{font-size:13px}
+ [data-case-study] .project-cover+.source-credit{margin:-15px 0 30px;font-size:12px}
+ [data-case-study] .project-links .button{min-height:44px;font-size:12px;padding:10px 17px}
+ [data-case-study] .figure{margin-top:26px}
+ [data-case-study] .figure button{padding:9px;border-radius:9px}
+ [data-case-study] .figure figcaption{font-size:12px;line-height:1.8;padding-top:14px}
+ .figure-caption-title{font-size:14px}.figure-evidence-type{font-size:10px}
+ [data-case-study] .gallery{gap:28px}
+ .home-overview .overview-introduction{padding-top:48px}
+ .home-overview .overview-capability .overview-capability-field{height:160px}
+}
+@media print{.case-study-visual{display:none}.case-heading-grid{display:block}}
