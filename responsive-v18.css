@@ -87,3 +87,43 @@
  .project-metric strong{font-size:29px}
 }
 @media print{.project-layout{display:block}.project-nav{display:none!important}.project-metric{break-inside:avoid}}
+
+/* Actual-width fallback for magnified phones (for example 320px at 200%).
+   Reflow fixed columns instead of clipping content or reducing body text. */
+body.ultra-narrow{overflow-wrap:anywhere}
+.ultra-narrow .wrap{width:calc(100% - 24px)}
+.ultra-narrow .nav-inner{gap:6px}
+.ultra-narrow .brand{min-width:0;gap:5px;font-size:10px;white-space:normal;line-height:1.3}
+.ultra-narrow .brand-mark{flex:0 0 22px;width:22px;height:22px;font-size:9px}
+.ultra-narrow .brand small{display:none}
+.ultra-narrow .nav-actions{flex:0 0 auto;gap:0}
+.ultra-narrow .menu-toggle{min-width:40px;width:40px;min-height:44px;padding:0}
+.ultra-narrow .overview-card-facts,.ultra-narrow .overview-inline-facts,.ultra-narrow .project-metrics,.ultra-narrow .chapter-metrics{grid-template-columns:minmax(0,1fr);gap:14px}
+.ultra-narrow .overview-card-facts>div,.ultra-narrow .overview-resource>div{min-width:0}
+.ultra-narrow .overview-resource{grid-template-columns:minmax(0,1fr);padding:13px;gap:14px}
+.ultra-narrow .overview-resource>img{width:70px;height:auto;max-height:110px}
+.ultra-narrow .overview-resource h3{font-size:18px}
+.ultra-narrow .overview-lab-link{display:block;padding:16px 12px}
+.ultra-narrow .overview-lab-arrow{display:block;margin-top:12px}
+.ultra-narrow .overview-capabilities.guide-compact .overview-capability{grid-template-columns:minmax(0,1fr);gap:12px}
+.ultra-narrow .overview-capabilities.guide-compact .overview-capability :is(.overview-capability-field,.overview-index,h3,p,.overview-topics){grid-column:1;grid-row:auto;min-width:0}
+.ultra-narrow .overview-capabilities.guide-compact .overview-capability .overview-capability-field{height:120px;width:100%}
+.ultra-narrow .timeline-item,.ultra-narrow .pub-row{grid-template-columns:minmax(0,1fr)!important;gap:12px}
+.ultra-narrow .hero-actions{align-items:flex-start;gap:14px}
+.ultra-narrow .hero-actions>*{max-width:100%;white-space:normal}
+.ultra-narrow .section h2,.ultra-narrow .overview-section-head h2,.ultra-narrow .overview-industry h2,.ultra-narrow .overview-lab h2{font-size:26px;line-height:1.3}
+.ultra-narrow .project-hero h1,.ultra-narrow .case-heading-copy h1{font-size:22px!important;line-height:1.25;overflow-wrap:anywhere}
+.ultra-narrow .landing-moon{--field-title-size:24px!important}
+.ultra-narrow .project-metric{padding:16px}
+.ultra-narrow .project-metric strong{white-space:normal;font-size:24px}
+.ultra-narrow .project-meta,.ultra-narrow .profile-stats{grid-template-columns:minmax(0,1fr)}
+
+.ultra-narrow .skip{left:12px;max-width:calc(100% - 24px)}
+.ultra-narrow .skip:not(:focus){top:0;transform:translateY(calc(-100% - 12px))}
+.ultra-narrow .overview-work-card h3{font-size:22px}
+
+.ultra-narrow .hero-credentials>a{grid-template-columns:minmax(0,1fr);gap:3px}
+.ultra-narrow .hero-credentials{gap:14px}
+.ultra-narrow .landing-content .eyebrow{display:block;line-height:1.65}
+.ultra-narrow .landing-content .eyebrow>span{display:block!important;margin-top:5px}
+.ultra-narrow .overview-lab h2{font-size:20px;line-height:1.35}

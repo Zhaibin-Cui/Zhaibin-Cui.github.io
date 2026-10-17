@@ -23,6 +23,7 @@
     if (scroll) requestAnimationFrame(() => target.scrollIntoView({block:'start'}));
   }
   function setDefaults() {
+    document.body.classList.toggle('ultra-narrow', document.body.clientWidth < 240);
     for (const layout of layouts) layout.classList.toggle('reading-stack', layout.clientWidth < 900);
     for (const guide of guides) guide.classList.toggle('guide-compact', guide.clientWidth < 330);
     for (const equation of equations) equation.classList.toggle('compact-equation', equation.clientWidth < 300);
@@ -48,7 +49,7 @@
   };
   if ('ResizeObserver' in window) {
     const observer = new ResizeObserver(scheduleLayout);
-    for (const element of [...layouts, ...equations, ...document.querySelectorAll('.project-hero,.overview-capabilities')]) observer.observe(element);
+    for (const element of [document.body, ...layouts, ...equations, ...document.querySelectorAll('.project-hero,.overview-capabilities')]) observer.observe(element);
   }
   addEventListener('resize', scheduleLayout, {passive:true});
   addEventListener('hashchange', () => revealTarget());
