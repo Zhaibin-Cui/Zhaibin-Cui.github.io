@@ -1,0 +1,29 @@
+/* The primary visualization is a full-width work, never a thumbnail beside copy. */
+.home-overview .research-field.scientific-field.landing-moon .landing-content,
+.research-field.scientific-field.landing-moon .landing-content{display:flex;flex-direction:column;gap:24px;padding-block:42px 82px;max-width:1600px}
+.research-field.scientific-field.landing-moon .scientific-field-copy{flex:none;width:100%;max-width:100%;display:grid;grid-template-columns:1.12fr 1fr;gap:18px 70px;align-items:start}
+.research-field.scientific-field.landing-moon .scientific-field-copy>.eyebrow{grid-column:1 / -1;margin:0}
+.research-field.scientific-field.landing-moon .scientific-field-copy>h1{grid-column:1;grid-row:2 / 4;margin:0!important;max-width:100%!important;font-size:clamp(52px,5.4vw,80px)!important;line-height:1.06!important}
+.research-field.scientific-field.landing-moon .scientific-field-copy>.hero-credentials{grid-column:2;grid-row:2;margin:4px 0 0;gap:8px}
+.research-field.scientific-field.landing-moon .scientific-field-copy>.landing-intro{grid-column:2;grid-row:3;font-size:15px;line-height:1.8;max-width:65ch}
+.research-field.scientific-field.landing-moon .scientific-field-copy>.hero-actions{grid-column:1 / -1;margin:5px 0 0;gap:14px 24px}
+.research-field.scientific-field.landing-moon .scientific-field-stage,
+.research-field.scientific-field.landing-moon[data-field-layout="stacked"] .scientific-field-stage{flex:none;width:100%;height:var(--moe-stage-height,620px);min-height:var(--moe-stage-height,620px);max-height:none;aspect-ratio:auto;align-self:auto;border-top:1px solid #bbc8d846;margin-top:6px}
+.research-field.scientific-field.landing-moon .scientific-field-stage .landing-coordinate{display:none}
+.research-field.scientific-field.landing-moon[data-field-presentation="portrait"] .scientific-field-copy{display:block}
+.home-overview .landing-moon[data-field-presentation="portrait"] .scientific-field-copy>h1{font-size:var(--field-title-size,48px)!important;line-height:1.08!important;margin:19px 0 22px!important}
+.landing-moon[data-field-presentation="portrait"] .scientific-field-copy>.hero-credentials{margin:0 0 18px}
+.landing-moon[data-field-presentation="portrait"] .scientific-field-copy>.hero-actions{margin-top:22px}
+.landing-moon[data-field-presentation="panoramic"] .moe-playbar{display:grid;grid-template-columns:1fr auto;gap:8px 35px;padding-top:16px}
+.landing-moon[data-field-presentation="panoramic"] .moe-controls{grid-column:1;grid-row:2 / 4}
+.landing-moon[data-field-presentation="panoramic"] .moe-concept{grid-column:1;grid-row:1}
+.landing-moon[data-field-presentation="panoramic"] .moe-feedback{grid-column:2;grid-row:1}
+.landing-moon[data-field-presentation="panoramic"] .moe-flow{grid-column:2;grid-row:2}
+.landing-moon[data-field-presentation="panoramic"] .moe-hint{grid-column:2;grid-row:3}
+@media(max-width:620px){
+ .home-overview .research-field.scientific-field.landing-moon .landing-content{padding-top:28px;gap:28px}
+ .research-field.scientific-field.landing-moon .scientific-field-copy>.landing-intro{font-size:14px;line-height:1.8}
+}
+.ultra-narrow .home-overview .landing-moon .scientific-field-copy>h1,
+.home-overview.ultra-narrow .landing-moon .scientific-field-copy>h1{font-size:24px!important}
+@media print{.research-field.scientific-field.landing-moon .scientific-field-stage{display:none!important}}

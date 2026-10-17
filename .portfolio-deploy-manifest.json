@@ -1166,9 +1166,9 @@
       "sha256": "d7dde5850e5895afde163a5df1c40288e05e240d7ad5e7ecae20c6696f0114b3"
     },
     "field.js": {
-      "bytes": 47674,
-      "git_blob_sha1": "6977efee7c3e139fda66b7518dfd0803ff8398c1",
-      "sha256": "6cd8c9896a18bb47b866a412b8ea817ed08417d725f4f036cd201d63c80bac5e"
+      "bytes": 48590,
+      "git_blob_sha1": "6cfcb0b898b3fa78fd7589705f93436c08737db6",
+      "sha256": "4a0296aa5d329ae8edfc3730406ce8494246953aa4c5c39b0672d1cfaf670888"
     },
     "fields-v16.css": {
       "bytes": 569,
@@ -1196,9 +1196,9 @@
       "sha256": "d008ce5539b77e312c94e07faee1d281d9a6e03c88fb4c6a5bad7e4b45d55afd"
     },
     "index.html": {
-      "bytes": 48114,
-      "git_blob_sha1": "946ca93d2e33d9750b76cb72869eb51b6915fc90",
-      "sha256": "238f07e96c2150119a9d70218827cafaf445719e4872a0f86d11f76aef408c58"
+      "bytes": 48241,
+      "git_blob_sha1": "af951ae47b21dc9219997a04876ccf0c1c38c85c",
+      "sha256": "27b66ddfe385028e6f267be87460faebd7fb8cac98437ad8585570d072a2d4a4"
     },
     "materials/archive/zhaibin-cui-cv-pre-v13.pdf": {
       "bytes": 891111,
@@ -1270,6 +1270,11 @@
       "git_blob_sha1": "7762021ddba7a7d80348f3bfa15f1b26b858b2be",
       "sha256": "3184cc10cae2810bfbf69e2a76797d2a921e85ca7b54abec3985756e752dc717"
     },
+    "presentation-v20.css": {
+      "bytes": 3354,
+      "git_blob_sha1": "f320b9f2694b3623dd6ba6fcdafb90da3f4e75f4",
+      "sha256": "3a6d11d4d27ba40e8963c81812323cc37b72c859d22c7beba1c37559eca4c658"
+    },
     "pretraining-methods-v10.css": {
       "bytes": 3292,
       "git_blob_sha1": "d9dd87d5ed7052c3e9311fa5e673c71c95fe5ae2",
@@ -1311,9 +1316,9 @@
       "sha256": "bb9d66ec68ba573e441aab8ec51bb1b3033258aa7b913ac57974969bc0313fa1"
     },
     "research.html": {
-      "bytes": 86860,
-      "git_blob_sha1": "b1d73e2a2d51b81efd358fd5a4463324fc95c1a2",
-      "sha256": "bfded83a69f7dcda96389dee0f10f540e1c6b09c7fb1bfcb97e5e0e2ad2d96a5"
+      "bytes": 86987,
+      "git_blob_sha1": "d7f7e1d5a26772d91839d9cf13490437bb109ee4",
+      "sha256": "b18d437d78c237428251406939bcc7519af5ca08cf7a6c2f1b56a6fd95941e1d"
     },
     "responsive-v18.css": {
       "bytes": 10244,
@@ -1326,14 +1331,19 @@
       "sha256": "79a726f9f5ca79e90cc6d4abd88af9903045e6762f5e3b1e5c92ccde68c95cc3"
     },
     "sources.html": {
-      "bytes": 25477,
-      "git_blob_sha1": "d36ca3fd96e04aaf61ca3b829ea0ee3c3613876f",
-      "sha256": "383a0787b4679bb8e31aadc3fe67aae5113e1d251dd7d7c4bd4696a7c1eda055"
+      "bytes": 25604,
+      "git_blob_sha1": "05bfe6a4663f461301be4b28de2ad14e5bac0b8b",
+      "sha256": "a1b7186b9b3c5845f9fc840de29ead18f77caf4d7c33655a7de0b3253bff2b20"
     },
     "style.css": {
       "bytes": 22510,
       "git_blob_sha1": "1d59fcd765f1609b28a35c342f5688e30cbf4883",
       "sha256": "34dfaf4d56006312e67b97cfe74a0611fc2bffdfe7f2b6f14e50aa752209045b"
+    },
+    "subpage-v20.css": {
+      "bytes": 719,
+      "git_blob_sha1": "153578045492c578f6ba98dfc1b97e008204812b",
+      "sha256": "c6e0a148ad05c4f832687dec8473c05b491e8747daa1326405c02b30e425a23b"
     },
     "visual.css": {
       "bytes": 37156,
@@ -1341,69 +1351,69 @@
       "sha256": "4fdfee82bea4d1aa2b16ad00702836b4365d3a2e98268795260f4aa5d063479e"
     },
     "work/bell-control.html": {
-      "bytes": 19777,
-      "git_blob_sha1": "5ce617e8130d36618113f1abce8e76c762f17ad3",
-      "sha256": "77a9b50ad1b21d9c469bafe608db1589233d7cd6f6e44bdde35d6f95c5b068d2"
+      "bytes": 19910,
+      "git_blob_sha1": "e49bdd756e2754acb72fff301d88168e785db25a",
+      "sha256": "4c14f96eac50c94db685affc38c01564034b7e0ef3e0dde6dfddd0cd19f2283a"
     },
     "work/harness.html": {
-      "bytes": 22908,
-      "git_blob_sha1": "cfdf7254016be1cd0c5db231ec949011a5e14c6d",
-      "sha256": "5cf99dbe17fdea5cba45acc365952f22254e000452f5500b93f6d625d583e9d2"
+      "bytes": 23041,
+      "git_blob_sha1": "f438fd520b602843655297e737a139a585832a23",
+      "sha256": "b44a29afbb50249bebcdc6aa900bf68f6388876c3b60c87bb7d7b693da042f48"
     },
     "work/minimax.html": {
-      "bytes": 20625,
-      "git_blob_sha1": "27e34110c2035f4aee1b17a323b0913c98d6f358",
-      "sha256": "012ca260c0d5ef6f3ffd4b97e6f567fa496bc766ddf96482255bae2ea3b905c9"
+      "bytes": 20758,
+      "git_blob_sha1": "f44288a937fbc83b0e682514ee7212249dd97721",
+      "sha256": "0e74c318ced48857eac33cde5a117fe18a1656f0031731fe49757e4cceb2646a"
     },
     "work/minitrainsys.html": {
-      "bytes": 26305,
-      "git_blob_sha1": "d1f1f1f06ccda1901553f98a87694a2e085ee9e1",
-      "sha256": "d4d7ffb797dc9510d1998cde2b20d11f2dc2e653b3dd5c6d34a1b140a3913f63"
+      "bytes": 26438,
+      "git_blob_sha1": "38c17235f400a9596a5dfb0dec4a0dd0c0396b41",
+      "sha256": "e08778d6c01d6c10e2396b2ccdbb5aeaacd9598c4ed3925af4720cb65d87dfb6"
     },
     "work/page.html": {
-      "bytes": 20555,
-      "git_blob_sha1": "97deefc5a9d10a12d54ca13b7c224a2150b2d747",
-      "sha256": "a77414e8fbc081a8e83a9cd216df9466e4fcffb7b016684fee06ea8478289d81"
+      "bytes": 20688,
+      "git_blob_sha1": "8722bc62b423df944f7ab05d46b3045ce946a3cf",
+      "sha256": "9ee8fa6ef8bb68217d119ca232c30548ed80e8e96ac73e4e9a0c170b26ddc396"
     },
     "work/quantum-control.html": {
-      "bytes": 19726,
-      "git_blob_sha1": "f162fd5118a6bef10713ea03a92c54d873c6b014",
-      "sha256": "ff1182812da1cb71cd75260d459e7d30003defd497ea653f97eee1ff61f7be32"
+      "bytes": 19859,
+      "git_blob_sha1": "55a956d0f004d30f4b5e301490f4072c96b80766",
+      "sha256": "a2ff8c67f5e3aaeb586cc124fe393ac234c097f0a8ed10d7a2c8c3ad8eb7cc72"
     },
     "work/quantum-gallery.html": {
-      "bytes": 101785,
-      "git_blob_sha1": "90b6cd531d777d262718aac2b651948a388c2ba9",
-      "sha256": "777ac74175cd3d49e870d8c381c742a1aab093fd91c374b49f792187fc4e76cf"
+      "bytes": 101918,
+      "git_blob_sha1": "30dd0e00285669eda20c1c0a76fd4480ede78bfb",
+      "sha256": "c571c82ce2b21d456176d4eabda28f669106a64d4f0afa73b8babd940ff2cdd5"
     },
     "work/quantum-lab.html": {
-      "bytes": 12410,
-      "git_blob_sha1": "8fdb74ff8408837e627157578fa3f43587bdd8d6",
-      "sha256": "66dba04200e07af50e03f503911ad3850adf2f4d1adf50ae713e6836aa967468"
+      "bytes": 12543,
+      "git_blob_sha1": "1860bf8fac6b7864b5a5bfad858dbc418a113a78",
+      "sha256": "7b0c0ab1048c51b812be722e5b6b471c180644e9c8bb31f74a3ed4cee656ac07"
     },
     "work/quantum-networks.html": {
-      "bytes": 33781,
-      "git_blob_sha1": "ba8d37dfe16fa73dfeb8aed9c11e51d7a96906da",
-      "sha256": "afdf0736d0990912a8b1982fd3fcd02e3191bd00db10bf680f980fdb3da69483"
+      "bytes": 33914,
+      "git_blob_sha1": "f473a95af6f8a9765726eb1b282b64cd88fa4e73",
+      "sha256": "886970f00d2b842e53ddac84c152d5cffc1ff49f33da8a04853786338c5443f3"
     },
     "work/quantum-research.html": {
-      "bytes": 39228,
-      "git_blob_sha1": "7de3a3831407a238196e028dd8320264b741bc48",
-      "sha256": "eec9d45cf7455829b0d12dfa38cf23c2891c7744a13666865e251aeeb2ef47e1"
+      "bytes": 39361,
+      "git_blob_sha1": "266caf77bcf7e7d9da46f4257c3cb9d39d16b9f7",
+      "sha256": "2e22d93ea2e81fa0a51bb8b1d1d021550f597043c75f66df3564748575fbdde0"
     },
     "work/quantum-systems.html": {
-      "bytes": 46654,
-      "git_blob_sha1": "876828742a388a9f5a68c4ee8a01d0cdfa8f299e",
-      "sha256": "d40da60825e0fe3b41d91fca2389a3e16dc1dc308c47fb09749189ce1783e615"
+      "bytes": 46787,
+      "git_blob_sha1": "44bc6b1e49e5796c330ee15b99844d07415b85a3",
+      "sha256": "3cb84b47a83ce845124017dd10d96edb9918885d49d81a6237e5872977e37051"
     },
     "work/research-notes.html": {
-      "bytes": 19077,
-      "git_blob_sha1": "2918a1af836baddc57f4201ccdbfb62e8e99b311",
-      "sha256": "92687a8c4a67319db24c4dbe79b40bb98bcb8f1fa7c3fac4d72b7c76771530bd"
+      "bytes": 19210,
+      "git_blob_sha1": "9152fd434ad0ab4675844e06c0c717a5c495e163",
+      "sha256": "c7d3338b8d04c86238b0544a5813a201e181c36b05d650f191f7ddd26098158f"
     },
     "work/world-models.html": {
-      "bytes": 34618,
-      "git_blob_sha1": "9c624fd749e4da10332839df33058107e0a48554",
-      "sha256": "de63b8e64ec7a489f90b79eafaf1f51b85a13c70d367640d7f7941a6d140e7d7"
+      "bytes": 34751,
+      "git_blob_sha1": "b84bdd2747014daabd3febb62a94adcd6df82275",
+      "sha256": "0b097646c36d10acaf9f2e3925e9aca86a062957a49da0eef0387b0b663d9c96"
     },
     "world-models-v10.css": {
       "bytes": 13065,

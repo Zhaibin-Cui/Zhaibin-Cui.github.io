@@ -1,4 +1,4 @@
-/* v19. Original three-dimensional point studies.
+/* v20. Original three-dimensional point studies.
  * The MoE decoder schematic combines causal multi-head attention from Vaswani
  * et al., https://arxiv.org/abs/1706.03762, and sparse FFN routing from Shazeer
  * et al., https://arxiv.org/abs/1701.06538. Selected-logit normalization follows
@@ -21,7 +21,7 @@
   let hidden=false,raf=0,then=0,lastPaint=0;
   function make(canvas,host,mode,hero=false){
     let ctx;try{ctx=canvas.getContext('2d',{alpha:false});}catch(_){return;}if(!ctx)return;
-    canvas.dataset.fieldRenderer='v19';host.dataset.fieldRenderer='v19';
+    canvas.dataset.fieldRenderer='v20';host.dataset.fieldRenderer='v20';
     host.dataset.fieldShape=mode==='transformer'?'causal-moe-transformer':mode;host.dataset.fieldMode=mode;
     const isLanding=host.classList.contains('landing-moon');
     const descriptions={transformer:['Sparse MoE decoder','Select a token · trace attention and experts','Trace token'],training:['Training trajectories','Drag the landscape · compare trajectories','Trace paths'],vision:['Spatial token representation','Touch to perturb · drag to rotate','Send a ripple'],agents:['Agent coordination graph','Drag a node · route a task','Dispatch task'],world:['Action-conditioned futures','Drag to inspect · compare possible futures','Compare paths'],control:['Synchronized control channels','Drag to inspect · follow the event clock','Run sequence'],quantum:['Distributed quantum field','Drag to rotate · shift optical phase','Shift phase']};
@@ -78,7 +78,7 @@
       card.addEventListener('pointerleave',()=>{tx=ty=0;},{passive:true});
     }
     function measure(){
-      if(hero){const layout=surface.parentElement,ls=getComputedStyle(layout),available=layout.clientWidth-(parseFloat(ls.paddingLeft)||0)-(parseFloat(ls.paddingRight)||0),stacked=available<1100;host.dataset.fieldLayout=stacked?'stacked':'split';const localWidth=host.clientWidth;host.style.setProperty('--field-title-size',`${localWidth<620?clamp(localWidth*.108,36,62):clamp(localWidth*.078,48,76)}px`);}
+      if(hero){const layout=surface.parentElement,ls=getComputedStyle(layout),available=layout.clientWidth-(parseFloat(ls.paddingLeft)||0)-(parseFloat(ls.paddingRight)||0),stacked=isLanding||available<1100;host.dataset.fieldLayout=stacked?'stacked':'split';if(isLanding&&mode==='transformer'){host.dataset.fieldPresentation=available>=900?'panoramic':'portrait';host.style.setProperty('--moe-stage-height',`${available>=900?clamp(available*.43,570,690):clamp(available*1.45+460,850,1150)}px`);}const localWidth=host.clientWidth;host.style.setProperty('--field-title-size',`${localWidth<620?clamp(localWidth*.108,36,62):clamp(localWidth*.078,48,76)}px`);}
       const r=surface.getBoundingClientRect(),style=getComputedStyle(surface),borderX=(parseFloat(style.borderLeftWidth)||0)+(parseFloat(style.borderRightWidth)||0),borderY=(parseFloat(style.borderTopWidth)||0)+(parseFloat(style.borderBottomWidth)||0);
       // Fractional CSS sizes matter under browser / embedded-view CSS zoom;
       // integer clientHeight can undersize a tall backing surface in WebKit.
@@ -98,9 +98,12 @@
       visible=r.bottom>0&&r.top<innerHeight;host.dataset.fieldReady='true';render();wake();
     }
     function project(x,y,z){
-      const yaw=(mode==='control'?-.22:-.26)+px,tilt=(mode==='transformer'?.31:mode==='agents'?.34:mode==='training'&&!hero?.40:.56)+py;
-      const X=x*Math.cos(yaw)+z*Math.sin(yaw),Z=z*Math.cos(yaw)-x*Math.sin(yaw),Y=y*Math.cos(tilt)-Z*Math.sin(tilt),D=y*Math.sin(tilt)+Z*Math.cos(tilt),pers=1/(1+D*.13);
-      return{x:g.cx+X*g.scale*pers,y:g.cy+Y*g.scale*pers,d:D,s:pers};
+      const portrait=mode==='transformer'&&hero&&w<900;
+      const yaw=(mode==='control'?-.22:portrait?-.16:-.26)+px*(portrait?.65:1),tilt=(mode==='transformer'?.31:mode==='agents'?.34:mode==='training'&&!hero?.40:.56)+py*(portrait?.55:1);
+      const X=x*Math.cos(yaw)+z*Math.sin(yaw),Z=z*Math.cos(yaw)-x*Math.sin(yaw),Y=y*Math.cos(tilt)-Z*Math.sin(tilt),D=y*Math.sin(tilt)+Z*Math.cos(tilt),depth=portrait?Z:D,pers=1/(1+depth*(portrait?.08:.13));
+      // A long portrait flow uses depth perspective without making its lower
+      // expert stage recede solely because it appears further down the page.
+      return{x:g.cx+X*g.scale*pers,y:g.cy+Y*g.scale*pers,d:depth,s:pers};
     }
     function point(x,y,z,c=0,a=.6,r=1){points.push({x,y,z,c,a,r});}
     function path(coords,c=0,a=.25,width=.65,flow=0){paths.push({coords,c,a,width,flow});}
@@ -122,7 +125,7 @@
     function transformer(){
       const cycle=Math.floor((t-moeClockStart)*.145);
       if(cycle!==moeCycle){moeCycle=cycle;if(t>tokenHoldUntil&&t-pulse>9)selected=(selected+1)%8;}
-      const vertical=hero,narrow=hero&&w<650, batchClock=fract((t-moeClockStart)*.145);
+      const vertical=hero&&w<900,narrow=vertical&&w<650, batchClock=fract((t-moeClockStart)*.145);
       const batch=(moeBatch?[selected,(selected+2)%8,(selected+4)%8,(selected+6)%8]:[selected]).map((token,j)=>({token,j,gate:routeToken(token),clock:clamp((batchClock-j*.05)/(1-j*.05),0,.999999),color:[0,1,4,5][j]}));
       const gate=batch[0].gate,active=gate.map(v=>v.expert),clock=batch[0].clock;
       const phase=clock<.38?0:clock<.59?1:clock<.74?2:3;
@@ -132,7 +135,7 @@
       host.__fieldRouting=audit;
       host.dataset.fieldFlowStage=['Attention','Dispatch','Compute','Combine'][phase];
       host.dataset.fieldArchitecture='sparse-moe';host.dataset.fieldDecoderBlocks='1';host.dataset.fieldAttentionHeads='3';host.dataset.fieldCoreNodes='8';
-      host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldActiveExperts=active.map(i=>i+1).join(',');host.dataset.fieldExpertWeights=gate.map(v=>v.weight.toFixed(6)).join(',');host.dataset.fieldTopK=String(moeTopK);host.dataset.fieldExpertCount=String(moeExpertCount);host.dataset.fieldComposition=vertical?(narrow?'folded':'staged'):'horizontal';
+      host.dataset.fieldSelectedToken=String(selected+1);host.dataset.fieldActiveExperts=active.map(i=>i+1).join(',');host.dataset.fieldExpertWeights=gate.map(v=>v.weight.toFixed(6)).join(',');host.dataset.fieldTopK=String(moeTopK);host.dataset.fieldExpertCount=String(moeExpertCount);host.dataset.fieldComposition=vertical?'portrait-flow':hero?'panoramic':'horizontal';
       host.dataset.fieldBatchSize=String(batch.length);host.dataset.fieldBatchActiveExperts=batchActive.map(i=>i+1).join(',');host.dataset.fieldBatchRoutes=JSON.stringify(audit.batch);host.dataset.fieldRouteCount=String(batch.length*moeTopK*2);host.dataset.fieldSeparateTokenOutputs='true';host.dataset.fieldClock=clock.toFixed(4);
       host.dataset.fieldCausalPositions=Array.from({length:selected+1},(_,i)=>i+1).join(',');host.dataset.fieldMaskedCells='84';host.dataset.fieldMaskAlpha='.14';host.dataset.fieldAllowedAlpha='.52';
       if(bar){
@@ -140,20 +143,21 @@
         if(key!==moeFeedbackKey){moeFeedbackKey=key;bar.querySelector('.moe-select').value=String(selected);bar.querySelectorAll('[data-top-k]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.topK)===moeTopK)));const button=bar.querySelector('.moe-batch');button.setAttribute('aria-pressed',String(moeBatch));button.textContent=moeBatch?'Batch ×4':'Focus ×1';bar.querySelector('.moe-token-feedback').textContent=`Token ${selected+1} →`;bar.querySelector('.moe-weights').textContent=gate.map(v=>`E${v.expert+1}\u00a0${(v.weight*100).toFixed(0)}%`).join('  ·  ');}
         if(phase!==moePhaseKey){moePhaseKey=phase;bar.querySelectorAll('[data-phase]').forEach(el=>el.dataset.active=String(Number(el.dataset.phase)===phase));}
       }
-      // Attention has the same visual weight as the complete expert bank.
-      const token=vertical?(narrow?[-1.42,-2.06,0]:[-2.70,-1.94,0]):[-4.48,0,0],qkv=vertical?(narrow?[-.91,-2.04,0]:[-1.85,-1.94,0]):[-3.67,0,0];
-      const attention=vertical?(narrow?[.22,-2.10,0]:[-.02,-2.02,0]):[-2.11,-.10,0],projection=vertical?(narrow?[1.22,-1.78,0]:[1.75,-1.78,0]):[-.71,.04,0];
-      const add=vertical?(narrow?[1.23,-.87,0]:[1.76,-.65,0]):[-.34,.08,0],router=vertical?[0,-.28,0]:[.26,.08,0];
-      const attSize=vertical?(narrow?1.30:1.90):1.66,tokenHeight=vertical?(narrow?1.12:1.56):1.35,qkvHeight=vertical?(narrow?.98:1.40):1.18,projectionHeight=vertical?(narrow?.76:1.14):1.05;
-      const headDepth=vertical?(narrow?.27:.46):.40;
-      const sideRail=vertical?(narrow?1.48:2.17):0;
+      // The desktop decoder spans the full page. On a phone, its input,
+      // attention and expert computation follow a purpose-built vertical path.
+      const token=vertical?(narrow?[-.90,-2.95,0]:[-2.80,-2.10,0]):[-5.15,0,0],qkv=vertical?(narrow?[.85,-2.95,0]:[-1.85,-2.10,0]):[-4.20,0,0];
+      const attention=vertical?(narrow?[-.04,-.80,0]:[.10,-2.10,0]):[-2.10,-.08,0],projection=vertical?(narrow?[1.25,.90,0]:[2.05,-1.80,0]):[.02,.04,0];
+      const add=vertical?(narrow?[1.25,1.50,0]:[2.05,-.65,0]):[.45,.08,0],router=vertical?(narrow?[0,1.90,0]:[0,.10,0]):[1.04,.08,0];
+      const attSize=vertical?(narrow?2.45:2.25):2.60,tokenHeight=vertical?(narrow?.85:1.65):1.80,qkvHeight=vertical?(narrow?.85:1.50):1.65,projectionHeight=vertical?(narrow?.65:1.20):1.55;
+      const headDepth=vertical?.34:.48;
+      const sideRail=vertical?(narrow?1.70:2.50):0;
       const rowAt=(center,height,index,dx=0,z=0)=>[center[0]+dx,center[1]+(index/7-.5)*height,z];
       const at=(coords,u)=>{const p=clamp(u,0,1)*(coords.length-1),i=Math.floor(p),a=coords[i],b=coords[Math.min(coords.length-1,i+1)];return[mix(a[0],b[0],fract(p)),mix(a[1],b[1],fract(p)),mix(a[2],b[2],fract(p))];};
       // Each packet is sampled from the exact polyline that draws its own wire.
       // The same per-token clock spans attention, dispatch, computation and return.
       function flow(coords,b,start,end,stage,id,expert=null,weight=.25){
         const foreground=b.j===0,c=b.color;
-        path(coords,c,foreground?.62:.19,foreground?.88+weight:.60);
+        path(coords,c,foreground?.72:.28,foreground?1.02+weight:.72);
         const route={id,token:b.token+1,expert,stage,color:c,start,end,coords};audit.routes.push(route);
         if(b.clock>=start&&b.clock<end){
           if(foreground)selectedPackets[stage]++;
@@ -200,18 +204,18 @@
         flow(arc(residual,port,vertical?-.07:0),b,.34,.38,'attention',`T${b.token+1}:router-input`);
         point(...residual,b.color,b.j===0?.88:.36,b.j===0?1.9:1.2);
       }
-      const attentionSkip=vertical?[[token[0],token[1]-tokenHeight*.53,0],[token[0],narrow?-3.10:-3.35,0],[sideRail,narrow?-3.10:-3.35,0],[sideRail,add[1],0],add]:[[token[0],-.72,0],[token[0],-1.43,0],[add[0],-1.43,0],add];path(attentionSkip,0,.16,.65);
+      const attentionSkip=vertical?[[token[0],token[1]-tokenHeight*.53,0],[token[0],(narrow?-3.72:-3.65),0],[sideRail,(narrow?-3.72:-3.65),0],[sideRail,add[1],0],add]:[[token[0],-.95,0],[token[0],-1.80,0],[add[0],-1.80,0],add];path(attentionSkip,0,.16,.65);
       globe(router,.068,94,2,.72);ring(router,.10,.07,1,.35,.2);
       const experts=Array.from({length:moeExpertCount},(_,expert)=>{
-        const row=Math.floor(expert/4),col=expert%4,x=vertical?(col-1.5)*(narrow?.64:.85):1.04+col*.61,y=vertical?.30+row*.46:-.86+row*.58,z=(row-1.5)*.055+(col%2-.5)*.05;
+        const row=Math.floor(expert/4),col=expert%4,x=vertical?(col-1.5)*(narrow?.78:1.10):2.02+col*.68,y=vertical?(narrow?2.55+row*.50:.80+row*.60):-1.0+row*.67,z=(row-1.5)*.055+(col%2-.5)*.05;
         const sx=vertical?(narrow?.29:.40):.34,sy=vertical?.24:.27;
-        // Folded composition also rotates the FFN's layer axis. Its entry,
+        // The portrait composition also rotates the FFN's layer axis. Its entry,
         // internal computation and exit consequently remain one continuous path.
         const axis=vertical?[0,1,0]:[1,0,0],length=vertical?.25:.37;
         const node=u=>[x+axis[0]*u*length,y+axis[1]*u*length,z];
         return{expert,x,y,z,sx,sy,axis,length,node,incoming:node(-.65),outgoing:node(.65)};
       });
-      const outputs=batch.map(b=>{const offset=batch.length===1?0:(b.j-1.5)*.45;return{...b,combine:vertical?[offset,2.24,0]:[3.65,offset,0],finalAdd:vertical?[offset,2.53,0]:[3.97,offset,0],output:vertical?[offset,2.76,0]:[4.23,offset,0]};});
+      const outputs=batch.map(b=>{const offset=batch.length===1?0:(b.j-1.5)*.45;return{...b,combine:vertical?[offset,narrow?4.70:3.32,0]:[5.00,offset,0],finalAdd:vertical?[offset,narrow?4.99:3.65,0]:[5.38,offset,0],output:vertical?[offset,narrow?5.23:3.95,0]:[5.70,offset,0]};});
       for(const b of [...outputs].reverse()){
         for(const v of b.gate){
           const e=experts[v.expert],depth=(Math.floor(e.expert/4)-1.5)*.07+b.j*.028;
@@ -228,7 +232,7 @@
         flow(arc(b.combine,b.finalAdd,0),b,.94,.97,'output',`T${b.token+1}:combine-output`);
         flow([b.finalAdd,b.output],b,.97,1,'output',`T${b.token+1}:output`);
         point(...b.finalAdd,b.color,b.j===0?.92:.55,b.j===0?1.7:1.2);globe(b.output,b.j===0?.034:.025,b.j===0?28:16,b.color,b.j===0?.88:.55);
-        const skip=vertical?[b.residual,[sideRail+b.j*.025,add[1],b.j*.02],[sideRail+b.j*.025,2.53,b.j*.02],b.finalAdd]:[b.residual,[add[0],1.56+b.j*.025,b.j*.02],[b.finalAdd[0],1.56+b.j*.025,b.j*.02],b.finalAdd];path(skip,b.color,b.j===0?.17:.055,b.j===0?.7:.45);
+        const skip=vertical?[b.residual,[sideRail+b.j*.025,add[1],b.j*.02],[sideRail+b.j*.025,b.finalAdd[1],b.j*.02],b.finalAdd]:[b.residual,[add[0],1.92+b.j*.025,b.j*.02],[b.finalAdd[0],1.92+b.j*.025,b.j*.02],b.finalAdd];path(skip,b.color,b.j===0?.17:.055,b.j===0?.7:.45);
         if(hero)text(`T${b.token+1}`,b.output[0]+(vertical?0:.21),b.output[1]+(vertical?.22:.055),0,b.color);
       }
       for(const e of experts){
@@ -241,8 +245,21 @@
         if(hero&&(w>=180||chosen))text(`E${e.expert+1}`,e.x,e.y+(vertical?.24:.25),e.z,chosen?0:3);
       }
       if(hero){
-        if(vertical){text('Tokens',token[0],token[1]+tokenHeight*.5+.23);text(w<180?'QKV':'Q / K / V',qkv[0],qkv[1]+qkvHeight*.5+.40);text(w<180?'Attention':'Causal attention',attention[0],narrow?-3.25:-3.56);if(w>=180)text(w<350?'3 heads':'3 parallel heads',attention[0],narrow?-1.17:-.79,0,1);text(w<180?'Proj.':'Projection',projection[0],narrow?-1.13:-.87);text(w<180?'Router':`Router · top ${moeTopK}`,0,-.53);text('MoE',0,.08,0,1);text(w<300?'Weighted sum':'Weighted combination',0,2.08);if(w>=180)text('Residual',sideRail,-.04,0,3);}
-        else{text('Tokens',-4.48,.98);text('Q / K / V',-3.67,.98);text('Causal attention',-2.08,-1.35);text('3 parallel heads',-2.08,1.04,0,1);text('Projection',-.71,.98);text(`Router · top ${moeTopK}`,.28,-.40);text('MoE',1.95,-1.27,0,1);text('Weighted combination',3.68,-1.04);text('Residual stream',1.2,1.79,0,3);}
+        if(vertical){
+          text('Tokens',token[0],narrow?-3.55:-.92);text(w<180?'QKV':'Q / K / V',qkv[0],narrow?-3.55:-.92);
+          text(w<180?'Attention':'Causal attention',attention[0],narrow?-2.36:-3.63);
+          if(w>=180)text(w<350?'3 heads':'3 parallel heads',attention[0]-.15,narrow?.66:-.61,0,1);
+          text(w<180?'Proj.':'Projection',projection[0],narrow?1.38:-.90);
+          text(w<180?'Router':`Router · top ${moeTopK}`,0,narrow?1.65:-.18);
+          text('MoE',0,narrow?2.25:.48,0,1);text(w<300?'Weighted sum':'Weighted combination',0,narrow?4.49:3.10);
+          if(w>=180)text('Residual',sideRail,narrow?1.20:.18,0,3);
+        }else{
+          text('Tokens',-5.15,1.23);text('Q / K / V',-4.20,1.23);
+          text('Causal attention',-2.10,-1.78);text('3 parallel heads',-2.10,1.58,0,1);
+          text('Projection',.02,1.23);text(`Router · top ${moeTopK}`,1.05,-.42);
+          text('MoE',3.05,-1.48,0,1);text('Weighted combination',5.02,-1.05);
+          text('Residual stream',1.0,2.21,0,3);
+        }
       }
       host.dataset.fieldFlowPackets=JSON.stringify(selectedPackets);host.dataset.fieldLabels=labels.map(l=>l.s).join(' | ');host.dataset.fieldPoints=String(points.length);
     }

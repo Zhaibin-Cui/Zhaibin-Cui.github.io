@@ -1,0 +1,26 @@
+/* Keep figure controls outside the evidence: schematics and measurements need
+   their entire image area, especially when a phone is magnified. */
+:is([data-case-study],.systems-page) .figure button:not(.figure-inspect)::after{
+ content:'View full-size figure  ↗';
+ position:static;
+ display:flex;
+ align-items:center;
+ justify-content:flex-end;
+ width:auto;
+ height:auto;
+ min-height:38px;
+ margin:12px 0 0;
+ padding:10px 2px 0;
+ border:0;
+ border-top:1px solid #dce2e9;
+ border-radius:0;
+ background:transparent;
+ color:#48678c;
+ font-size:12px;
+ line-height:1.6;
+ text-align:right;
+ box-shadow:none;
+}
+@media print{
+ :is([data-case-study],.systems-page) .figure button:not(.figure-inspect)::after{display:none}
+}
