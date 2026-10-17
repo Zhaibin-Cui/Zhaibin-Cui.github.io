@@ -11,4 +11,5 @@ canvas[data-handshake-field]:focus-visible{outline:1px solid #8399b4;outline-off
 .handshake-hint{font-size:10px;font-weight:400;letter-spacing:.025em;opacity:.9}
 @media(max-width:620px){.handshake-key{left:18px;right:18px;bottom:15px;display:grid;grid-template-columns:1fr 1fr;font-size:10px;gap:7px 16px;letter-spacing:.12em}.handshake-human,.handshake-robot{gap:7px;grid-row:1}.handshake-robot{justify-self:end}.handshake-hint{grid-column:1/-1;grid-row:2;text-align:center;font-size:10px;letter-spacing:.01em}.handshake-human:before,.handshake-robot:before{width:4px;height:4px}}
 @media(max-width:350px){.handshake-key{left:14px;right:14px}}
+@media(max-height:500px) and (orientation:landscape){.wm-hero .handshake-stage{height:clamp(240px,70vh,340px);height:clamp(240px,70svh,340px)}.handshake-key{bottom:15px}}
 @media print{canvas[data-handshake-field]{position:relative;aspect-ratio:2.15}.handshake-hint{display:none}}

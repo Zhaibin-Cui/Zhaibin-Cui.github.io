@@ -37,3 +37,19 @@
   .field-play-action,.field-play-reset{min-height:40px;font-size:11px}.field-interaction{border-radius:12px}
 }
 @media print{.field-interaction,.field-playbar{display:none!important}}
+
+/* v13: diagrams occupy their own space; native card links remain the hit target. */
+.topic-field{position:relative;isolation:isolate;aspect-ratio:1.7;min-height:0;width:100%;overflow:hidden;background:#f6f5f1;pointer-events:none}
+.topic-field>canvas{position:absolute;inset:0;display:block;width:100%;height:100%;pointer-events:none}
+.transformer-field .field-interaction{border-radius:0;touch-action:pan-y pinch-zoom}
+.transformer-playbar{align-items:center;gap:4px 16px}
+.transformer-playbar .field-play-hint{font-size:10px;line-height:1.4}
+.transformer-playbar .field-play-action,.transformer-playbar .field-play-reset{min-height:44px}
+@media(max-width:1000px){.research-field.transformer-field.landing-moon .landing-content{padding-bottom:560px}}
+@media(max-width:620px){
+ .research-field.transformer-field.landing-moon .landing-content{padding-bottom:490px}
+ .topic-field{min-height:0;aspect-ratio:1.75}
+ .transformer-playbar .field-play-hint{flex-basis:100%;font-size:10px}
+ .transformer-playbar{padding-inline:3px;gap:0 17px}
+}
+@media print{.topic-field{display:none}}

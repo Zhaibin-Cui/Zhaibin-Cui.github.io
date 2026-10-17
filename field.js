@@ -1,10 +1,236 @@
+/* v13. Original three-dimensional point studies. Transformer geometry follows the
+ * token / QKV / causal multi-head attention / projection / residual / FFN structure
+ * of Vaswani et al., https://arxiv.org/abs/1706.03762. This is a conceptual decoder
+ * block, not a claim about a particular model, measured attention, or experiment.
+ */
+(() => {
+  'use strict';
+  const TAU=Math.PI*2, PAPER='#f6f5f1';
+  const palette=['#567ba6','#8c79a9','#3f648e','#a2b2c9','#779aaf'];
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),mix=(a,b,t)=>a+(b-a)*t;
+  const scenes=[],heroCanvases=[...document.querySelectorAll('canvas[data-research-field],#research-field')].filter(c=>{
+    const mode=c.dataset.fieldMode||c.parentElement.dataset.fieldMode||'ai';
+    return mode==='transformer'||(mode==='ai'&&!!c.closest('.landing-moon'));
+  });
+  const topics=[...document.querySelectorAll('[data-topic-field]')];
+  if(!heroCanvases.length&&!topics.length)return;
+  const fract=v=>v-Math.floor(v),ease=v=>{v=clamp(v,0,1);return v*v*(3-2*v);};
+  let hidden=false,raf=0,then=0,lastPaint=0;
+  function make(canvas,host,mode,hero=false){
+    let ctx;try{ctx=canvas.getContext('2d',{alpha:false});}catch(_){return;}if(!ctx)return;
+    canvas.dataset.fieldRenderer='v13';host.dataset.fieldRenderer='v13';
+    host.dataset.fieldShape=hero?'causal-transformer':mode;host.dataset.fieldMode=hero?'transformer':mode;
+    let w=0,h=0,dpr=1,small=false,visible=false,t=0,px=0,py=0,tx=0,ty=0,pulse=-20,selected=4,step=-1,interactions=0;
+    let g={left:0,top:0,width:1,height:1,scale:1,cx:0,cy:0},points=[],paths=[],labels=[],screenPoints=[];
+    let pane=null,bar=null,status=null,pressed=false,moved=false,start=null;
+    const triplets=[[-.72,.31,-.32],[-.72,.31,0],[-.72,.31,.32]];
+    const stages=['Tokens','Q / K / V','Causal attention','Projection','Residual + FFN'];
+    function record(type){interactions++;host.dataset.fieldInteractions=String(interactions);host.dataset.fieldInteractionType=type;}
+    function activate(token){if(Number.isInteger(token))selected=clamp(token,0,7);pulse=t;record('attention-flow');host.dataset.fieldSelectedToken=String(selected+1);if(status)status.textContent=`Following token ${selected+1} through Q, K and V, causal attention, output projection, and residual feed-forward paths.`;}
+    if(hero){
+      host.classList.add('field-interactive','transformer-field');
+      pane=document.createElement('div');pane.className='field-interaction transformer-interaction';pane.tabIndex=0;pane.setAttribute('role','group');pane.setAttribute('aria-label','Explore a Transformer block');
+      const help=document.createElement('span');help.className='field-sr-only';help.id='transformer-help-'+scenes.length;help.textContent='A conceptual decoder Transformer. Select a token to follow its causal attention through three heads, then projection, residual addition and the feed-forward layer. Drag horizontally to change perspective. Arrow keys select a token; Enter runs its path; R resets the view.';pane.setAttribute('aria-describedby',help.id);
+      bar=document.createElement('div');bar.className='field-playbar transformer-playbar';bar.innerHTML='<span class="field-play-hint">Select a token · follow its attention</span><button class="field-play-action" type="button">Trace token</button><button class="field-play-reset" type="button">Reset</button>';
+      status=document.createElement('span');status.className='field-sr-only';status.setAttribute('role','status');status.setAttribute('aria-live','polite');host.append(pane,bar,help,status);
+      bar.querySelector('.field-play-action').addEventListener('click',()=>activate());
+      bar.querySelector('.field-play-reset').addEventListener('click',()=>{tx=ty=0;selected=4;pulse=-20;record('reset');status.textContent='Perspective and token selection reset.';});
+      const location=e=>{const r=host.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};};
+      pane.addEventListener('pointerdown',e=>{if(e.button!==0)return;pressed=true;moved=false;start={...location(e),tx,ty,id:e.pointerId};try{pane.setPointerCapture(e.pointerId);}catch(_){};pane.classList.add('is-dragging');});
+      pane.addEventListener('pointermove',e=>{const p=location(e);if(pressed){const dx=p.x-start.x,dy=p.y-start.y;moved=moved||Math.hypot(dx,dy)>5;tx=clamp(start.tx+dx*.0028,-.24,.24);ty=clamp(start.ty+dy*.0012,-.12,.12);}else{pane.classList.toggle('is-node-hover',screenPoints.some(n=>Math.hypot(n.x-p.x,n.y-p.y)<18));}});
+      const end=(e,cancel)=>{if(!pressed)return;pressed=false;pane.classList.remove('is-dragging');if(!cancel){if(moved)record('view-drag');else{const p=location(e);let n=selected,d=Infinity;screenPoints.forEach((q,i)=>{const dd=Math.hypot(p.x-q.x,p.y-q.y);if(dd<d){d=dd;n=i;}});activate(d<80?n:undefined);}}};
+      pane.addEventListener('pointerup',e=>end(e,false));pane.addEventListener('pointercancel',e=>end(e,true));
+      pane.addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){e.preventDefault();selected=(selected+(['ArrowLeft','ArrowUp'].includes(e.key)?7:1))%8;activate(selected);}else if(['Enter',' '].includes(e.key)){e.preventDefault();activate();}else if(e.key.toLowerCase()==='r'){tx=ty=0;record('reset');}});
+    }else{
+      host.setAttribute('aria-hidden','true');
+      // Card art never captures a click, touch or wheel event. Hover is observed on
+      // the card itself, retaining the user's ordinary link navigation semantics.
+      const card=host.closest('article,.wm-teaser,.overview-industry')||host;
+      card.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;const r=card.getBoundingClientRect();tx=clamp((e.clientX-r.left)/r.width-.5,-.5,.5)*.18;ty=clamp((e.clientY-r.top)/r.height-.5,-.5,.5)*.1;},{passive:true});
+      card.addEventListener('pointerleave',()=>{tx=ty=0;},{passive:true});
+    }
+    function measure(){
+      const r=host.getBoundingClientRect();w=Math.max(1,Math.round(r.width));h=Math.max(1,Math.round(r.height));small=w<700;dpr=Math.min(devicePixelRatio||1,2);
+      canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+      if(hero){
+        const mobile=innerWidth<=1000,foot=mobile?70:83;
+        if(mobile){const artHeight=small?318:390;g={left:small?8:32,top:h-foot-78-artHeight,width:w-(small?16:64),height:artHeight};}
+        else g={left:w*.505,top:98,width:w*.475-16,height:h-98-foot-80};
+        pane.style.cssText=`left:${g.left}px;top:${g.top}px;width:${g.width}px;height:${g.height}px`;
+        bar.style.cssText=`left:${g.left+8}px;width:${g.width-16}px;bottom:${foot+7}px`;
+      }else g={left:12,top:10,width:w-24,height:h-20};
+      const spanY={transformer:2.42,training:1.75,vision:2.02,agents:1.9,world:2.8,control:1.64,quantum:1.65}[mode]||2.42;
+      g.scale=Math.min(g.width/(mode==='transformer'?3.65:3.25),g.height/spanY);g.cx=g.left+g.width*.5;g.cy=g.top+g.height*(mode==='world'?.54:mode==='training'?.46:.50);
+      g.baseScale=g.scale;g.baseCx=g.cx;g.baseCy=g.cy;
+      host.dataset.fieldArtTop=String(Math.round(g.top));host.dataset.fieldArtLeft=String(Math.round(g.left));
+      visible=r.bottom>0&&r.top<innerHeight;host.dataset.fieldReady='true';render();wake();
+    }
+    function project(x,y,z){
+      const yaw=(mode==='transformer'?-.13:-.24)+px,tilt=(mode==='transformer'?.25:.56)+py;
+      const X=x*Math.cos(yaw)+z*Math.sin(yaw),Z=z*Math.cos(yaw)-x*Math.sin(yaw),Y=y*Math.cos(tilt)-Z*Math.sin(tilt),D=y*Math.sin(tilt)+Z*Math.cos(tilt),pers=1/(1+D*.13);
+      return{x:g.cx+X*g.scale*pers,y:g.cy+Y*g.scale*pers,d:D,s:pers};
+    }
+    function point(x,y,z,c=0,a=.6,r=1){points.push({x,y,z,c,a,r});}
+    function path(coords,c=0,a=.25,width=.65,flow=0){paths.push({coords,c,a,width,flow});}
+    function text(s,x,y,z=0,c=2){if(hero)labels.push({s,x,y,z,c});}
+    function slab(x,y,z,sx,sy,sz,c,group,mask=false){
+      const nx=mask?11:8,ny=mask?11:8,nz=3;
+      for(let k=0;k<nz;k++)for(let j=0;j<ny;j++)for(let i=0;i<nx;i++){
+        if(mask&&i>j)continue;
+        const v=fract(i*.618+j*.137+k*.46),hot=step>=group&&step<group+1;
+        const selectedRow=Math.floor(j*8/ny)===selected;
+        point(x+(i/(nx-1)-.5)*sx,y+(j/(ny-1)-.5)*sy,z+(k/(nz-1)-.5)*sz,c,(k===0?.70:.36)+(selectedRow?.16:0)+(hot?.16:0),mask&&i===j?1.14:.84+v*.27);
+      }
+    }
+    function trace(coords,c=0,phaseOffset=0){
+      path(coords,c,.3,.75);const speed=hero?.20:.14,progress=fract((t-pulse>0&&t-pulse<6?(t-pulse)*speed:t*speed*.65)+phaseOffset),j=progress*(coords.length-1),a=coords[Math.floor(j)],b=coords[Math.min(coords.length-1,Math.floor(j)+1)];
+      point(mix(a[0],b[0],fract(j)),mix(a[1],b[1],fract(j)),mix(a[2],b[2],fract(j)),c,.95,1.9);
+    }
+    function arc(a,b,lift=.12,depth=0){const out=[];for(let i=0;i<=32;i++){const u=i/32;out.push([mix(a[0],b[0],u),mix(a[1],b[1],u)-Math.sin(u*Math.PI)*lift,mix(a[2],b[2],u)+Math.sin(u*Math.PI)*depth]);}return out;}
+    function transformer(){
+      if(!hero){
+        // Compact cards show the characteristic attention planes rather than
+        // squeezing every full-block label and component into a thumbnail.
+        for(let head=0;head<3;head++){
+          const z=(head-1)*.46,x=(head-1)*.10,y=-.03-head*.025;
+          slab(x,y,z,1.18,1.18,.08,head%2,2,true);
+          trace(arc([-1.23,.26,0],[x-.6,y+.3,z],.2),head%2,head*.16);
+          trace(arc([x+.60,y+.52,z],[1.21,.28,0],-.14),head%2,head*.16+.4);
+        }
+        for(let j=0;j<8;j++)for(let i=0;i<3;i++){point(-1.25+i*.055,(j/7-.5)*.91+.25,0,0,.59,.82);point(1.2+i*.055,(j/7-.5)*.91+.25,0,1,.59,.82);}
+        return;
+      }
+      if(t-pulse>9)selected=Math.floor(t*.24)%8;
+      step=(t-pulse)*.8;host.dataset.fieldFlowStage=step>=0&&step<5?stages[Math.floor(step)]:'overview';
+      slab(-1.38,.22,0,.33,1.13,.12,0,0);screenPoints=[];
+      for(let n=0;n<8;n++){const y=.22+(n/7-.5)*1.13,p=project(-1.62,y,0);screenPoints.push(p);point(-1.62,y,0,n===selected?2:0,n===selected?.98:.45,n===selected?2:1.1);}
+      triplets.forEach((v,i)=>{slab(...v,.26,.85,.06,i===1?1:0,1);trace(arc([-1.2,.22,0],[v[0]-.15,.22,v[2]],.03),i===1?1:0,i*.18);});
+      for(let head=0;head<3;head++){
+        const z=(head-1)*.40,x=.03+head*.035,y=-.20-head*.04;
+        slab(x,y,z,.72,.72,.055,head%2,2,true);
+        const frame=[[-.36,-.36],[.36,-.36],[.36,.36],[-.36,.36],[-.36,-.36]].map(q=>[x+q[0],y+q[1],z]);path(frame,head%2,.15,.6);
+        trace(arc([-.55,.24,triplets[head][2]],[x-.38,y,z],.15),head%2,head*.13);
+        trace(arc([x+.37,y+.30,z],[.69,.36,0],-.12),head%2,head*.13+.3);
+        // The selected row can attend only to its own and preceding positions.
+        const yRow=y+(selected/7-.5)*.72;
+        for(let n=0;n<=selected;n++){
+          const u=n/7,weight=.28+.55*Math.pow(Math.cos((selected-n)*.7+head),2);
+          point(x+(u-.5)*.72,yRow,z-.055,head%2,.9,1.15+weight*.6);
+        }
+      }
+      slab(.79,.36,0,.24,.83,.13,1,3);
+      const add=[1.02,.36,0];point(...add,2,.92,2.1);
+      path([[-1.38,-.40,0],[-1.38,-.91,0],[1.02,-.91,0],add],0,.28,.72);
+      trace(arc([.92,.36,0],add,0),1,.6);
+      // Token-wise expansion / contraction in the feed-forward sublayer.
+      for(let layer=0;layer<3;layer++){
+        const x=1.19+layer*.16,span=layer===1?1.02:.62;
+        slab(x,.36,0,.065,span,.13,layer===1?1:0,4);
+        if(layer)for(let row=0;row<8;row+=2)path([[x-.16,.36+(row/7-.5)*(layer===1?.62:1.02),0],[x,.36+(row/7-.5)*span,0]],1,.14,.5);
+      }
+      trace([add,[1.19,.36,0],[1.35,.36,0],[1.51,.36,0]],1,.72);
+      path([[1.02,.36,0],[1.02,1.0,0],[1.59,1.0,0],[1.59,.36,0]],1,.20,.6);point(1.59,.36,0,2,.85,1.8);
+      text('TOKENS',-1.39,1.02);text('Q  K  V',-.73,1.02);text('CAUSAL ATTENTION',.05,-.85);text('PROJECTION',.79,1.02);text('FFN',1.36,-.39);
+      if(hero){text('RESIDUAL',-.4,-1.04,0,0);text('× 3 HEADS',.02,.54,0,1);}
+      host.dataset.fieldPoints=String(points.length);host.dataset.fieldCoreNodes='8';
+    }
+    function training(){
+      const n=small?40:58,m=small?20:28;
+      const loss=(x,z)=>.20*Math.sin(x*2.7+z)+.18*Math.cos(z*2.2)-.23*Math.exp(-((x-.30)**2+(z+.1)**2)*3)+.15*x*x;
+      for(let j=0;j<=m;j++)for(let i=0;i<=n;i++){const x=(i/n-.5)*2.9,z=(j/m-.5)*1.7;point(x,loss(x,z),z,j%3?0:1,.30+(j/m)*.25,.78);}
+      for(let line=0;line<3;line++){const coords=[];for(let i=0;i<=80;i++){const u=i/80,x=-1.38+u*2.55,z=(line-1)*.43+.23*Math.sin(u*5+line)*Math.exp(-u*1.6);coords.push([x,loss(x,z)-.03,z]);}trace(coords,line%2,line*.22);}
+    }
+    function vision(){
+      for(let j=0;j<29;j++)for(let i=0;i<45;i++){
+        const x=(i/44-.5)*2.65,z=(j/28-.5)*1.75,r=Math.hypot(x+.2,z),y=.14*Math.sin(x*2+z*2+t*.28)+.24*Math.exp(-((r-.7)**2)*6);
+        point(x,y,z,(i+j)%7?0:1,.33+.24*(1-Math.abs(x)/1.5),.8);
+      }
+      // Spatial tokens gather into a shared representation above the patch plane.
+      for(let i=0;i<560;i++){const a=i*2.39996,r=.35*Math.sqrt((i+.5)/560),x=.25+Math.cos(a)*r,z=Math.sin(a)*r;point(x,-.54+.07*Math.sin(a+t*.5),z,1,.58,.82);}
+      for(let i=0;i<5;i++){const a=i*TAU/5;trace(arc([Math.cos(a)*1.05,.12,Math.sin(a)*.64],[.25,-.54,0],.22),i%2,i*.12);}
+    }
+    function agents(){
+      const hubs=[[0,0,0]];for(let j=0;j<6;j++){const a=j*TAU/6;hubs.push([1.12*Math.cos(a),.62*Math.sin(a),.20*Math.sin(a*2)]);}
+      hubs.forEach((c,j)=>{const count=j?150:300,r=j?.145:.25;for(let i=0;i<count;i++){const y=1-2*(i+.5)/count,a=i*2.39996+t*.04,rr=Math.sqrt(1-y*y);point(c[0]+Math.cos(a)*rr*r,c[1]+y*r,c[2]+Math.sin(a)*rr*r,j%2,.51+(y+1)*.12,.85);}if(j)trace(arc([0,0,0],c,.05,(j%2?1:-1)*.14),j%2,j*.13);});
+      for(let j=1;j<hubs.length;j++)path(arc(hubs[j],hubs[j===6?1:j+1],.07),0,.13,.5);
+    }
+    function world(){
+      // A latent state gives rise to alternative action-conditioned trajectories.
+      const branchCount=7;
+      for(let branch=0;branch<branchCount;branch++){
+        const angle=(branch-3)*.20,coords=[];
+        for(let i=0;i<=85;i++){const u=i/85,x=-1.34+u*2.65,y=Math.sin(angle)*u*u*1.75+.09*Math.sin(u*5+t*.25+branch)*u,z=Math.cos(angle*2)*.42*u+(branch%2?1:-1)*.16*Math.sin(u*Math.PI);coords.push([x,y,z]);for(let n=0;n<5;n++){const a=n*TAU/5+u*5+t*.1;point(x,y+Math.sin(a)*(.025+.045*u),z+Math.cos(a)*(.025+.045*u),branch%2,.28+.23*u,.75);}}
+        trace(coords,branch%2,branch*.11);
+        const end=coords[85];for(let j=0;j<80;j++){const a=j*2.39996,r=.085*Math.sqrt(j/80);point(end[0]+Math.cos(a)*r,end[1]+Math.sin(a)*r,end[2],branch%2,.55,.85);}
+      }
+      for(let n=0;n<300;n++){const a=n*2.39996,y=1-2*(n+.5)/300,r=.19*Math.sqrt(1-y*y);point(-1.32+Math.cos(a)*r,y*.19,Math.sin(a)*r,2,.65,.9);}
+    }
+    function control(){
+      // Waveform lanes, timed events, and a physical output: a control system,
+      // rather than another generic network or a decorative PCB silhouette.
+      for(let lane=0;lane<5;lane++){
+        const y=(lane-2)*.25,z=(lane-2)*.06,coords=[];
+        for(let i=0;i<=160;i++){const u=i/160,x=-1.42+u*2.6;let v;
+          if(lane%2===0)v=Math.sin((u*5-t*.11)*TAU)*Math.exp(-Math.pow((u-.56)*3.6,2))*.095;
+          else v=((u>.2&&u<.34)||(u>.57&&u<.78)?-.11:.04);
+          coords.push([x,y+v,z]);point(x,y+v,z,lane%2,.55, .83);
+        }
+        path(coords,lane%2,.22,.55);const u=fract(t*.09+lane*.13);point(-1.42+u*2.6,y,z,lane%2,.9,1.8);
+      }
+      for(let j=0;j<5;j++)for(let i=0;i<10;i++)point(1.34+(i/9-.5)*.23,(j/4-.5)*1.05,0,1,.45,.95);
+      for(const x of [-.9,.1,.7]){const coords=[];for(let j=0;j<18;j++)coords.push([x,(j/17-.5)*1.35,0]);path(coords,2,.18,.6);}
+    }
+    function quantum(){
+      // Two distributed network nodes and interfering optical paths; not Bloch
+      // spheres and not a claimed simulation of a particular experimental state.
+      for(const side of [-1,1]){
+        const cx=side*.97;
+        for(let n=0;n<650;n++){const a=n*2.39996,b=TAU*fract(n*.61803),r=.32+.065*Math.cos(b);point(cx+Math.cos(a)*r,Math.sin(a)*r,Math.sin(b)*.065,side<0?0:1,.36+.22*Math.sin(b)**2,.83);}
+        for(let n=0;n<140;n++){const a=n*2.39996,y=1-2*(n+.5)/140,r=.115*Math.sqrt(1-y*y);point(cx+Math.cos(a)*r,y*.115,Math.sin(a)*r,side<0?0:1,.72,.91);}
+      }
+      for(let k=0;k<2;k++){const coords=[];for(let i=0;i<=140;i++){const u=i/140,a=u*TAU*1.5+t*.42+k*Math.PI;coords.push([- .97+u*1.94,.10*Math.sin(a)*Math.sin(u*Math.PI),.10*Math.cos(a)*Math.sin(u*Math.PI)]);if(i%2===0)point(...coords[coords.length-1],k,.35,.65);}trace(coords,k,k*.5);}
+    }
+    const draw={transformer,training,vision,agents,world,control,quantum};
+    function render(){
+      if(w<2||h<2)return;g.scale=g.baseScale;g.cx=g.baseCx;g.cy=g.baseCy;points=[];paths=[];labels=[];ctx.fillStyle=PAPER;ctx.fillRect(0,0,w,h);
+      const glow=ctx.createRadialGradient(g.cx,g.cy,0,g.cx,g.cy,g.width*.6);glow.addColorStop(0,'rgba(219,226,238,.52)');glow.addColorStop(.55,'rgba(230,225,238,.17)');glow.addColorStop(1,'rgba(246,245,241,0)');ctx.fillStyle=glow;ctx.fillRect(g.left,g.top,g.width,g.height);
+      (draw[mode]||draw.transformer)();
+      if(!hero&&points.length){
+        // Fit the projected object, not just a theoretical bounding sphere.
+        // Wide and narrow cards keep the complete surface and trajectory tips.
+        let loX=Infinity,loY=Infinity,hiX=-Infinity,hiY=-Infinity;
+        for(const v of points){const q=project(v.x,v.y,v.z);loX=Math.min(loX,q.x);hiX=Math.max(hiX,q.x);loY=Math.min(loY,q.y);hiY=Math.max(hiY,q.y);}
+        const factor=Math.min(1.25,(g.width-14)/Math.max(1,hiX-loX),(g.height-14)/Math.max(1,hiY-loY));
+        g.scale*=factor;g.cx=g.left+g.width*.5-((loX+hiX)*.5-g.baseCx)*factor;g.cy=g.top+g.height*.5-((loY+hiY)*.5-g.baseCy)*factor;
+      }
+      ctx.save();ctx.beginPath();ctx.rect(g.left,g.top,g.width,g.height);ctx.clip();
+      for(const p of paths){ctx.beginPath();p.coords.forEach((v,i)=>{const q=project(...v);if(i)ctx.lineTo(q.x,q.y);else ctx.moveTo(q.x,q.y);});ctx.strokeStyle=palette[p.c];ctx.globalAlpha=p.a;ctx.lineWidth=p.width;ctx.stroke();}
+      const projected=points.map(v=>({...v,...project(v.x,v.y,v.z)}));projected.sort((a,b)=>b.d-a.d);
+      for(const p of projected){ctx.globalAlpha=clamp(p.a*(1-p.d*.13),.1,1);ctx.fillStyle=palette[p.c];ctx.beginPath();ctx.arc(p.x,p.y,Math.max(.45,p.r*(hero?(small?.95:1.1):.90)*p.s),0,TAU);ctx.fill();}
+      ctx.globalAlpha=1;
+      for(const l of labels){const p=project(l.x,l.y,l.z);ctx.font=`500 ${small?9:10}px "Space Grotesk",sans-serif`;ctx.textAlign='center';ctx.fillStyle=palette[l.c];ctx.fillText(l.s,p.x,p.y);}
+      ctx.restore();host.dataset.fieldPoints=String(points.length);host.dataset.fieldFrame=String(Math.round(t*30));
+    }
+    const scene={tick(delta){t+=delta;const e=1-Math.exp(-delta*4);px+=(tx-px)*e;py+=(ty-py)*e;render();},get visible(){return visible;},setVisible(v){visible=v;host.dataset.fieldRunning=String(v&&!hidden&&!document.hidden);wake();},measure};scenes.push(scene);
+    if(typeof ResizeObserver==='function')new ResizeObserver(measure).observe(host);
+    if(typeof IntersectionObserver==='function')new IntersectionObserver(es=>scene.setVisible(es[0].isIntersecting),{rootMargin:'30px',threshold:0}).observe(host);
+    measure();
+  }
+  function tick(now){raf=0;if(hidden||document.hidden)return;const interval=1000/28,elapsed=now-then;if(elapsed>=interval){const delta=Math.min(.08,(now-lastPaint)/1000);then=now-elapsed%interval;lastPaint=now;for(const s of scenes)if(s.visible)s.tick(delta);}if(scenes.some(s=>s.visible))raf=requestAnimationFrame(tick);}
+  function wake(){if(!raf&&!hidden&&!document.hidden&&scenes.some(s=>s.visible)){then=lastPaint=performance.now();raf=requestAnimationFrame(tick);}}
+  heroCanvases.forEach(c=>make(c,c.closest('.research-field')||c.parentElement,'transformer',true));
+  topics.forEach(host=>{let c=host.matches('canvas')?host:host.querySelector('canvas');if(!c){c=document.createElement('canvas');host.append(c);}make(c,host,host.dataset.topicField);});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){if(raf)cancelAnimationFrame(raf);raf=0;}scenes.forEach(s=>s.setVisible(s.visible));wake();});
+  window.addEventListener('pagehide',()=>{hidden=true;if(raf)cancelAnimationFrame(raf);raf=0;});window.addEventListener('pageshow',()=>{hidden=false;wake();});
+})();
+
 /* Interactive research studies. Original Canvas 2D geometry; no remote dependencies.
  * Conceptual illustrations, not experimental results or measured model internals.
  * Pointer and keyboard input share one state; offscreen scenes suspend rendering.
  */
 (() => {
   'use strict';
-  const canvases = [...new Set(document.querySelectorAll('canvas[data-research-field], .research-field > canvas, .quantum-field-stage > canvas, #research-field, #quantum-field'))];
+  const canvases = [...new Set(document.querySelectorAll('canvas[data-research-field], .research-field > canvas, .quantum-field-stage > canvas, #research-field, #quantum-field'))].filter(c=>c.dataset.fieldRenderer!=='v13');
   if (!canvases.length) return;
   const TAU=Math.PI*2,PAPER='#f6f5f1';
   const INK=[47,76,119],BLUE=[71,105,165],PLUM=[116,88,142],PALE=[130,153,186];

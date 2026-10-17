@@ -55,3 +55,5 @@
 .wm-topic-nav a:hover,.wm-topic-nav a:focus-visible{color:#223f63;border-bottom-color:#5d7a9d}
 .wm-sources li>span,.wm-inline-source,.wm-timeline .wm-inline-source,.wm-figure figcaption small{font-size:11px;line-height:1.8;color:#5c708c}
 @media(max-width:620px){.wm-hero .handshake-stage{margin-top:28px;margin-inline:0}.wm-hero-caption{font-size:10px;line-height:1.7}.wm-hero-caption span+span{margin-top:7px}.wm-topic-nav{gap:0 20px;padding-block:12px;margin-top:23px}.wm-topic-nav a{font-size:11px}.wm-figure figcaption small,.wm-timeline .wm-inline-source,.wm-sources li>span{font-size:11px}}
+.wm-teaser-art .wm-topic-field{width:100%;height:190px;aspect-ratio:auto;border-bottom:1px solid #dce2e9;pointer-events:none}
+@media(max-width:620px){.wm-teaser-art .wm-topic-field{height:160px}}
