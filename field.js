@@ -266,7 +266,11 @@
       ctx.restore();host.dataset.fieldPoints=String(points.length);host.dataset.fieldFrame=String(Math.round(t*30));host.dataset.fieldRenders=String(++renderCount);
     }
     const scene={tick(delta){t+=delta;const e=1-Math.exp(-delta*4);px+=(tx-px)*e;py+=(ty-py)*e;render();},get visible(){return visible;},setVisible(v){visible=v;host.dataset.fieldRunning=String(v&&!hidden&&!document.hidden);wake();},measure};scenes.push(scene);
-    if(typeof ResizeObserver==='function')new ResizeObserver(measure).observe(surface);
+    // Measuring also updates responsive title/layout styles. Defer those writes
+    // until the next frame so they cannot re-enter ResizeObserver delivery.
+    let measureFrame=0;
+    const queueMeasure=()=>{if(!measureFrame)measureFrame=requestAnimationFrame(()=>{measureFrame=0;measure();});};
+    if(typeof ResizeObserver==='function')new ResizeObserver(queueMeasure).observe(surface);
     if(typeof IntersectionObserver==='function')new IntersectionObserver(es=>scene.setVisible(es[0].isIntersecting),{rootMargin:'30px',threshold:0}).observe(surface);
     measure();
   }

@@ -1,0 +1,70 @@
+/* Recruitment and collaboration: identity, evidence, then depth. */
+.home-overview .landing-moon{min-height:0}
+.home-overview .research-field.scientific-field.landing-moon .landing-content{padding-block:42px 86px;align-items:center}
+.home-overview .research-field.scientific-field.landing-moon .scientific-field-copy h1{font-size:clamp(48px,4.9vw,72px);line-height:1.08;margin:23px 0 26px;letter-spacing:-.055em}
+.home-overview .research-field.scientific-field.landing-moon[data-field-layout="stacked"] .scientific-field-copy h1{font-size:min(var(--field-title-size,60px),64px)}
+.home-overview .landing-moon .eyebrow{font-size:10px;letter-spacing:.1em}
+.hero-credentials{display:grid;gap:7px;margin-bottom:20px}
+.hero-credentials>a{display:grid;grid-template-columns:116px minmax(0,1fr);column-gap:10px;align-items:baseline;line-height:1.55}
+.hero-credentials strong{font-size:15px;font-weight:600;color:var(--ink)}
+.hero-credentials span{font-size:12px;color:var(--muted)}
+.hero-credentials a:hover strong{text-decoration:underline;text-underline-offset:4px;color:var(--accent)}
+.home-overview .landing-moon .landing-intro{font-size:14px;line-height:1.8;color:#526178;max-width:59ch;margin:0}
+.hero-evidence{display:grid;border-top:1px solid #ccd5e0;margin-top:23px}
+.hero-evidence>a{display:grid;grid-template-columns:102px minmax(0,1fr) 14px;gap:12px;align-items:center;border-bottom:1px solid #d9dfe7;padding:13px 0;min-width:0}
+.hero-evidence-area{font-size:10px;line-height:1.55;color:#587092;max-width:12ch}
+.hero-evidence-detail{min-width:0;display:grid;gap:3px}
+.hero-evidence-detail strong{font-size:14px;line-height:1.5;font-weight:550;letter-spacing:-.015em;color:#23334d}
+.hero-evidence-detail small{font-size:11px;line-height:1.6;color:#52657e}
+.hero-evidence-arrow{font-size:14px;color:#5d789f;transition:transform .2s}
+.hero-evidence>a:hover{background:#eaf0f65c}
+.hero-evidence>a:hover .hero-evidence-arrow{transform:translate(2px,-2px)}
+.home-overview .landing-moon .hero-actions{margin-top:24px;gap:12px 22px}
+.home-overview .hero-actions .button{font-size:12px;min-height:44px;padding:10px 20px}
+.hero-contact{font-size:11px;line-height:1.6;min-height:44px;display:inline-flex;align-items:center;gap:7px;color:#526b91}
+.hero-contact:hover{text-decoration:underline;text-underline-offset:5px}
+.industry-scope{list-style:none;padding:0;margin:24px 0 26px;display:grid;grid-template-columns:1fr 1fr;gap:12px 22px}
+.industry-scope li{font-size:12px;line-height:1.65;border-top:1px solid #cad4e1;padding-top:10px;color:#365171}
+.home-overview .overview-introduction{padding-block:65px}
+.home-overview .overview-capability .overview-capability-field{height:145px;margin-bottom:14px}
+.home-overview .overview-capability h3{font-size:23px}
+.home-overview .overview-capability p{min-height:0;max-width:37ch}
+.home-overview .overview-capabilities{margin-top:28px}
+.home-overview .overview-industry-art img{padding:8px;max-height:none;width:100%}
+.home-overview .overview-industry-art>span{font-family:var(--font);font-size:11px;letter-spacing:0}
+.project-diagram-hint{display:flex;justify-content:flex-end;align-items:center;gap:8px;font-size:12px;line-height:1.6;padding:13px 6px 2px;color:#405f88}
+.rn-experiment-example{padding:22px 26px;margin-top:25px;background:#edf1f6;border-left:2px solid #7894b7}
+.rn-experiment-example h3{margin:0 0 10px;font-size:19px;line-height:1.4;letter-spacing:-.025em}
+.rn-experiment-example p{margin:0 0 14px;font-size:14px}
+.rn-experiment-example a{font-size:13px;color:#365e8e;text-decoration:underline;text-underline-offset:4px}
+@media(max-width:1100px){
+ .home-overview .research-field.scientific-field.landing-moon .landing-content{padding-block:35px 76px;gap:20px}
+ .hero-credentials>a{grid-template-columns:116px minmax(0,1fr)}
+ .hero-evidence{max-width:680px}
+}
+@media(max-width:760px){
+ .home-overview .research-field.scientific-field.landing-moon .landing-content{padding-top:26px}
+ .home-overview .research-field.scientific-field.landing-moon .scientific-field-copy h1{margin:18px 0 20px;line-height:1.08}
+ .hero-credentials{gap:6px;margin-bottom:16px}
+ .hero-credentials>a{grid-template-columns:100px minmax(0,1fr);gap:7px}
+ .hero-credentials strong{font-size:14px}.hero-credentials span{font-size:11px;line-height:1.55}
+ .home-overview .landing-moon .landing-intro{font-size:13px;line-height:1.75}
+ .hero-evidence{margin-top:18px}
+ .hero-evidence>a{grid-template-columns:78px minmax(0,1fr) 12px;gap:9px;padding:12px 0}
+ .hero-evidence-area{font-size:9px;max-width:12ch}
+ .hero-evidence-detail strong{font-size:13px;line-height:1.55}
+ .hero-evidence-detail small{font-size:10px;line-height:1.6}
+ .home-overview .landing-moon .hero-actions{margin-top:19px;gap:8px 16px}
+ .hero-contact{font-size:11px}
+ .home-overview .overview-introduction{padding-block:44px}
+ .home-overview .overview-capability .overview-capability-field{height:130px}
+ .industry-scope{gap:12px 16px}.industry-scope li{font-size:11px}
+}
+@media(max-width:360px){
+ .hero-credentials>a{grid-template-columns:84px minmax(0,1fr)}
+ .hero-credentials strong{font-size:12px}
+ .hero-evidence>a{grid-template-columns:65px minmax(0,1fr) 10px;gap:7px}
+ .hero-evidence-detail strong{font-size:12px}
+ .hero-evidence-detail small{font-size:10px}
+}
+@media print{.hero-evidence>a{break-inside:avoid}.hero-evidence-arrow{display:none}}
